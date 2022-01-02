@@ -56,8 +56,7 @@ class Session:
 
         url = urljoin(self._base_url, path)
         response = await self._client.get(url)  # type: ignore
-        Session._check_error(response)
-        return response.json()
+        return Session._check_error(response).json()
 
     async def post(self, path: str, content: Any = None):
         """
@@ -77,8 +76,7 @@ class Session:
             url,
             content=json_content
         )
-        Session._check_error(response)
-        return response.json()
+        return Session._check_error(response).json()
 
     async def close(self):
         """
@@ -99,6 +97,13 @@ class Session:
 
     @staticmethod
     def _check_error(response: Response):
+        """
+        从服务器响应中检查错误。
+
+        返回：
+            传入的 `response` 参数。
+        """
         if int(response.status_code / 10) != 20:  # type: ignore
             content = response.json()
             raise ApiError(content["code"], content["message"])
+        return response
