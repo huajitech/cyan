@@ -76,5 +76,18 @@ class Guild:
             以 `Member` 类型表示成员的 `list[T]` 集合。
         """
 
-        content = await self._session.get(f"/guilds/{self.identifier}/members")
-        return list(map(Member, content))
+        members = await self._session.get(f"/guilds/{self.identifier}/members")
+        return list(map(Member, members))
+
+    async def get_member(self, identifier: str):
+        """
+        异步获取当前频道的指定 ID 成员。
+
+        返回：
+            以 `Member` 类型表示成员的 `list[T]` 集合。
+        """
+
+        props = await self._session.get(
+            f"/guilds/{self.identifier}/members/{identifier}"
+        )
+        return Member(props)
