@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "cz-emoji-conventional": "^1.0.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-emoji-conventional"
+    }
+  }
+}
