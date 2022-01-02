@@ -16,3 +16,9 @@ pyright = "^0.0.13"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = ["cyan"]
+exclude = ["**/node_modules", "**/__pycache__"]
+typeCheckingMode = "strict"
+reportImportCycles = "none"
