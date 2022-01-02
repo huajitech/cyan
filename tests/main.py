@@ -12,9 +12,27 @@ async def main():
 
     current_user = await session.get_current_user()
     print(
+        "Current User Info:\n "
         f"ID: {current_user.identifier}, Name: {current_user.name}, "
         f"Bot: {current_user.bot}"
     )
+
+    guilds = await session.get_guilds()
+    print(
+        "Guilds:\n" + "\n".join([
+            f" ID: {guild.identifier}, Name: {guild.name}"
+            for guild in guilds
+        ])
+    )
+
+    if guilds:
+        guild = guilds[0]
+        members = await guild.get_members()
+        print(f"Guild {guild} Members:\n" + "\n".join([
+            f" ID: {member.as_user().identifier}, Nickname: {member.nickname},"
+            f" Roles: {member.roles}, Joined Time: {member.joined_time}"
+            for member in members
+        ]))
 
     await session.close()
 
