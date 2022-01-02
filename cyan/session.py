@@ -86,7 +86,7 @@ class Session:
 
     async def close(self):
         """
-        异步关闭会话。
+        异步关闭当前会话。
         """
 
         await self._client.aclose()
@@ -99,11 +99,25 @@ class Session:
             以 `User` 类型表示的当前用户。
         """
 
-        from cyan.model import User
+        from cyan.model.user import User  # 防止循环引用。
 
         props = await self.get("/users/@me")
         props["bot"] = True
         return User(props)
+
+    async def get_guild(self, identifier: str):
+        """
+        异步获取指定 ID 频道。
+
+        参数：
+            - identifier: 频道 ID
+
+        返回：
+            以 `Guild` 类型表示的频道。
+        """
+        from cyan.model.guild import Guild  # 防止循环引用。
+
+        return Guild(self, await self.get(f"/guilds/{identifier}"))
 
     async def get_guilds(self):
         """
@@ -113,7 +127,7 @@ class Session:
             以 `Guild` 类型表示频道的 `list[T]` 集合。
         """
 
-        from cyan.model import Guild
+        from cyan.model.guild import Guild  # 防止循环引用。
 
         cur = None
         guilds = list[Guild]()
@@ -127,6 +141,21 @@ class Session:
             if len(content) < Session._QUERY_LIMIT:
                 return guilds
             cur = guilds[-1].identifier
+
+    async def get_channel(self, identifier: str):
+        """
+        异步获取指定 ID 子频道。
+
+        参数：
+            - identifier: 频道 ID
+
+        返回：
+            以 `Channel` 类型表示的子频道。
+        """
+
+        from cyan.model.channel import Channel
+
+        return Channel(self, await self.get(f"/channel/{identifier}"))
 
     @staticmethod
     def _check_error(response: Response):

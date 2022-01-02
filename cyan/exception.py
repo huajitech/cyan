@@ -2,6 +2,7 @@ class CyanException(Exception):
     """
     当 Cyan 出现异常时抛出。
     """
+
     pass
 
 
@@ -9,6 +10,7 @@ class ApiError(CyanException):
     """
     当 API 返回错误时抛出。
     """
+
     _code: int
     _message: str
 
@@ -16,6 +18,7 @@ class ApiError(CyanException):
         """
         初始化 `ApiError` 实例。
         """
+
         self._code = code
         self._message = message
 
@@ -24,6 +27,7 @@ class ApiError(CyanException):
         """
         错误代码。
         """
+    
         return self._code
 
     @property
@@ -31,4 +35,5 @@ class ApiError(CyanException):
         """
         错误消息。
         """
+
         return self._message

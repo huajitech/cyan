@@ -24,7 +24,7 @@ class Member:
     @property
     def nickname(self) -> str:
         """
-        用户昵称。
+        成员昵称。
         """
 
         return self._props["nick"]
@@ -32,7 +32,7 @@ class Member:
     @property
     def joined_time(self) -> datetime:
         """
-        入群时间。
+        成员入群时间。
         """
 
         return self._props["joined_at"]
@@ -52,5 +52,5 @@ class Member:
         返回：
             当前实例的 `User` 形式。
         """
-
+        
         return User(self._props["user"])

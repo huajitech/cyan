@@ -1,8 +1,9 @@
 from typing import Any
 from httpx import AsyncClient
 
+from cyan.session import Session
 from cyan.model.member import Member
-from cyan import Session
+from cyan.model.channel import Channel
 
 
 class Guild:
@@ -18,6 +19,7 @@ class Guild:
         初始化 `Guild` 实例。
 
         参数：
+            - session: 会话
             - props: 属性
         """
 
@@ -46,7 +48,7 @@ class Guild:
         频道最大成员数。
         """
 
-        return self._props["max_members"]
+        return self._props.get("max_members", -1)
 
     @property
     def description(self) -> str:
@@ -54,7 +56,7 @@ class Guild:
         频道描述。
         """
 
-        return self._props["description"]
+        return self._props.get("description", "")
 
     async def get_icon(self):
         """
@@ -83,11 +85,27 @@ class Guild:
         """
         异步获取当前频道的指定 ID 成员。
 
+        参数：
+            - identifier: 成员 ID
+
         返回：
-            以 `Member` 类型表示成员的 `list[T]` 集合。
+            以 `Member` 类型表示的成员。
         """
 
         props = await self._session.get(
             f"/guilds/{self.identifier}/members/{identifier}"
         )
         return Member(props)
+
+    async def get_channels(self):
+        """
+        异步获取当前频道的所有子频道。
+
+        返回：
+            以 `Channel` 类型表示成员的 `list[T]` 集合。
+        """
+
+        channels = await self._session.get(
+            f"/guilds/{self.identifier}/channels"
+        )
+        return [Channel(self._session, channel) for channel in channels]

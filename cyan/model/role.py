@@ -8,13 +8,13 @@ class DefaultRole(Enum):
     """
     ADMINISTRATOR = "2"
     """
-    管理员
+    管理员。
     """
     OWNER = "4"
     """
-    创建者
+    创建者。
     """
     OPERATOR = "5"
     """
-    子频道管理员
+    子频道管理员。
     """

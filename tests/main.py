@@ -20,7 +20,8 @@ async def main():
     guilds = await session.get_guilds()
     print(
         "Guilds:\n" + "\n".join([
-            f" ID: {guild.identifier}, Name: {guild.name}"
+            f" ID: {guild.identifier}, Name: {guild.name},"
+            f" Capacity: {guild.capacity}, Description: {guild.description}"
             for guild in guilds
         ])
     )
@@ -33,6 +34,15 @@ async def main():
             f" Roles: {member.roles}, Joined Time: {member.joined_time}"
             for member in members
         ]))
+
+        channels = await guild.get_channels()
+        print("Channels:\n" + "\n".join(
+            [
+                f" ID: {channel.identifier}, Name: {channel.name},"
+                f" Type: {channel.channel_type}, SubType: {channel.channel_subtype}"
+                for channel in channels
+            ]
+        ))
 
     await session.close()
 
