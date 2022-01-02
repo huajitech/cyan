@@ -56,8 +56,7 @@ class Guild:
 
         return self._props["description"]
 
-    @property
-    async def icon(self) -> bytes:
+    async def get_icon(self):
         """
         异步获取频道头像。
 
