@@ -38,7 +38,8 @@ async def main():
             print("Channels:\n" + "\n".join(
                 [
                     f" ID: {channel.identifier}, Name: {channel.name},"
-                    f" Type: {channel.channel_type}, SubType: {channel.channel_subtype}"
+                    f" Type: {channel.channel_type}, SubType: {channel.channel_subtype},"
+                    f" Parent: {(await channel.get_parent()).name}"
                     for channel in channels
                 ]
             ))

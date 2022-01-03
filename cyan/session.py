@@ -1,10 +1,15 @@
 import json
 from dataclasses import dataclass
+from types import TracebackType
 from typing import Any
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
-from cyan.exception import ApiError
+from cyan.exception import ApiError, InvalidTargetError
+
+
+# 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html 的最大拉取量。
+QUERY_LIMIT = 2
 
 
 @dataclass
@@ -28,9 +33,6 @@ class Session:
     """
     会话。
     """
-
-    # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html 的最大拉取量。
-    _QUERY_LIMIT = 2
 
     _base_url: str
     _client: AsyncClient
@@ -124,7 +126,7 @@ class Session:
         异步获取当前会话的所有频道。
 
         返回：
-            以 `Guild` 类型表示频道的 `list[T]` 集合。
+            以 `Guild` 类型表示频道的 `list` 集合。
         """
 
         from cyan.model.guild import Guild  # 防止循环引用。
@@ -132,13 +134,13 @@ class Session:
         cur = None
         guilds = list[Guild]()
         while True:
-            params = {"limit": str(Session._QUERY_LIMIT)}
+            params: dict[str, Any] = {"limit": QUERY_LIMIT}
             params.update(
                 {"after": cur} if cur else {}
             )
             content = await self.get("/users/@me/guilds", params)
             guilds.extend([Guild(self, guild) for guild in content])
-            if len(content) < Session._QUERY_LIMIT:
+            if len(content) < QUERY_LIMIT:
                 return guilds
             cur = guilds[-1].identifier
 
@@ -155,12 +157,53 @@ class Session:
 
         from cyan.model.channel import Channel
 
-        return Channel(self, await self.get(f"/channel/{identifier}"))
+        channel = await self._get_channel_core(identifier)
+        if isinstance(channel, Channel):
+            return channel
+        raise InvalidTargetError("指定的 ID 不为子频道。")
+
+    async def get_channel_group(self, identifier: str):
+        """
+        异步获取指定 ID 子频道。
+
+        参数：
+            - identifier: 频道 ID
+
+        返回：
+            以 `Channel` 类型表示的子频道。
+        """
+
+        from cyan.model.channel import ChannelGroup
+
+        channel = await self._get_channel_core(identifier)
+        if isinstance(channel, ChannelGroup):
+            return channel
+        raise InvalidTargetError("指定的 ID 不为子频道组。")
+
+    async def _get_channel_core(self, identifier: str):
+        """
+        异步获取指定 ID 子频道或子频道组。
+
+        参数：
+            - identifier: 频道 ID
+
+        返回：
+            以 `Channel` 类型表示的子频道或以 `ChannelGroup` 类型表示的子频道组。
+        """
+
+        from cyan.model.channel import parse as parse_channel
+
+        return parse_channel(self, await self.get(f"/channels/{identifier}"))
 
     async def __aenter__(self):
         return self
 
-    async def __aexit__(self):
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] = ...,
+        exc_value: BaseException = ...,
+        traceback: TracebackType = ...
+    ):
         await self.aclose()
 
     @staticmethod

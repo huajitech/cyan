@@ -2,8 +2,9 @@ from typing import Any
 from httpx import AsyncClient
 
 from cyan.session import Session
-from cyan.model.member import Member
+from cyan.model.channel import parse as channel_parse
 from cyan.model.channel import Channel
+from cyan.model.member import Member
 
 
 class Guild:
@@ -75,7 +76,7 @@ class Guild:
         异步获取当前频道的所有成员。
 
         返回：
-            以 `Member` 类型表示成员的 `list[T]` 集合。
+            以 `Member` 类型表示成员的 `list` 集合。
         """
 
         members = await self._session.get(f"/guilds/{self.identifier}/members")
@@ -102,10 +103,36 @@ class Guild:
         异步获取当前频道的所有子频道。
 
         返回：
-            以 `Channel` 类型表示成员的 `list[T]` 集合。
+            以 `Channel` 类型表示子频道的 `list` 集合。
+        """
+        return [
+            channel
+            for channel in await self._get_channels_core()
+            if isinstance(channel, Channel)
+        ]
+
+    async def get_channel_groups(self):
+        """
+        异步获取当前频道的所有子频道组。
+
+        返回：
+            以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
+        """
+        return [
+            channel
+            for channel in await self._get_channels_core()
+            if isinstance(channel, Channel)
+        ]
+
+    async def _get_channels_core(self):
+        """
+        异步获取当前频道的所有子频道及子频道组。
+
+        返回：
+            以 `Channel` 类型表示子频道及以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
         """
 
         channels = await self._session.get(
             f"/guilds/{self.identifier}/channels"
         )
-        return [Channel(self._session, channel) for channel in channels]
+        return [channel_parse(self._session, props) for props in channels]

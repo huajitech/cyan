@@ -6,6 +6,14 @@ class CyanException(Exception):
     pass
 
 
+class InvalidTargetError(Exception):
+    """
+    当目标无效时抛出。
+    """
+
+    pass
+
+
 class ApiError(CyanException):
     """
     当 API 返回错误时抛出。
