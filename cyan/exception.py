@@ -6,7 +6,7 @@ class CyanException(Exception):
     pass
 
 
-class InvalidTargetError(Exception):
+class InvalidTargetError(CyanException):
     """
     当目标无效时抛出。
     """
