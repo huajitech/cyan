@@ -28,14 +28,14 @@ async def main():
         if guilds:
             guild = guilds[0]
             members = await guild.get_members()
-            print(f"Guild {guild} Members:\n" + "\n".join([
+            print(f"Guild {guild.name} Members:\n" + "\n".join([
                 f" ID: {member.as_user().identifier}, Nickname: {member.nickname},"
                 f" Roles: {member.roles}, Joined Time: {member.joined_time}"
                 for member in members
             ]))
 
             channel_groups = await guild.get_channel_groups()
-            print("Channels:\n" + "\n".join(
+            print("Channel Groups:\n" + "\n".join(
                 [
                     f" ID: {group.identifier}, Name: {group.name},"
                     f" Owner: {getattr(await group.get_owner(), 'nickname', None)}"
