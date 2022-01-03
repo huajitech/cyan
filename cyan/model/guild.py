@@ -101,7 +101,6 @@ class Guild:
                 if ex.code == 130000:
                     return members
 
-
     async def get_member(self, identifier: str):
         """
         异步获取当前频道的指定 ID 成员。
