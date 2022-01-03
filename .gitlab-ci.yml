@@ -8,7 +8,6 @@ variables:
 cache:
   paths:
     - .cache/pip
-    - venv/
     - $HOME/.npm
 
 before_script:
@@ -16,11 +15,9 @@ before_script:
   - python -V
   - node -v
 
-  - pip install poetry -q -i $PYPI_MIRROR
-  - poetry shell
-
 test:
   script:
+    - pip install poetry -q -i $PYPI_MIRROR
     - poetry install
     - npm install -g pyright --registry $NPM_MIRROR
 
