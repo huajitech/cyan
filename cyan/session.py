@@ -5,11 +5,8 @@ from typing import Any
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
+from cyan.constant import GUILD_QUERY_LIMIT
 from cyan.exception import ApiError, InvalidTargetError
-
-
-# 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html 的最大拉取量。
-QUERY_LIMIT = 2
 
 
 @dataclass
@@ -134,13 +131,13 @@ class Session:
         cur = None
         guilds = list[Guild]()
         while True:
-            params: dict[str, Any] = {"limit": QUERY_LIMIT}
+            params: dict[str, Any] = {"limit": GUILD_QUERY_LIMIT}
             params.update(
                 {"after": cur} if cur else {}
             )
             content = await self.get("/users/@me/guilds", params)
             guilds.extend([Guild(self, guild) for guild in content])
-            if len(content) < QUERY_LIMIT:
+            if len(content) < GUILD_QUERY_LIMIT:
                 return guilds
             cur = guilds[-1].identifier
 

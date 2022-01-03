@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any
-from cyan import DEFAULT_ID
 
+from cyan.constant import DEFAULT_ID
 from cyan.session import Session
 from cyan.utils.enum import get_enum_key
 

@@ -1,6 +1,8 @@
 from typing import Any
 from httpx import AsyncClient
 
+from cyan.constant import MEMBER_QUERY_LIMIT
+from cyan.exception import ApiError
 from cyan.session import Session
 from cyan.model.channel import Channel, ChannelGroup, parse as channel_parse
 from cyan.model.member import Member
@@ -78,8 +80,27 @@ class Guild:
             以 `Member` 类型表示成员的 `list` 集合。
         """
 
-        members = await self._session.get(f"/guilds/{self.identifier}/members")
-        return list(map(Member, members))
+        cur = None
+        members = list[Member]()
+        while True:
+            params: dict[str, Any] = {"limit": MEMBER_QUERY_LIMIT}
+            params.update(
+                {"after": cur} if cur else {}
+            )
+            try:
+                content = await self._session.get(
+                    f"/guilds/{self.identifier}/members",
+                    params
+                )
+                members.extend(map(Member, content))
+                if len(content) < MEMBER_QUERY_LIMIT:
+                    return members
+                cur = members[-1].as_user().identifier
+            except ApiError as ex:
+                # 若当前成员为频道最后一个元素时，API 会抛出代码为 130000 错误。
+                if ex.code == 130000:
+                    return members
+
 
     async def get_member(self, identifier: str):
         """
