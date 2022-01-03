@@ -22,3 +22,8 @@ include = ["cyan"]
 exclude = ["**/node_modules", "**/__pycache__"]
 typeCheckingMode = "strict"
 reportImportCycles = "none"
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+default = true
