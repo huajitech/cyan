@@ -84,7 +84,7 @@ class Session:
         )
         return Session._check_error(response).json()
 
-    async def close(self):
+    async def aclose(self):
         """
         异步关闭当前会话。
         """
@@ -156,6 +156,12 @@ class Session:
         from cyan.model.channel import Channel
 
         return Channel(self, await self.get(f"/channel/{identifier}"))
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self):
+        await self.aclose()
 
     @staticmethod
     def _check_error(response: Response):
