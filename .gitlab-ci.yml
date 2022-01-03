@@ -16,13 +16,11 @@ before_script:
   - python -V
   - node -v
 
-  - pip install virtualenv -i $PYPI_MIRROR
-  - virtualenv venv
-  - source venv/bin/activate
+  - pip install poetry -q -i $PYPI_MIRROR
+  - poetry shell
 
 test:
-  script:   
-    - pip install poetry flake8 -q -i $PYPI_MIRROR
+  script:
     - poetry install
     - npm install -g pyright --registry $NPM_MIRROR
 
