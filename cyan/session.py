@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
 from cyan.constant import GUILD_QUERY_LIMIT
-from cyan.exception import ApiError, InvalidTargetError
+from cyan.exception import OpenApiError, InvalidTargetError
 
 
 @dataclass
@@ -213,5 +213,9 @@ class Session:
         """
         if int(response.status_code / 10) != 20:  # type: ignore
             content = response.json()
-            raise ApiError(content["code"], content["message"])
+            raise OpenApiError(
+                response.status_code,  # type: ignore
+                content["code"],
+                content["message"]
+            )
         return response

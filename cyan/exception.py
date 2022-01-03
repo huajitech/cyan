@@ -14,21 +14,23 @@ class InvalidTargetError(Exception):
     pass
 
 
-class ApiError(CyanException):
+class OpenApiError(CyanException):
     """
-    当 API 返回错误时抛出。
+    当 OpenAPI 返回错误时抛出。
     """
 
     _code: int
     _message: str
+    _status_code: int
 
-    def __init__(self, code: int, message: str):
+    def __init__(self, status_code: int, code: int, message: str):
         """
         初始化 `ApiError` 实例。
         """
 
         self._code = code
         self._message = message
+        self._status_code = status_code
 
     @property
     def code(self):
@@ -37,6 +39,14 @@ class ApiError(CyanException):
         """
 
         return self._code
+
+    @property
+    def status_code(self):
+        """
+        HTTP 状态码。
+        """
+
+        return self._status_code
 
     @property
     def message(self):

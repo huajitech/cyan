@@ -2,7 +2,7 @@ from typing import Any
 from httpx import AsyncClient
 
 from cyan.constant import MEMBER_QUERY_LIMIT
-from cyan.exception import ApiError
+from cyan.exception import OpenApiError
 from cyan.session import Session
 from cyan.model.channel import Channel, ChannelGroup, parse as channel_parse
 from cyan.model.member import Member
@@ -96,7 +96,7 @@ class Guild:
                 if len(content) < MEMBER_QUERY_LIMIT:
                     return members
                 cur = members[-1].as_user().identifier
-            except ApiError as ex:
+            except OpenApiError as ex:
                 # 若当前成员为频道最后一个元素时，API 会抛出代码为 130000 错误。
                 if ex.code == 130000:
                     return members
