@@ -35,7 +35,7 @@ class ApiError(CyanException):
         """
         错误代码。
         """
-    
+
         return self._code
 
     @property

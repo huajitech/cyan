@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any
+from cyan import DEFAULT_ID
 
 from cyan.session import Session
 from cyan.utils.enum import get_enum_key
@@ -120,12 +121,15 @@ class ChannelGroup:
         获取子频道组创建者。
 
         返回：
-            以 `User` 类型表示的当前子频道创建者。
+            当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
+            若不存在，则返回 None。
         """
 
+        identifier = self._props["owner_id"]
+        if identifier == DEFAULT_ID:
+            return None
         guild = await self.get_guild()
-        member = await guild.get_member(self._props["owner_id"])
-        return member.as_user()
+        return await guild.get_member(identifier)
 
     async def get_guild(self):
         """
@@ -216,15 +220,18 @@ class Channel:
 
     async def get_owner(self):
         """
-        获取子频道创建者。
+        获取子频道组创建者。
 
         返回：
-            以 `User` 类型表示的当前子频道创建者。
+            当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
+            若不存在，则返回 None。
         """
 
+        identifier = self._props["owner_id"]
+        if identifier == DEFAULT_ID:
+            return None
         guild = await self.get_guild()
-        member = await guild.get_member(self._props["owner_id"])
-        return member.as_user()
+        return await guild.get_member(identifier)
 
     async def get_parent(self):
         """

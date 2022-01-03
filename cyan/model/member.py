@@ -52,5 +52,5 @@ class Member:
         返回：
             当前实例的 `User` 形式。
         """
-        
+
         return User(self._props["user"])

@@ -34,14 +34,22 @@ async def main():
                 for member in members
             ]))
 
-            channels = await guild.get_channels()
+            channel_groups = await guild.get_channel_groups()
             print("Channels:\n" + "\n".join(
                 [
-                    f" ID: {channel.identifier}, Name: {channel.name},"
-                    f" Type: {channel.channel_type}, SubType: {channel.channel_subtype},"
-                    f" Parent: {(await channel.get_parent()).name}"
-                    for channel in channels
+                    f" ID: {group.identifier}, Name: {group.name},"
+                    f" Owner: {getattr(await group.get_owner(), 'nickname', None)}"
+                    for group in channel_groups
                 ]
             ))
+
+            channels = await guild.get_channels()
+            print("Channels:\n" + "\n".join([
+                f" ID: {channel.identifier}, Name: {channel.name},"
+                f" Type: {channel.channel_type}, SubType: {channel.channel_subtype},"
+                f" Parent: {(await channel.get_parent()).name},"
+                f" Owner: {getattr(await channel.get_owner(), 'nickname', None)}"
+                for channel in channels
+            ]))
 
 asyncio.run(main())

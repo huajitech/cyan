@@ -2,8 +2,7 @@ from typing import Any
 from httpx import AsyncClient
 
 from cyan.session import Session
-from cyan.model.channel import parse as channel_parse
-from cyan.model.channel import Channel
+from cyan.model.channel import Channel, ChannelGroup, parse as channel_parse
 from cyan.model.member import Member
 
 
@@ -105,6 +104,7 @@ class Guild:
         返回：
             以 `Channel` 类型表示子频道的 `list` 集合。
         """
+
         return [
             channel
             for channel in await self._get_channels_core()
@@ -118,10 +118,11 @@ class Guild:
         返回：
             以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
         """
+
         return [
             channel
             for channel in await self._get_channels_core()
-            if isinstance(channel, Channel)
+            if isinstance(channel, ChannelGroup)
         ]
 
     async def _get_channels_core(self):
