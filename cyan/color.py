@@ -13,6 +13,7 @@ class ARGB:
         """
         Alpha 透明度通道。
         """
+
         return self._alpha
 
     @property
@@ -20,6 +21,7 @@ class ARGB:
         """
         红色通道。
         """
+
         return self._red
 
     @property
@@ -27,6 +29,7 @@ class ARGB:
         """
         绿色通道。
         """
+
         return self._green
 
     @property
@@ -34,6 +37,7 @@ class ARGB:
         """
         蓝色通道。
         """
+
         return self._blue
 
     def __init__(self, alpha: int, red: int, green: int, blue: int):

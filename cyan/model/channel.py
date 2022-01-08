@@ -221,6 +221,10 @@ class Channel:
 
 
 class TextChannel(Channel):
+    """
+    文字子频道。
+    """
+
     @property
     def text_channel_type(self):
         """
@@ -263,6 +267,10 @@ class ForumChannel(Channel):
 
 
 class UnknownChannel(Channel):
+    """
+    未知子频道。
+    """
+
     @property
     def channel_type(self):
         """

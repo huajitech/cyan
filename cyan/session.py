@@ -189,17 +189,6 @@ class Session:
 
         return parse_channel(self, await self.get(f"/channels/{identifier}"))
 
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] = ...,
-        exc_value: BaseException = ...,
-        traceback: TracebackType = ...
-    ):
-        await self.aclose()
-
     @staticmethod
     def _check_error(response: Response):
         """
@@ -216,3 +205,14 @@ class Session:
                 content["message"]
             )
         return response
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] = ...,
+        exc_value: BaseException = ...,
+        traceback: TracebackType = ...
+    ):
+        await self.aclose()
