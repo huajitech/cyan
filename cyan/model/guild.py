@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from typing import Any
 from httpx import AsyncClient
 
@@ -97,7 +98,7 @@ class Guild:
                     params
                 )
                 content = response.json()
-                members.extend([Member(self, member) for member in content])
+                members.extend([Member(self._bot, self, member) for member in content])
                 if len(content) < _MEMBER_QUERY_LIMIT:
                     return members
                 cur = members[-1].as_user().identifier
@@ -121,7 +122,7 @@ class Guild:
 
         response = await self._bot.get(f"/guilds/{self.identifier}/members/{identifier}")
         member = response.json()
-        return Member(self, member)
+        return Member(self._bot, self, member)
 
     async def get_channels(self):
         """
@@ -234,3 +235,32 @@ class Guild:
             content=content
         )
         return Role(self._bot, self, response.json()["role"])
+
+    async def mute(self, duration: timedelta):
+        """
+        异步禁言当前频道指定时长。
+
+        参数：
+            - duration: 禁言时长。
+        """
+
+        content = {"mute_seconds": str(duration.seconds)}
+        await self._bot.patch(f"/guilds/{self.identifier}/mute", content=content)
+
+    async def mute_until(self, time: datetime):
+        """
+        异步禁言当前频道至指定时间。
+
+        参数：
+            - time: 禁言终止时间。
+        """
+
+        content = {"mute_end_timestamp": str(int(time.timestamp()))}
+        await self._bot.patch(f"/guilds/{self.identifier}/mute", content=content)
+
+    async def unmute(self):
+        """
+        异步解除当前频道的禁言。
+        """
+
+        await self.mute(timedelta())

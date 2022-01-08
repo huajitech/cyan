@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
+from cyan.bot import Bot
 from cyan.model.guild import Guild
 from cyan.model.user import User
 
@@ -10,10 +11,11 @@ class Member:
     成员。
     """
 
+    _bot: Bot
     _guild: Guild
     _props: dict[str, Any]
 
-    def __init__(self, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
         """
         初始化 `Member` 实例。
 
@@ -21,6 +23,7 @@ class Member:
             - props: 属性
         """
 
+        self._bot = bot
         self._guild = guild
         self._props = props
 
@@ -39,6 +42,14 @@ class Member:
         """
 
         return self._props["joined_at"]
+
+    @property
+    def guild(self):
+        """
+        成员所属频道。
+        """
+
+        return self._guild
 
     async def get_roles(self):
         """
@@ -61,3 +72,32 @@ class Member:
         """
 
         return User(self._props["user"])
+
+    async def mute(self, duration: timedelta):
+        """
+        异步禁言当前成员指定时长。
+        """
+
+        content = {"mute_seconds": str(duration.seconds)}
+        await self._bot.patch(
+            f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
+            content=content
+        )
+
+    async def mute_until(self, time: datetime):
+        """
+        异步禁言当前成员至指定时间。
+        """
+
+        content = {"mute_end_timestamp": str(time.timestamp())}
+        await self._bot.patch(
+            f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
+            content=content
+        )
+
+    async def unmute(self):
+        """
+        异步解除当前频道的禁言。
+        """
+
+        await self.mute(timedelta())
