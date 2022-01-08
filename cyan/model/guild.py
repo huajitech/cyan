@@ -1,10 +1,12 @@
 from typing import Any
 from httpx import AsyncClient
 
-from cyan.constant import MEMBER_QUERY_LIMIT
 from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
 from cyan.model.role import Role
+
+# 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
+_MEMBER_QUERY_LIMIT = 1000
 
 
 class Guild:
@@ -84,7 +86,7 @@ class Guild:
         cur = None
         members = list[Member]()
         while True:
-            params: dict[str, Any] = {"limit": MEMBER_QUERY_LIMIT}
+            params: dict[str, Any] = {"limit": _MEMBER_QUERY_LIMIT}
             params.update(
                 {"after": cur} if cur else {}
             )
@@ -95,7 +97,7 @@ class Guild:
                 )
                 content = response.json()
                 members.extend([Member(self, member) for member in content])
-                if len(content) < MEMBER_QUERY_LIMIT:
+                if len(content) < _MEMBER_QUERY_LIMIT:
                     return members
                 cur = members[-1].as_user().identifier
             except OpenApiError as ex:

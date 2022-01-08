@@ -4,8 +4,10 @@ from typing import Any
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
-from cyan.constant import GUILD_QUERY_LIMIT
 from cyan.exception import OpenApiError, InvalidTargetError
+
+# 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html。
+_GUILD_QUERY_LIMIT = 100
 
 
 @dataclass
@@ -176,14 +178,14 @@ class Bot:
         cur = None
         guilds = list[Guild]()
         while True:
-            params: dict[str, Any] = {"limit": GUILD_QUERY_LIMIT}
+            params: dict[str, Any] = {"limit": _GUILD_QUERY_LIMIT}
             params.update(
                 {"after": cur} if cur else {}
             )
             response = await self.get("/users/@me/guilds", params)
             content = response.json()
             guilds.extend([Guild(self, guild) for guild in content])
-            if len(content) < GUILD_QUERY_LIMIT:
+            if len(content) < _GUILD_QUERY_LIMIT:
                 return guilds
             cur = guilds[-1].identifier
 
