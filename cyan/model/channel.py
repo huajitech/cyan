@@ -177,7 +177,7 @@ class Channel:
 
     async def get_owner(self):
         """
-        获取子频道组创建者。
+        异步获取子频道组创建者。
 
         返回：
             当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
@@ -192,7 +192,7 @@ class Channel:
 
     async def get_parent(self):
         """
-        获取子频道附属的子频道组。
+        异步获取子频道附属的子频道组。
 
         返回：
             以 `Channel` 类型表示的当前子频道附属的子频道组。
@@ -200,7 +200,7 @@ class Channel:
 
         return await self._bot.get_channel_group(self._props["parent_id"])
 
-    async def is_child_of(self, parent: ChannelGroup):
+    def is_child_of(self, parent: ChannelGroup) -> bool:
         """
         判断当前子频道是否为指定子频道组的成员。
 
@@ -211,7 +211,7 @@ class Channel:
 
     async def get_guild(self):
         """
-        获取子频道附属的频道。
+        异步获取子频道附属的频道。
 
         返回：
             以 `Guild` 类型表示的当前子频道附属的频道。

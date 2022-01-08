@@ -1,6 +1,6 @@
 import asyncio
-from cyan.color import ARGB
 
+from cyan.color import ARGB
 from cyan.model.channel import AppChannel, TextChannel
 from cyan.bot import Bot, Ticket
 
