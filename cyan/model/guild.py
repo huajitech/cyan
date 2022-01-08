@@ -1,9 +1,10 @@
 from typing import Any
 from httpx import AsyncClient
 
+from cyan.color import ARGB
 from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
-from cyan.model.role import Role
+
 
 # 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
 _MEMBER_QUERY_LIMIT = 1000
@@ -176,9 +177,11 @@ class Guild:
             以 `Role` 类型表示身份组的 `list` 集合。
         """
 
+        from cyan.model.role import Role
+
         response = await self._bot.get(f"/guilds/{self.identifier}/roles")
         roles = response.json()["roles"]
-        return list(map(Role, roles))
+        return [Role(self._bot, self, role) for role in roles]
 
     async def get_role(self, identifier: str):
         """
@@ -197,12 +200,37 @@ class Guild:
                 return role
         raise InvalidTargetError("所指定 ID 的身份组不存在。")
 
-    async def delete_role(self, role: Role):
+    async def create_role(
+        self,
+        name: str | None = None,
+        color: ARGB | None = None,
+        shown: bool | None = None
+    ):
         """
-        异步删除当前频道的指定身份组。
+        异步在当前频道创建身份组。
 
         参数：
-            - role: 将要删除的身份组
-        """
+            - identifier: 身份组 ID
 
-        await self._bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
+        返回：
+            以 `Role` 类型表示的身份组。
+        """
+    
+        from cyan.model.role import Role
+
+        _filter = {
+            "name": int(name is not None),
+            "color": int(color is not None),
+            "hoist": int(shown is not None)
+        }
+        info = {
+            "name": name,
+            "color": color.to_hex() if color else None,
+            "hoist": int(bool(shown))
+        }
+        content = { "filter": _filter, "info": info }
+        response = await self._bot.post(
+            f"/guilds/{self.identifier}/roles",
+            content=content
+        )
+        return Role(self._bot, self, response.json()["role"])

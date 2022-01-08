@@ -45,7 +45,7 @@ class Member:
         异步获取当前成员的所有所属身份组。
 
         返回：
-            以 `Role` 类型表示当前成员所属身份组的 `tuple` 集合。
+            以 `Role` 类型表示当前成员所属身份组的 `list` 集合。
         """
 
         roles = await self._guild.get_roles()

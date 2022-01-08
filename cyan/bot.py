@@ -64,36 +64,38 @@ class Bot:
         response = await self._client.get(url, params=params)  # type: ignore
         return Bot._check_error(response)
 
-    async def post(self, path: str, params: dict[str, Any] | None = None):
+    async def post(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
         """
         异步向服务器请求 POST 操作。
 
         参数：
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
+            - content: 请求内容（将序列化为 JSON）
 
         返回：
             以 `Response` 类型表示的服务器响应。
         """
 
         url = urljoin(self._base_url, path)
-        response = await self._client.post(url, params=params)  # type: ignore
+        response = await self._client.post(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
-    async def put(self, path: str, params: dict[str, Any] | None = None):
+    async def put(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
         """
         异步向服务器请求 PUT 操作。
 
         参数：
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
+            - content: 请求内容（将序列化为 JSON）
 
         返回：
             以 `Response` 类型表示的服务器响应。
         """
 
         url = urljoin(self._base_url, path)
-        response = await self._client.put(url, params=params)  # type: ignore
+        response = await self._client.put(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
     async def delete(self, path: str, params: dict[str, Any] | None = None):
@@ -112,20 +114,21 @@ class Bot:
         response = await self._client.delete(url, params=params)  # type: ignore
         return Bot._check_error(response)
 
-    async def patch(self, path: str, params: dict[str, Any] | None = None):
+    async def patch(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
         """
         异步向服务器请求 PATCH 操作。
 
         参数：
             - path: 请求路径（不包含 API 地址）
-            - content: 请求内容
+            - params: 请求参数
+            - content: 请求内容（将序列化为 JSON）
 
         返回：
             以 `Response` 类型表示的服务器响应。
         """
 
         url = urljoin(self._base_url, path)
-        response = await self._client.patch(url, params=params)  # type: ignore
+        response = await self._client.patch(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
     async def aclose(self):

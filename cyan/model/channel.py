@@ -228,7 +228,7 @@ class TextChannel(Channel):
     @property
     def text_channel_type(self):
         """
-        文字频道类型。
+        文字子频道类型。
         """
 
         return get_enum_key(TextChannelType, self._props["sub_type"])
