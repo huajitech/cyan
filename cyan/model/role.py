@@ -155,8 +155,8 @@ class Role:
             "color": int(color is not None),
             "hoist": int(shown is not None)
         }
-        info = { "name": name, "color": color, "hoist": int(bool(shown)) }
-        content = { "filter": _filter, "info": info }
+        info = {"name": name, "color": color, "hoist": int(bool(shown))}
+        content = {"filter": _filter, "info": info}
         response = await self._bot.patch(
             f"/guilds/{self._guild.identifier}/roles/{self.identifier}",
             content=content

@@ -215,7 +215,7 @@ class Guild:
         返回：
             以 `Role` 类型表示的身份组。
         """
-    
+
         from cyan.model.role import Role
 
         _filter = {
@@ -228,7 +228,7 @@ class Guild:
             "color": color.to_hex() if color else None,
             "hoist": int(bool(shown))
         }
-        content = { "filter": _filter, "info": info }
+        content = {"filter": _filter, "info": info}
         response = await self._bot.post(
             f"/guilds/{self.identifier}/roles",
             content=content
