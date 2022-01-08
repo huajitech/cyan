@@ -6,46 +6,7 @@ from cyan.session import Session
 from cyan.utils.enum import get_enum_key
 
 
-GROUP_CHANNEL_TYPE = 4
-
-
-class ChannelType(Enum):
-    TEXT = 0
-    """
-    文字子频道。
-    """
-
-    # RESERVED = 1
-
-    VOICE = 2
-    """
-    语音子频道。
-    """
-
-    # RESERVED = 3
-
-    # GROUP = 4
-    # """
-    # 子频道分组。
-    # """
-
-    LIVE = 10005
-    """
-    直播子频道。
-    """
-
-    APP = 10006
-    """
-    应用子频道。
-    """
-
-    FORUM = 10007
-    """
-    论坛子频道。
-    """
-
-
-class ChannelSubType(Enum):
+class TextChannelType(Enum):
     CHAT = 0
     """
     闲聊。
@@ -207,22 +168,6 @@ class Channel:
         return self._props["name"]
 
     @property
-    def channel_type(self):
-        """
-        子频道类型。
-        """
-
-        return get_enum_key(ChannelType, self._props["type"])
-
-    @property
-    def channel_subtype(self):
-        """
-        子频道子类型。
-        """
-
-        return get_enum_key(ChannelSubType, self._props["sub_type"])
-
-    @property
     def visibility(self):
         """
         子频道可见性。
@@ -275,7 +220,71 @@ class Channel:
         return await self._session.get_guild(self._props["guild_id"])
 
 
-def parse(session: Session, d: dict[str, Any]):
+class TextChannel(Channel):
+    @property
+    def text_channel_type(self):
+        """
+        文字频道类型。
+        """
+
+        return get_enum_key(TextChannelType, self._props["sub_type"])
+
+
+class VoiceChannel(Channel):
+    """
+    语音子频道。
+    """
+
+    pass
+
+
+class LiveChannel(Channel):
+    """
+    直播子频道。
+    """
+
+    pass
+
+
+class AppChannel(Channel):
+    """
+    应用子频道。
+    """
+
+    pass
+
+
+class ForumChannel(Channel):
+    """
+    论坛子频道。
+    """
+
+    pass
+
+
+class UnknownChannel(Channel):
+    @property
+    def channel_type(self):
+        """
+        子频道类型。
+        """
+
+        return get_enum_key(TextChannelType, self._props["type"])
+
+
+CHANNEL_TYPE_MAPPING = {
+    0: TextChannel,
+    # 1: Reserved,
+    2: VoiceChannel,
+    # 3: Reserved,
+    4: ChannelGroup,
+    10005: LiveChannel,
+    10006: AppChannel,
+    10007: ForumChannel
+}
+
+
+def parse(session: Session, d: dict[str, Any]) -> Channel | ChannelGroup:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 
@@ -283,7 +292,5 @@ def parse(session: Session, d: dict[str, Any]):
         当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组，否则返回以 `Channel` 类型表示的子频道。
     """
 
-    channel = Channel(session, d)
-    if channel.channel_type == GROUP_CHANNEL_TYPE:
-        return ChannelGroup(session, d)
-    return channel
+    channel_type = CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
+    return channel_type(session, d)

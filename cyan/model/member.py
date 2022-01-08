@@ -35,7 +35,7 @@ class Member:
     @property
     def joined_time(self) -> datetime:
         """
-        成员入群时间。
+        成员加入时间。
         """
 
         return self._props["joined_at"]

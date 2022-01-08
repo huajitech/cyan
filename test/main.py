@@ -1,6 +1,7 @@
 import asyncio
+from cyan.model.channel import TextChannel
 
-from cyan import Session, Ticket
+from cyan.session import Session, Ticket
 
 
 async def main():
@@ -54,8 +55,10 @@ async def main():
             channels = await guild.get_channels()
             print(f"Guild {guild.name} Channels:\n" + "\n".join([
                 f" ID: {channel.identifier}, Name: {channel.name},"
-                f" Type: {channel.channel_type}, SubType: {channel.channel_subtype},"
-                f" Parent: {(await channel.get_parent()).name},"
+                f" Type: {channel.__class__.__name__}, " + (
+                    f" SubType: {channel.text_channel_type},"
+                    if isinstance(channel, TextChannel) else ""
+                ) + f" Parent: {(await channel.get_parent()).name},"
                 f" Owner: {getattr(await channel.get_owner(), 'nickname', None)}"
                 for channel in channels
             ]))
