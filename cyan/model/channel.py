@@ -280,7 +280,7 @@ class UnknownChannel(Channel):
         return get_enum_key(TextChannelType, self._props["type"])
 
 
-CHANNEL_TYPE_MAPPING = {
+_CHANNEL_TYPE_MAPPING = {
     0: TextChannel,
     # 1: Reserved,
     2: VoiceChannel,
@@ -300,5 +300,5 @@ def parse(bot: Bot, d: dict[str, Any]) -> Channel | ChannelGroup:
         当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组，否则返回以 `Channel` 类型表示的子频道。
     """
 
-    channel_type = CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
+    channel_type = _CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
     return channel_type(bot, d)

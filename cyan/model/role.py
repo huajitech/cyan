@@ -1,6 +1,33 @@
+from enum import Enum
 from typing import Any
 
 from cyan.color import ARGB
+
+
+class DefaultRoleId(Enum):
+    """
+    默认身份组 ID。
+    """
+
+    DEFAULT = "1"
+    """
+    默认。
+    """
+
+    ADMINISTRATOR = "2"
+    """
+    管理员。
+    """
+
+    OWNER = "4"
+    """
+    创建者。
+    """
+
+    OPERATOR = "5"
+    """
+    子频道管理员。
+    """
 
 
 class Role:
@@ -56,4 +83,4 @@ class Role:
         身份组是否在成员列表中单独展示。
         """
 
-        return self._props["hoist"]
+        return bool(self._props["hoist"])

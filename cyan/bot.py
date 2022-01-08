@@ -1,4 +1,3 @@
-import json
 from dataclasses import dataclass
 from types import TracebackType
 from typing import Any
@@ -56,29 +55,76 @@ class Bot:
             - params: 请求参数
 
         返回：
-            反序列化后的服务器返回内容。
+            以 `Response` 类型表示的服务器响应。
         """
 
         url = urljoin(self._base_url, path)
         response = await self._client.get(url, params=params)  # type: ignore
-        return Bot._check_error(response).json()
+        return Bot._check_error(response)
 
-    async def post(self, path: str, content: Any = None):
+    async def post(self, path: str, params: dict[str, Any] | None = None):
         """
         异步向服务器请求 POST 操作。
+
+        参数：
+            - path: 请求路径（不包含 API 地址）
+            - params: 请求参数
+
+        返回：
+            以 `Response` 类型表示的服务器响应。
+        """
+
+        url = urljoin(self._base_url, path)
+        response = await self._client.post(url, params=params)  # type: ignore
+        return Bot._check_error(response)
+
+    async def put(self, path: str, params: dict[str, Any] | None = None):
+        """
+        异步向服务器请求 PUT 操作。
+
+        参数：
+            - path: 请求路径（不包含 API 地址）
+            - params: 请求参数
+
+        返回：
+            以 `Response` 类型表示的服务器响应。
+        """
+
+        url = urljoin(self._base_url, path)
+        response = await self._client.put(url, params=params)  # type: ignore
+        return Bot._check_error(response)
+
+    async def delete(self, path: str, params: dict[str, Any] | None = None):
+        """
+        异步向服务器请求 DELETE 操作。
+
+        参数：
+            - path: 请求路径（不包含 API 地址）
+            - params: 请求参数
+
+        返回：
+            以 `Response` 类型表示的服务器响应。
+        """
+
+        url = urljoin(self._base_url, path)
+        response = await self._client.delete(url, params=params)  # type: ignore
+        return Bot._check_error(response)
+
+    async def patch(self, path: str, params: dict[str, Any] | None = None):
+        """
+        异步向服务器请求 PATCH 操作。
 
         参数：
             - path: 请求路径（不包含 API 地址）
             - content: 请求内容
 
         返回：
-            反序列化后的服务器返回内容。
+            以 `Response` 类型表示的服务器响应。
         """
 
         url = urljoin(self._base_url, path)
-        json_content = json.dumps(content)
-        response = await self._client.post(url, content=json_content)  # type: ignore
-        return Bot._check_error(response).json()
+        response = await self._client.patch(url, params=params)  # type: ignore
+        return Bot._check_error(response)
 
     async def aclose(self):
         """
@@ -97,9 +143,10 @@ class Bot:
 
         from cyan.model.user import User
 
-        props = await self.get("/users/@me")
-        props["bot"] = True
-        return User(props)
+        response = await self.get("/users/@me")
+        user = response.json()
+        user["bot"] = True
+        return User(user)
 
     async def get_guild(self, identifier: str):
         """
@@ -113,7 +160,8 @@ class Bot:
         """
         from cyan.model.guild import Guild
 
-        return Guild(self, await self.get(f"/guilds/{identifier}"))
+        response = await self.get(f"/guilds/{identifier}")
+        return Guild(self, response.json())
 
     async def get_guilds(self):
         """
@@ -132,7 +180,8 @@ class Bot:
             params.update(
                 {"after": cur} if cur else {}
             )
-            content = await self.get("/users/@me/guilds", params)
+            response = await self.get("/users/@me/guilds", params)
+            content = response.json()
             guilds.extend([Guild(self, guild) for guild in content])
             if len(content) < GUILD_QUERY_LIMIT:
                 return guilds
@@ -187,7 +236,8 @@ class Bot:
 
         from cyan.model.channel import parse as parse_channel
 
-        return parse_channel(self, await self.get(f"/channels/{identifier}"))
+        response = await self.get(f"/channels/{identifier}")
+        return parse_channel(self, response.json())
 
     @staticmethod
     def _check_error(response: Response):

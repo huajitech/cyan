@@ -1,6 +1,6 @@
 import asyncio
-from cyan.model.channel import TextChannel
 
+from cyan.model.channel import TextChannel
 from cyan.bot import Bot, Ticket
 
 
@@ -32,7 +32,8 @@ async def main():
             roles = await guild.get_roles()
             print(f"Guild {guild.name} Roles:\n" + "\n".join([
                 f" ID: {role.identifier}, Name: {role.name},"
-                f" Color: {role.color}, Capacity: {role.capacity}"
+                f" Color: {role.color}, Capacity: {role.capacity},"
+                f" Shown: {role.shown}"
                 for role in roles
             ]))
 

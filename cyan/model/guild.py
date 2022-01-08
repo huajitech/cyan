@@ -2,7 +2,7 @@ from typing import Any
 from httpx import AsyncClient
 
 from cyan.constant import MEMBER_QUERY_LIMIT
-from cyan.exception import OpenApiError
+from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
 from cyan.model.role import Role
 
@@ -89,10 +89,11 @@ class Guild:
                 {"after": cur} if cur else {}
             )
             try:
-                content = await self._bot.get(
+                response = await self._bot.get(
                     f"/guilds/{self.identifier}/members",
                     params
                 )
+                content = response.json()
                 members.extend([Member(self, member) for member in content])
                 if len(content) < MEMBER_QUERY_LIMIT:
                     return members
@@ -115,8 +116,9 @@ class Guild:
 
         from cyan.model.member import Member
 
-        props = await self._bot.get(f"/guilds/{self.identifier}/members/{identifier}")
-        return Member(self, props)
+        response = await self._bot.get(f"/guilds/{self.identifier}/members/{identifier}")
+        member = response.json()
+        return Member(self, member)
 
     async def get_channels(self):
         """
@@ -160,8 +162,9 @@ class Guild:
 
         from cyan.model.channel import parse as channel_parse
 
-        channels = await self._bot.get(f"/guilds/{self.identifier}/channels")
-        return [channel_parse(self._bot, props) for props in channels]
+        response = await self._bot.get(f"/guilds/{self.identifier}/channels")
+        channels = response.json()
+        return [channel_parse(self._bot, channel) for channel in channels]
 
     async def get_roles(self):
         """
@@ -171,10 +174,11 @@ class Guild:
             以 `Role` 类型表示身份组的 `list` 集合。
         """
 
-        content = await self._bot.get(f"/guilds/{self.identifier}/roles")
-        return list(map(Role, content["roles"]))
+        response = await self._bot.get(f"/guilds/{self.identifier}/roles")
+        roles = response.json()["roles"]
+        return list(map(Role, roles))
 
-    async def get_role(self, identifier: int):
+    async def get_role(self, identifier: str):
         """
         异步获取当前频道的指定 ID 身份组。
 
@@ -189,3 +193,14 @@ class Guild:
         for role in roles:
             if role.identifier == identifier:
                 return role
+        raise InvalidTargetError("所指定 ID 的身份组不存在。")
+
+    async def delete_role(self, role: Role):
+        """
+        异步删除当前频道的指定身份组。
+
+        参数：
+            - role: 将要删除的身份组
+        """
+
+        await self._bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
