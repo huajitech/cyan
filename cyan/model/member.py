@@ -59,7 +59,7 @@ class Member:
             以 `Role` 类型表示当前成员所属身份组的 `list` 集合。
         """
 
-        roles = await self._guild.get_roles()
+        roles = await self.guild.get_roles()
         role_map = dict([(role.identifier, role) for role in roles])
         return [role_map[role] for role in self._props["roles"]]
 

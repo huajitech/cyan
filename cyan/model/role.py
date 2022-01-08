@@ -158,7 +158,7 @@ class Role:
         info = {"name": name, "color": color, "hoist": int(bool(shown))}
         content = {"filter": _filter, "info": info}
         response = await self._bot.patch(
-            f"/guilds/{self._guild.identifier}/roles/{self.identifier}",
+            f"/guilds/{self.guild.identifier}/roles/{self.identifier}",
             content=content
         )
         self._props = response.json()["role"]

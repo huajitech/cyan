@@ -55,7 +55,7 @@ class ChannelGroup:
 
     def __init__(self, bot: Bot, props: dict[str, Any]):
         """
-        初始化 `Guild` 实例。
+        初始化 `ChannelGroup` 实例。
 
         参数：
             - bot: 机器人
@@ -141,7 +141,7 @@ class Channel:
 
     def __init__(self, bot: Bot, props: dict[str, Any]):
         """
-        初始化 `Guild` 实例。
+        初始化 `Channel` 实例。
 
         参数：
             - bot: 机器人
@@ -255,7 +255,42 @@ class AppChannel(Channel):
     应用子频道。
     """
 
-    pass
+    # TODO: 实现为获取所有日程。
+    async def get_schedules(self):
+        """
+        获取子频道当天日程列表。
+
+        返回：
+            以 `Schedule` 类型表示日程的 `list` 集合。
+        """
+
+        from cyan.model.schedule import Schedule
+
+        response = await self._bot.get(f"/channels/{self.identifier}/schedules")
+        schedules = response.json()
+        guild = await self.get_guild()
+        return (
+            [Schedule(self._bot, guild, schedule) for schedule in schedules]
+            if schedules else []
+        )
+
+    async def get_schedule(self, identifier: str):
+        """
+        获取子频道的指定 ID 日程。
+
+        参数：
+            - identifier: 日程 ID
+
+        返回：
+            以 `Schedule` 类型表示的日程。
+        """
+
+        from cyan.model.schedule import Schedule
+
+        response = await self._bot.get(f"/channels/{self.identifier}/schedules/{identifier}")
+        schedule = response.json()
+        guild = await self.get_guild()
+        return Schedule(self._bot, guild, schedule)
 
 
 class ForumChannel(Channel):
