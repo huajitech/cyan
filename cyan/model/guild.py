@@ -4,8 +4,7 @@ from httpx import AsyncClient
 from cyan.constant import MEMBER_QUERY_LIMIT
 from cyan.exception import OpenApiError
 from cyan.session import Session
-from cyan.model.channel import Channel, ChannelGroup, parse as channel_parse
-from cyan.model.member import Member
+from cyan.model.role import Role
 
 
 class Guild:
@@ -80,6 +79,8 @@ class Guild:
             以 `Member` 类型表示成员的 `list` 集合。
         """
 
+        from cyan.model.member import Member
+
         cur = None
         members = list[Member]()
         while True:
@@ -92,7 +93,7 @@ class Guild:
                     f"/guilds/{self.identifier}/members",
                     params
                 )
-                members.extend(map(Member, content))
+                members.extend([Member(self, member) for member in content])
                 if len(content) < MEMBER_QUERY_LIMIT:
                     return members
                 cur = members[-1].as_user().identifier
@@ -112,10 +113,10 @@ class Guild:
             以 `Member` 类型表示的成员。
         """
 
-        props = await self._session.get(
-            f"/guilds/{self.identifier}/members/{identifier}"
-        )
-        return Member(props)
+        from cyan.model.member import Member
+
+        props = await self._session.get(f"/guilds/{self.identifier}/members/{identifier}")
+        return Member(self, props)
 
     async def get_channels(self):
         """
@@ -124,6 +125,8 @@ class Guild:
         返回：
             以 `Channel` 类型表示子频道的 `list` 集合。
         """
+
+        from cyan.model.channel import Channel
 
         return [
             channel
@@ -139,6 +142,8 @@ class Guild:
             以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
         """
 
+        from cyan.model.channel import ChannelGroup
+
         return [
             channel
             for channel in await self._get_channels_core()
@@ -153,7 +158,34 @@ class Guild:
             以 `Channel` 类型表示子频道及以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
         """
 
-        channels = await self._session.get(
-            f"/guilds/{self.identifier}/channels"
-        )
+        from cyan.model.channel import parse as channel_parse
+
+        channels = await self._session.get(f"/guilds/{self.identifier}/channels")
         return [channel_parse(self._session, props) for props in channels]
+
+    async def get_roles(self):
+        """
+        异步获取当前频道的所有身份组。
+
+        返回：
+            以 `Role` 类型表示身份组的 `list` 集合。
+        """
+
+        content = await self._session.get(f"/guilds/{self.identifier}/roles")
+        return list(map(Role, content["roles"]))
+
+    async def get_role(self, identifier: int):
+        """
+        异步获取当前频道的指定 ID 身份组。
+
+        参数：
+            - identifier: 身份组 ID
+
+        返回：
+            以 `Role` 类型表示的身份组。
+        """
+
+        roles = await self.get_roles()
+        for role in roles:
+            if role.identifier == identifier:
+                return role

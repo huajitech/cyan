@@ -77,10 +77,7 @@ class Session:
 
         url = urljoin(self._base_url, path)
         json_content = json.dumps(content)
-        response = await self._client.post(  # type: ignore
-            url,
-            content=json_content
-        )
+        response = await self._client.post(url, content=json_content)  # type: ignore
         return Session._check_error(response).json()
 
     async def aclose(self):
@@ -98,7 +95,7 @@ class Session:
             以 `User` 类型表示的当前用户。
         """
 
-        from cyan.model.user import User  # 防止循环引用。
+        from cyan.model.user import User
 
         props = await self.get("/users/@me")
         props["bot"] = True
@@ -114,7 +111,7 @@ class Session:
         返回：
             以 `Guild` 类型表示的频道。
         """
-        from cyan.model.guild import Guild  # 防止循环引用。
+        from cyan.model.guild import Guild
 
         return Guild(self, await self.get(f"/guilds/{identifier}"))
 
@@ -126,7 +123,7 @@ class Session:
             以 `Guild` 类型表示频道的 `list` 集合。
         """
 
-        from cyan.model.guild import Guild  # 防止循环引用。
+        from cyan.model.guild import Guild
 
         cur = None
         guilds = list[Guild]()

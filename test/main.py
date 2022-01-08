@@ -27,24 +27,32 @@ async def main():
 
         if guilds:
             guild = guilds[0]
+
+            roles = await guild.get_roles()
+            print(f"Guild {guild.name} Roles:\n" + "\n".join([
+                f" ID: {role.identifier}, Name: {role.name},"
+                f" Color: {role.color}, Capacity: {role.capacity}"
+                for role in roles
+            ]))
+
             members = await guild.get_members()
             print(f"Guild {guild.name} Members:\n" + "\n".join([
-                f" ID: {member.as_user().identifier}, Nickname: {member.nickname},"
-                f" Roles: {member.roles}, Joined Time: {member.joined_time}"
+                f" ID: {member.as_user().identifier}, Name: {member.as_user().name},"
+                f" Nickname: {member.nickname},"
+                f" Roles: {[role.name for role in (await member.get_roles())]},"
+                f" Joined Time: {member.joined_time}"
                 for member in members
             ]))
 
             channel_groups = await guild.get_channel_groups()
-            print("Channel Groups:\n" + "\n".join(
-                [
-                    f" ID: {group.identifier}, Name: {group.name},"
-                    f" Owner: {getattr(await group.get_owner(), 'nickname', None)}"
-                    for group in channel_groups
-                ]
-            ))
+            print(f"Guild {guild.name} Channel Groups:\n" + "\n".join([
+                f" ID: {group.identifier}, Name: {group.name},"
+                f" Owner: {getattr(await group.get_owner(), 'nickname', None)}"
+                for group in channel_groups
+            ]))
 
             channels = await guild.get_channels()
-            print("Channels:\n" + "\n".join([
+            print(f"Guild {guild.name} Channels:\n" + "\n".join([
                 f" ID: {channel.identifier}, Name: {channel.name},"
                 f" Type: {channel.channel_type}, SubType: {channel.channel_subtype},"
                 f" Parent: {(await channel.get_parent()).name},"

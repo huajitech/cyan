@@ -14,24 +14,31 @@ class ChannelType(Enum):
     """
     文字子频道。
     """
+
     # RESERVED = 1
+
     VOICE = 2
     """
     语音子频道。
     """
+
     # RESERVED = 3
+
     # GROUP = 4
     # """
     # 子频道分组。
     # """
+
     LIVE = 10005
     """
     直播子频道。
     """
+
     APP = 10006
     """
     应用子频道。
     """
+
     FORUM = 10007
     """
     论坛子频道。
@@ -43,14 +50,17 @@ class ChannelSubType(Enum):
     """
     闲聊。
     """
+
     ANNOUNCEMENT = 1
     """
     公告。
     """
+
     STRATEGY = 2
     """
     攻略。
     """
+
     GAME = 3
     """
     开黑。
@@ -62,10 +72,12 @@ class ChannelVisibility(Enum):
     """
     所有人。
     """
+
     ADMINISTRATOR = 1
     """
     创建者及管理员。
     """
+
     APOINTEE = 2
     """
     创建者、管理员及指定人员。

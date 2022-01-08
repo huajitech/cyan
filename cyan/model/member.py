@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
 
+from cyan.model.guild import Guild
 from cyan.model.user import User
 
 
@@ -9,9 +10,10 @@ class Member:
     成员。
     """
 
+    _guild: Guild
     _props: dict[str, Any]
 
-    def __init__(self, props: dict[str, Any]):
+    def __init__(self, guild: Guild, props: dict[str, Any]):
         """
         初始化 `Member` 实例。
 
@@ -19,6 +21,7 @@ class Member:
             - props: 属性
         """
 
+        self._guild = guild
         self._props = props
 
     @property
@@ -37,13 +40,17 @@ class Member:
 
         return self._props["joined_at"]
 
-    @property
-    def roles(self) -> tuple[str]:
+    async def get_roles(self):
         """
-        成员角色。
+        异步获取当前成员的所有所属身份组。
+
+        返回：
+            以 `Role` 类型表示当前成员所属身份组的 `tuple` 集合。
         """
 
-        return tuple[str](self._props["roles"])
+        roles = await self._guild.get_roles()
+        role_map = dict([(role.identifier, role) for role in roles])
+        return [role_map[role] for role in self._props["roles"]]
 
     def as_user(self) -> User:
         """

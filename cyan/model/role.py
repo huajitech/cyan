@@ -1,20 +1,51 @@
-from enum import Enum
+from typing import Any
+
+from cyan.color import ARGB
 
 
-class DefaultRole(Enum):
-    DEFAULT = "1"
+class Role:
     """
-    默认。
+    身份组。
     """
-    ADMINISTRATOR = "2"
-    """
-    管理员。
-    """
-    OWNER = "4"
-    """
-    创建者。
-    """
-    OPERATOR = "5"
-    """
-    子频道管理员。
-    """
+
+    def __init__(self, props: dict[str, Any]):
+        """
+        初始化 `Role` 实例。
+
+        参数：
+            - props: 属性
+        """
+
+        self._props = props
+
+    @property
+    def identifier(self):
+        """
+        身份组 ID。
+        """
+
+        return self._props["id"]
+
+    @property
+    def name(self):
+        """
+        身份组名称。
+        """
+
+        return self._props["name"]
+
+    @property
+    def capacity(self):
+        """
+        身份组容量。
+        """
+
+        return self._props["member_limit"]
+
+    @property
+    def color(self):
+        """
+        身份组颜色。
+        """
+
+        return ARGB.from_hex(self._props["color"])
