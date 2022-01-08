@@ -55,7 +55,7 @@ async def main():
             channels = await guild.get_channels()
             print(f"Guild {guild.name} Channels:\n" + "\n".join([
                 f" ID: {channel.identifier}, Name: {channel.name},"
-                f" Type: {channel.__class__.__name__}, " + (
+                f" Type: {channel.__class__.__name__}," + (
                     f" SubType: {channel.text_channel_type},"
                     if isinstance(channel, TextChannel) else ""
                 ) + f" Parent: {(await channel.get_parent()).name},"

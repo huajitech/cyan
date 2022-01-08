@@ -13,7 +13,7 @@ def get_enum_key(
     参数：
         - enum: Enum 类型
         - value: 将要查询对应键的值
-        - default: 当对应键不存在时返回的默认值
+        - default: 当对应键不存在时返回的默认值（默认返回传入的 `value` 参数）
     """
 
     return enum._value2member_map_.get(
