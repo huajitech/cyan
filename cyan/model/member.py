@@ -97,7 +97,7 @@ class Member:
 
     async def unmute(self):
         """
-        异步解除当前频道的禁言。
+        异步解除当前成员的禁言。
         """
 
         await self.mute(timedelta())
