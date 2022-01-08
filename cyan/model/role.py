@@ -19,7 +19,7 @@ class Role:
         self._props = props
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """
         身份组 ID。
         """
@@ -27,7 +27,7 @@ class Role:
         return self._props["id"]
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         身份组名称。
         """
@@ -35,7 +35,7 @@ class Role:
         return self._props["name"]
 
     @property
-    def capacity(self):
+    def capacity(self) -> int:
         """
         身份组容量。
         """
@@ -49,3 +49,11 @@ class Role:
         """
 
         return ARGB.from_hex(self._props["color"])
+
+    @property
+    def shown(self) -> bool:
+        """
+        身份组是否在成员列表中单独展示。
+        """
+
+        return self._props["hoist"]
