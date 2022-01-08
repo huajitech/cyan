@@ -49,7 +49,7 @@ async def main():
             )
 
             roles = await guild.get_roles()
-            print(f"频道 {guild.name} ：\n" + "\n".join([
+            print(f"频道 {guild.name} 身份组：\n" + "\n".join([
                 f" ID：{role.identifier}，名称：{role.name}，"
                 f"颜色：{role.color}，容量：{role.capacity}，"
                 f"是否单独展示：{role.shown}"
@@ -88,7 +88,7 @@ async def main():
                     if not isinstance(channel, AppChannel):
                         continue
                     schedules = await channel.get_schedules()
-                    print(f"子频道 {channel.name} 日程:\n" + "\n".join([
+                    print(f"子频道 {channel.name} 日程：\n" + "\n".join([
                         f" ID：{schedule.identifier}，名称：{schedule.name}，"
                         f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
                         f"结束时间：{schedule.end_time}，创建者：{schedule.creator.as_user().name}，"
