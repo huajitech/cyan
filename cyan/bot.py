@@ -163,6 +163,7 @@ class Bot:
         返回：
             以 `Guild` 类型表示的频道。
         """
+
         from cyan.model.guild import Guild
 
         response = await self.get(f"/guilds/{identifier}")
@@ -252,6 +253,7 @@ class Bot:
         返回：
             传入的 `response` 参数。
         """
+
         if int(response.status_code / 10) != 20:  # type: ignore
             content = response.json()
             raise OpenApiError(
