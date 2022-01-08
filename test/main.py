@@ -1,7 +1,7 @@
 import asyncio
 from cyan.model.channel import TextChannel
 
-from cyan.session import Session, Ticket
+from cyan.bot import Bot, Ticket
 
 
 async def main():
@@ -9,15 +9,15 @@ async def main():
     app_id = input("请输入 APP ID: ")
     token = input("请输入 Token: ")
 
-    async with Session(api, Ticket(app_id, token)) as session:
-        current_user = await session.get_current_user()
+    async with Bot(api, Ticket(app_id, token)) as bot:
+        current_user = await bot.get_current_user()
         print(
             "Current User Info:\n "
             f"ID: {current_user.identifier}, Name: {current_user.name}, "
             f"Bot: {current_user.bot}"
         )
 
-        guilds = await session.get_guilds()
+        guilds = await bot.get_guilds()
         print(
             "Guilds:\n" + "\n".join([
                 f" ID: {guild.identifier}, Name: {guild.name},"

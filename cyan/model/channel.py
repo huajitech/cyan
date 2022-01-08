@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any
 
 from cyan.constant import DEFAULT_ID
-from cyan.session import Session
+from cyan.bot import Bot
 from cyan.utils.enum import get_enum_key
 
 
@@ -51,19 +51,19 @@ class ChannelGroup:
     """
 
     _props: dict[str, Any]
-    _session: Session
+    _bot: Bot
 
-    def __init__(self, session: Session, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]):
         """
         初始化 `Guild` 实例。
 
         参数：
-            - session: 会话
+            - bot: 机器人
             - props: 属性
         """
 
         self._props = props
-        self._session = session
+        self._bot = bot
 
     @property
     def identifier(self) -> str:
@@ -112,7 +112,7 @@ class ChannelGroup:
             以 `Guild` 类型表示的当前子频道附属的频道。
         """
 
-        return await self._session.get_guild(self._props["guild_id"])
+        return await self._bot.get_guild(self._props["guild_id"])
 
     async def get_children(self):
         """
@@ -137,19 +137,19 @@ class Channel:
     """
 
     _props: dict[str, Any]
-    _session: Session
+    _bot: Bot
 
-    def __init__(self, session: Session, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]):
         """
         初始化 `Guild` 实例。
 
         参数：
-            - session: 会话
+            - bot: 机器人
             - props: 属性
         """
 
         self._props = props
-        self._session = session
+        self._bot = bot
 
     @property
     def identifier(self) -> str:
@@ -198,7 +198,7 @@ class Channel:
             以 `Channel` 类型表示的当前子频道附属的子频道组。
         """
 
-        return await self._session.get_channel_group(self._props["parent_id"])
+        return await self._bot.get_channel_group(self._props["parent_id"])
 
     async def is_child_of(self, parent: ChannelGroup):
         """
@@ -217,7 +217,7 @@ class Channel:
             以 `Guild` 类型表示的当前子频道附属的频道。
         """
 
-        return await self._session.get_guild(self._props["guild_id"])
+        return await self._bot.get_guild(self._props["guild_id"])
 
 
 class TextChannel(Channel):
@@ -292,7 +292,7 @@ CHANNEL_TYPE_MAPPING = {
 }
 
 
-def parse(session: Session, d: dict[str, Any]) -> Channel | ChannelGroup:
+def parse(bot: Bot, d: dict[str, Any]) -> Channel | ChannelGroup:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 
@@ -301,4 +301,4 @@ def parse(session: Session, d: dict[str, Any]) -> Channel | ChannelGroup:
     """
 
     channel_type = CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
-    return channel_type(session, d)
+    return channel_type(bot, d)

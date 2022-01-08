@@ -26,9 +26,9 @@ class Ticket:
     """
 
 
-class Session:
+class Bot:
     """
-    会话。
+    机器人。
     """
 
     _base_url: str
@@ -36,7 +36,7 @@ class Session:
 
     def __init__(self, api_base_url: str, ticket: Ticket):
         """
-        初始化 `Session` 实例。
+        初始化 `Bot` 实例。
 
         参数：
             - api_base_url: API 地址（包括 schema, host, port）
@@ -61,7 +61,7 @@ class Session:
 
         url = urljoin(self._base_url, path)
         response = await self._client.get(url, params=params)  # type: ignore
-        return Session._check_error(response).json()
+        return Bot._check_error(response).json()
 
     async def post(self, path: str, content: Any = None):
         """
@@ -78,18 +78,18 @@ class Session:
         url = urljoin(self._base_url, path)
         json_content = json.dumps(content)
         response = await self._client.post(url, content=json_content)  # type: ignore
-        return Session._check_error(response).json()
+        return Bot._check_error(response).json()
 
     async def aclose(self):
         """
-        异步关闭当前会话。
+        异步关闭当前机器人。
         """
 
         await self._client.aclose()
 
     async def get_current_user(self):
         """
-        异步获取当前会话用户。
+        异步获取当前机器人用户。
 
         返回：
             以 `User` 类型表示的当前用户。
@@ -117,7 +117,7 @@ class Session:
 
     async def get_guilds(self):
         """
-        异步获取当前会话的所有频道。
+        异步获取当前机器人的所有频道。
 
         返回：
             以 `Guild` 类型表示频道的 `list` 集合。

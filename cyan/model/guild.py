@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from cyan.constant import MEMBER_QUERY_LIMIT
 from cyan.exception import OpenApiError
-from cyan.session import Session
+from cyan.bot import Bot
 from cyan.model.role import Role
 
 
@@ -13,19 +13,19 @@ class Guild:
     """
 
     _props: dict[str, Any]
-    _session: Session
+    _bot: Bot
 
-    def __init__(self, session: Session, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]):
         """
         初始化 `Guild` 实例。
 
         参数：
-            - session: 会话
+            - bot: 机器人
             - props: 属性
         """
 
         self._props = props
-        self._session = session
+        self._bot = bot
 
     @property
     def identifier(self) -> str:
@@ -89,7 +89,7 @@ class Guild:
                 {"after": cur} if cur else {}
             )
             try:
-                content = await self._session.get(
+                content = await self._bot.get(
                     f"/guilds/{self.identifier}/members",
                     params
                 )
@@ -115,7 +115,7 @@ class Guild:
 
         from cyan.model.member import Member
 
-        props = await self._session.get(f"/guilds/{self.identifier}/members/{identifier}")
+        props = await self._bot.get(f"/guilds/{self.identifier}/members/{identifier}")
         return Member(self, props)
 
     async def get_channels(self):
@@ -160,8 +160,8 @@ class Guild:
 
         from cyan.model.channel import parse as channel_parse
 
-        channels = await self._session.get(f"/guilds/{self.identifier}/channels")
-        return [channel_parse(self._session, props) for props in channels]
+        channels = await self._bot.get(f"/guilds/{self.identifier}/channels")
+        return [channel_parse(self._bot, props) for props in channels]
 
     async def get_roles(self):
         """
@@ -171,7 +171,7 @@ class Guild:
             以 `Role` 类型表示身份组的 `list` 集合。
         """
 
-        content = await self._session.get(f"/guilds/{self.identifier}/roles")
+        content = await self._bot.get(f"/guilds/{self.identifier}/roles")
         return list(map(Role, content["roles"]))
 
     async def get_role(self, identifier: int):
