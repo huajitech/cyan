@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -95,7 +96,7 @@ class ChannelGroup:
 
         返回：
             当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
-            若不存在，则返回 None。
+            若不存在，则返回 `None`。
         """
 
         identifier = self._props["owner_id"]
@@ -181,7 +182,7 @@ class Channel:
 
         返回：
             当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
-            若不存在，则返回 None。
+            若不存在，则返回 `None`。
         """
 
         identifier = self._props["owner_id"]
@@ -255,10 +256,13 @@ class AppChannel(Channel):
     应用子频道。
     """
 
-    # TODO: 实现为获取所有日程。
+    from cyan.model.schedule import RemindType
+
+    # TODO: 实现为获取所有日程（通过传入指定 since 参数以实现，但据目前所提供的 API 下测试失败）。
+    # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/get_schedules.html。
     async def get_schedules(self):
         """
-        获取子频道当天日程列表。
+        异步获取子频道当天日程列表。
 
         返回：
             以 `Schedule` 类型表示日程的 `list` 集合。
@@ -268,15 +272,14 @@ class AppChannel(Channel):
 
         response = await self._bot.get(f"/channels/{self.identifier}/schedules")
         schedules = response.json()
-        guild = await self.get_guild()
         return (
-            [Schedule(self._bot, guild, schedule) for schedule in schedules]
+            [Schedule(self._bot, self, schedule) for schedule in schedules]
             if schedules else []
         )
 
     async def get_schedule(self, identifier: str):
         """
-        获取子频道的指定 ID 日程。
+        异步获取子频道的指定 ID 日程。
 
         参数：
             - identifier: 日程 ID
@@ -289,8 +292,44 @@ class AppChannel(Channel):
 
         response = await self._bot.get(f"/channels/{self.identifier}/schedules/{identifier}")
         schedule = response.json()
-        guild = await self.get_guild()
-        return Schedule(self._bot, guild, schedule)
+        return Schedule(self._bot, self, schedule)
+
+    # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
+    # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/post_schedule.html。
+    async def create_schedule(
+        self,
+        name: str,
+        start_time: datetime,
+        end_time: datetime,
+        remind_type: RemindType,
+        description: str = "",
+        destination: Channel | None = None
+    ):
+        """
+        异步在当前子频道创建日程。
+
+        参数：
+            - name: 日程名称
+            - start_time: 日程开始时间
+            - end_time: 日程结束时间
+            - description: 日程描述
+            - destination: 日程指向目标子频道
+        """
+
+        from cyan.model.schedule import Schedule
+
+        schedule = {
+            "name": name,
+            "description": description,
+            "start_timestamp": int(start_time.timestamp() * 1000),
+            "end_timestamp": int(end_time.timestamp() * 1000),
+            "jump_channel_id": destination.identifier if destination else DEFAULT_ID,
+            "remind_type": str(remind_type.value)
+        }
+        content = {"schedule": schedule}
+        print(content)
+        response = await self._bot.post(f"/channels/{self.identifier}/schedules", content=content)
+        return Schedule(self._bot, self, response.json())
 
 
 class ForumChannel(Channel):

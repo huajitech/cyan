@@ -3,8 +3,9 @@ from enum import Enum
 from typing import Any
 
 from cyan.bot import Bot
-from cyan.model.guild import Guild
+from cyan.constant import DEFAULT_ID
 from cyan.model.member import Member
+from cyan.model.channel import Channel
 
 
 class RemindType(Enum):
@@ -49,10 +50,10 @@ class Schedule:
     """
 
     _bot: Bot
-    _guild: Guild
+    _channel: Channel
     _props: dict[str, Any]
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, channel: Channel, props: dict[str, Any]):
         """
         初始化 `Schedule` 实例。
 
@@ -61,7 +62,7 @@ class Schedule:
         """
 
         self._bot = bot
-        self._guild = guild
+        self._channel = channel
         self._props = props
 
     @property
@@ -105,20 +106,22 @@ class Schedule:
         return datetime.fromtimestamp(int(self._props["end_timestamp"]) / 1000)
 
     @property
-    def guild(self):
+    def channel(self):
         """
-        日程所属频道。
-        """
-
-        return self._guild
-
-    @property
-    def creator(self):
-        """
-        日程创建者。
+        日程所属子频道。
         """
 
-        return Member(self._bot, self.guild, self._props["creator"])
+        return self._channel
+
+    async def get_creator(self):
+        """
+        异步获取日程创建者。
+
+        返回：
+            以 `Member` 类型表示的子频道
+        """
+
+        return Member(self._bot, await self.channel.get_guild(), self._props["creator"])
 
     @property
     def remind_type(self):
@@ -132,7 +135,20 @@ class Schedule:
         异步获取日程指向的目标子频道。
 
         返回：
-            以 `Channel` 类型表示的子频道。
+            当存在目标子频道时，返回以 `Channel` 类型表示的子频道；若不存在，则返回 `None`。
         """
 
+        if self._props["jump_channel_id"] == DEFAULT_ID:
+            return None
         return await self._bot.get_channel(self._props["jump_channel_id"])
+
+    # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
+    # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/delete_schedule.html。
+    async def discard(self):
+        """
+        异步删除当前日程。
+        """
+
+        await self._bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")
+
+    # TODO: 实现日程信息修改。

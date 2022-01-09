@@ -147,7 +147,7 @@ class Role:
         参数：
             - name: 目标名称
             - color: 目标颜色
-            - shown: 是否在成员列表中单独展示
+            - shown: 身份组是否在成员列表中单独展示
         """
 
         _filter = {

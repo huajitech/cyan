@@ -211,7 +211,9 @@ class Guild:
         异步在当前频道创建身份组。
 
         参数：
-            - identifier: 身份组 ID
+            - name: 身份组名称
+            - color: 身份组颜色
+            - shown: 身份组是否在成员列表中单独展示
 
         返回：
             以 `Role` 类型表示的身份组。
@@ -241,7 +243,7 @@ class Guild:
         异步禁言当前频道指定时长。
 
         参数：
-            - duration: 禁言时长。
+            - duration: 禁言时长
         """
 
         content = {"mute_seconds": str(duration.seconds)}
@@ -252,7 +254,7 @@ class Guild:
         异步禁言当前频道至指定时间。
 
         参数：
-            - time: 禁言终止时间。
+            - time: 禁言终止时间
         """
 
         content = {"mute_end_timestamp": str(int(time.timestamp()))}

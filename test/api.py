@@ -88,11 +88,14 @@ async def main():
                     if not isinstance(channel, AppChannel):
                         continue
                     schedules = await channel.get_schedules()
+                    if not schedules:
+                        continue
                     print(f"子频道 {channel.name} 日程：\n" + "\n".join([
                         f" ID：{schedule.identifier}，名称：{schedule.name}，"
                         f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
-                        f"结束时间：{schedule.end_time}，创建者：{schedule.creator.as_user().name}，"
-                        f"跳转子频道：{(await schedule.get_destination()).name}，"
+                        f"结束时间：{schedule.end_time}，"
+                        f"创建者：{(await schedule.get_creator()).as_user().name}，"
+                        f"跳转子频道：{getattr(await schedule.get_destination(), 'name', None)}，"
                         f"提醒类型：{schedule.remind_type}"
                         for schedule in schedules
                     ]))
