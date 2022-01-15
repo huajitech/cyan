@@ -151,7 +151,7 @@ class Bot:
         response = await self.get("/users/@me")
         user = response.json()
         user["bot"] = True
-        return User(user)
+        return User(self, user)
 
     async def get_guild(self, identifier: str):
         """
