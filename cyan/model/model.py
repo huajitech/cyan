@@ -19,3 +19,7 @@ class Model:
         `Model` ID。
         """
         raise NotImplementedError
+
+    def __eq__(self, obj: object):
+        _type = type(self)
+        return isinstance(obj, _type) and obj.bot == self.bot and obj.identifier == self.identifier
