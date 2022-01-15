@@ -5,6 +5,7 @@ from typing import Any
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
 from cyan.model.model import Model
+from cyan.model.renovatable import AsyncRenovatable
 from cyan.util._enum import get_enum_key
 
 
@@ -47,7 +48,7 @@ class ChannelVisibility(Enum):
     """
 
 
-class ChannelGroup(Model):
+class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
     """
     子频道组。
     """
@@ -77,6 +78,10 @@ class ChannelGroup(Model):
 
     @property
     def name(self) -> str:
+        """
+        子频道组名。
+        """
+
         return self._props["name"]
 
     @property
@@ -128,8 +133,11 @@ class ChannelGroup(Model):
             if channel.is_child_of(self)
         ]
 
+    async def renovate(self):
+        return await self.bot.get_channel_group(self.identifier)
 
-class Channel(Model):
+
+class Channel(Model, AsyncRenovatable["Channel"]):
     """
     子频道。
     """
@@ -150,11 +158,11 @@ class Channel(Model):
         self._bot = bot
 
     @property
-    def identifier(self) -> str:
-        """
-        子频道 ID。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
@@ -216,6 +224,9 @@ class Channel(Model):
         """
 
         return await self.bot.get_guild(self._props["guild_id"])
+
+    async def renovate(self):
+        return await self.bot.get_channel(self.identifier)
 
 
 class TextChannel(Channel):

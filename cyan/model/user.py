@@ -34,6 +34,10 @@ class User(Model):
 
     @property
     def name(self) -> str:
+        """
+        用户名称。
+        """
+
         return self._props["username"]
 
     @property

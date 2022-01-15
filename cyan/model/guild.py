@@ -6,13 +6,14 @@ from cyan.color import ARGB
 from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
 from cyan.model.model import Model
+from cyan.model.renovatable import AsyncRenovatable
 
 
 # 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
 _MEMBER_QUERY_LIMIT = 1000
 
 
-class Guild(Model):
+class Guild(Model, AsyncRenovatable["Guild"]):
     """
     频道。
     """
@@ -42,6 +43,10 @@ class Guild(Model):
 
     @property
     def name(self) -> str:
+        """
+        频道名。
+        """
+
         return self._props["name"]
 
     @property
@@ -263,3 +268,6 @@ class Guild(Model):
         """
 
         await self.mute(timedelta())
+
+    async def renovate(self):
+        return await self.bot.get_guild(self.identifier)

@@ -19,11 +19,3 @@ class Model:
         `Model` ID。
         """
         raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        """
-        `Model` 名称。
-        """
-        raise NotImplementedError

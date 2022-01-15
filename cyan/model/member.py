@@ -4,10 +4,11 @@ from typing import Any
 from cyan.bot import Bot
 from cyan.model.guild import Guild
 from cyan.model.model import Model
+from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.user import User
 
 
-class Member(Model):
+class Member(Model, AsyncRenovatable["Member"]):
     """
     成员。
     """
@@ -34,6 +35,10 @@ class Member(Model):
 
     @property
     def name(self) -> str:
+        """
+        成员名称。
+        """
+
         return self._props["nick"]
 
     @property
@@ -102,3 +107,7 @@ class Member(Model):
         """
 
         await self.mute(timedelta())
+
+    async def renovate(self):
+        guild = await self.guild.renovate()
+        return await guild.get_member(self.identifier)

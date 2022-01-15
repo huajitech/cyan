@@ -4,9 +4,11 @@ from typing import Any
 
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
+from cyan.exception import InvalidTargetError
 from cyan.model.member import Member
-from cyan.model.channel import Channel
+from cyan.model.channel import AppChannel
 from cyan.model.model import Model
+from cyan.model.renovatable import AsyncRenovatable
 
 
 class RemindType(Enum):
@@ -45,16 +47,16 @@ class RemindType(Enum):
     """
 
 
-class Schedule(Model):
+class Schedule(Model, AsyncRenovatable["Schedule"]):
     """
     日程。
     """
 
     _bot: Bot
-    _channel: Channel
+    _channel: AppChannel
     _props: dict[str, Any]
 
-    def __init__(self, bot: Bot, channel: Channel, props: dict[str, Any]):
+    def __init__(self, bot: Bot, channel: AppChannel, props: dict[str, Any]):
         """
         初始化 `Schedule` 实例。
 
@@ -76,6 +78,10 @@ class Schedule(Model):
 
     @property
     def name(self) -> str:
+        """
+        日程名称。
+        """
+
         return self._props["name"]
 
     @property
@@ -149,3 +155,9 @@ class Schedule(Model):
         await self.bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")
 
     # TODO: 实现日程信息修改。
+
+    async def renovate(self):
+        channel = await self.channel.renovate()
+        if not isinstance(channel, AppChannel):
+            raise InvalidTargetError("目标子频道类型不为 AppChannel。")
+        return await channel.get_schedule(self.identifier)  # type: AppChannel

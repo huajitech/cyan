@@ -5,6 +5,7 @@ from cyan.bot import Bot
 from cyan.color import ARGB
 from cyan.model.guild import Guild
 from cyan.model.model import Model
+from cyan.model.renovatable import AsyncRenovatable
 
 
 class DefaultRoleId(Enum):
@@ -33,7 +34,7 @@ class DefaultRoleId(Enum):
     """
 
 
-class Role(Model):
+class Role(Model, AsyncRenovatable["Role"]):
     """
     身份组。
     """
@@ -64,6 +65,10 @@ class Role(Model):
 
     @property
     def name(self) -> str:
+        """
+        成员组名称。
+        """
+
         return self._props["name"]
 
     @property
@@ -166,3 +171,7 @@ class Role(Model):
         """
 
         await self.bot.delete(f"/guilds/{self.guild.identifier}/roles/{self.identifier}")
+
+    async def renovate(self):
+        guild = await self.guild.renovate()
+        return await guild.get_role(self.identifier)
