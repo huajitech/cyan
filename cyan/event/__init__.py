@@ -32,7 +32,7 @@ class Intent(Enum):
     """
     事件注册 `Intent`。
     """
-    
+
     DEFAULT = 0
     """
     默认。
