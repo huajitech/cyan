@@ -33,7 +33,7 @@ async def main():
         print(
             "当前用户信息：\n "
             f"ID: {current_user.identifier}，名称：{current_user.name}，"
-            f"是否为机器人：{current_user.bot}"
+            f"是否为机器人：{current_user.is_bot}"
         )
 
         guilds = await bot.get_guilds()
