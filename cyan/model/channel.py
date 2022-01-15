@@ -335,7 +335,6 @@ class AppChannel(Channel):
             "remind_type": str(remind_type.value)
         }
         content = {"schedule": schedule}
-        print(content)
         response = await self.bot.post(f"/channels/{self.identifier}/schedules", content=content)
         return Schedule(self.bot, self, response.json())
 
