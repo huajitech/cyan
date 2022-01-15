@@ -4,6 +4,7 @@ from typing import Any
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
+from cyan.model.guild import Guild
 from cyan.model.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.util._enum import get_enum_key
@@ -54,9 +55,10 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
     """
 
     _props: dict[str, Any]
+    _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
         """
         初始化 `ChannelGroup` 实例。
 
@@ -66,6 +68,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         """
 
         self._props = props
+        self._guild = guild
         self._bot = bot
 
     @property
@@ -83,6 +86,14 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         """
 
         return self._props["name"]
+
+    @property
+    def guild(self):
+        """
+        子频道组附属频道。
+        """
+
+        return self._guild
 
     @property
     def visibility(self):
@@ -143,9 +154,10 @@ class Channel(Model, AsyncRenovatable["Channel"]):
     """
 
     _props: dict[str, Any]
+    _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
         """
         初始化 `Channel` 实例。
 
@@ -155,6 +167,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
 
         self._props = props
+        self._guild = guild
         self._bot = bot
 
     @property
@@ -172,6 +185,14 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
 
         return self._props["name"]
+
+    @property
+    def guild(self):
+        """
+        子频道附属频道。
+        """
+
+        return self._guild
 
     @property
     def visibility(self):
@@ -193,8 +214,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         identifier = self._props["owner_id"]
         if identifier == DEFAULT_ID:
             return None
-        guild = await self.get_guild()
-        return await guild.get_member(identifier)
+        return self.guild.get_member(identifier)
 
     async def get_parent(self):
         """
@@ -214,16 +234,6 @@ class Channel(Model, AsyncRenovatable["Channel"]):
             如果当前子频道为指定子频道组的成员，返回 `True`；否则，返回 `False`。
         """
         return self._props["parent_id"] == parent.identifier
-
-    async def get_guild(self):
-        """
-        异步获取子频道附属的频道。
-
-        返回：
-            以 `Guild` 类型表示的当前子频道附属的频道。
-        """
-
-        return await self.bot.get_guild(self._props["guild_id"])
 
     async def renovate(self):
         return await self.bot.get_channel(self.identifier)
@@ -373,7 +383,7 @@ _CHANNEL_TYPE_MAPPING = {
 }
 
 
-def parse(bot: Bot, d: dict[str, Any]) -> Channel | ChannelGroup:
+async def parse(bot: Bot, d: dict[str, Any], guild: Guild | None = None) -> Channel | ChannelGroup:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 
@@ -382,4 +392,5 @@ def parse(bot: Bot, d: dict[str, Any]) -> Channel | ChannelGroup:
     """
 
     channel_type = _CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
-    return channel_type(bot, d)
+    guild = guild or await bot.get_guild(d["guild_id"])
+    return channel_type(bot, guild, d)

@@ -28,6 +28,11 @@ EventHandler = (
 """
 
 
+class NotSupported:
+    def __new__(cls):
+        return NotSupported
+
+
 class Intent(Enum):
     """
     事件注册 `Intent`。
@@ -125,7 +130,7 @@ class Event:
         raise NotImplementedError
 
     @abstractmethod
-    def _parse_data(self, data: Any) -> Any:
+    async def _parse_data(self, data: Any) -> Any:
         """
         解析数据。
 
@@ -135,7 +140,7 @@ class Event:
 
         raise NotImplementedError
 
-    def bind(self, handler: EventHandler):
+    def bind(self, *handler: EventHandler):
         """
         绑定事件处理器。
 
@@ -143,7 +148,7 @@ class Event:
             - handler: 将要绑定的事件处理器
         """
 
-        self._handlers.add(handler)
+        self._handlers.update(handler)
 
     def handle(self):
         """
@@ -163,7 +168,9 @@ class Event:
             - data: 用于解析及分发的数据
         """
 
-        event_data = self._parse_data(data)
+        event_data = await self._parse_data(data)
+        if event_data == NotSupported:
+            return
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
             argnames = inspect.signature(handler).parameters.keys()

@@ -118,15 +118,13 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
         return self._channel
 
-    async def get_creator(self):
+    @property
+    def creator(self):
         """
-        异步获取日程创建者。
-
-        返回：
-            以 `Member` 类型表示的子频道
+        日程创建者。
         """
 
-        return Member(self.bot, await self.channel.get_guild(), self._props["creator"])
+        return Member(self.bot, self.channel.guild, self._props["creator"])
 
     @property
     def remind_type(self):

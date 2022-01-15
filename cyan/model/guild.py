@@ -163,7 +163,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         response = await self.bot.get(f"/guilds/{self.identifier}/channels")
         channels = response.json()
-        return [channel_parse(self.bot, channel) for channel in channels]
+        return [await channel_parse(self.bot, channel, self) for channel in channels]
 
     async def get_roles(self):
         """

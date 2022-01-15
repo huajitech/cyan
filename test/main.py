@@ -1,10 +1,19 @@
 import asyncio
 
 from cyan.color import ARGB
-from cyan.event.events import ChannelCreatedEvent, ChannelDeletedEvent
-from cyan.model import AppChannel, TextChannel
+from cyan.event.events import (
+    ChannelCreatedEvent,
+    ChannelDeletedEvent,
+    ChannelUpdatedEvent,
+    GuildCreatedEvent,
+    GuildDeletedEvent,
+    GuildUpdatedEvent,
+    MemberJoinedEvent,
+    MemberUpdatedEvent,
+    MemberLeftEvent
+)
+from cyan.model import AppChannel, TextChannel, Channel, Guild, Member
 from cyan import Bot, Ticket
-from cyan.model.channel import Channel
 
 
 api = "https://sandbox.api.sgroup.qq.com/"
@@ -13,16 +22,6 @@ token = input("请输入 Token：")
 
 bot = Bot(api, Ticket(app_id, token))
 event_source = bot.get_event_source()
-
-
-@event_source.listen(ChannelCreatedEvent)
-async def channel_created(data: Channel):
-    print(f"子频道 {data.name} 已创建。")
-
-
-@event_source.listen(ChannelDeletedEvent)
-async def channel_deleted(data: Channel):
-    print(f"子频道 {data.name} 被删除。")
 
 
 async def main():
@@ -112,15 +111,62 @@ async def main():
                         f" ID：{schedule.identifier}，名称：{schedule.name}，"
                         f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
                         f"结束时间：{schedule.end_time}，"
-                        f"创建者：{(await schedule.get_creator()).as_user().name}，"
+                        f"创建者：{schedule.creator.as_user().name}，"
                         f"跳转子频道：{getattr(await schedule.get_destination(), 'name', None)}，"
                         f"提醒类型：{schedule.remind_type}"
                         for schedule in schedules
                     ]))
                     break
 
+            await role.discard()
+
             while True:
                 await asyncio.sleep(1)
+
+
+@event_source.listen(ChannelCreatedEvent)
+async def channel_created(data: Channel):
+    print(f"子频道 {data.name} 已创建。")
+
+
+@event_source.listen(ChannelDeletedEvent)
+async def channel_deleted(data: Channel):
+    print(f"子频道 {data.name} 被删除。")
+
+
+@event_source.listen(ChannelUpdatedEvent)
+async def channel_updated(data: Channel):
+    print(f"子频道 {data.name} 资料更新。")
+
+
+@event_source.listen(GuildCreatedEvent)
+async def guild_created(data: Guild):
+    print(f"频道 {data.name} 已创建。")
+
+
+@event_source.listen(GuildDeletedEvent)
+async def guild_deleted(data: Guild):
+    print(f"频道 {data.name} 被删除。")
+
+
+@event_source.listen(GuildUpdatedEvent)
+async def guild_updated(data: Guild):
+    print(f"频道 {data.name} 资料更新。")
+
+
+@event_source.listen(MemberJoinedEvent)
+async def member_joined(data: Member):
+    print(f"用户 {data.as_user().name} 加入频道 {data.guild.name}。")
+
+
+@event_source.listen(MemberLeftEvent)
+async def member_left(data: Member):
+    print(f"用户 {data.as_user().name} 离开频道 {data.guild.name}。")
+
+
+@event_source.listen(MemberUpdatedEvent)
+async def member_updated(data: Member):
+    print(f"用户 {data.as_user().name} 在频道 {data.guild.name} 更新资料。")
 
 
 asyncio.run(main())

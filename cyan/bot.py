@@ -241,7 +241,7 @@ class Bot:
         from cyan.model.channel import parse as parse_channel
 
         response = await self.get(f"/channels/{identifier}")
-        return parse_channel(self, response.json())
+        return await parse_channel(self, response.json())
 
     @staticmethod
     def _check_error(response: Response):

@@ -1,43 +1,48 @@
 from typing import Any
 
-from cyan.event import Event, EventType, Intent
-from cyan.model.channel import Channel
+from cyan.event import Event, EventType, Intent, NotSupported
+from cyan.model.channel import Channel, parse
 
 
-class ChannelCreatedEvent(Event):
+class _ChannelEvent(Event):
+    async def _parse_data(self, data: Any):
+        channel = await parse(self._bot, data)
+        if not isinstance(channel, Channel):
+            return NotSupported
+        return channel
+
+
+class ChannelCreatedEvent(_ChannelEvent):
     """
     当子频道被创建时触发。
+
+    触发时回调的数据类型为 `Channel`。
     """
 
     @staticmethod
     def get_event_type():
         return EventType("CHANNEL_CREATE", Intent.GUILD)
 
-    def _parse_data(self, data: Any):
-        return Channel(self._bot, data)
 
-
-class ChannelUpdatedEvent(Event):
+class ChannelUpdatedEvent(_ChannelEvent):
     """
     当子频道信息更新时触发。
+
+    触发时回调的数据类型为 `Channel`。
     """
 
     @staticmethod
     def get_event_type():
         return EventType("CHANNEL_UPDATE", Intent.GUILD)
 
-    def _parse_data(self, data: Any):
-        return Channel(self._bot, data)
 
-
-class ChannelDeletedEvent(Event):
+class ChannelDeletedEvent(_ChannelEvent):
     """
     当子频道被删除时触发。
+
+    触发时回调的数据类型为 `Channel`。
     """
 
     @staticmethod
     def get_event_type():
         return EventType("CHANNEL_DELETE", Intent.GUILD)
-
-    def _parse_data(self, data: Any):
-        return Channel(self._bot, data)

@@ -7,7 +7,7 @@ class ReadyEvent(Event):
     def get_event_type():
         return EventType("READY", Intent.DEFAULT)
 
-    def _parse_data(self, data: Any) -> Any:
+    async def _parse_data(self, data: Any) -> Any:
         return ReadyEventData(data)
 
 
