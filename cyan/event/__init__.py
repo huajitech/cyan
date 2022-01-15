@@ -368,15 +368,14 @@ class EventSource:
     async def _send_heartbeat(self):
         await self.send(Operation.HEARTBEAT, self._serial_code)
 
-    async def _heartbeat(self, interval: int):
-        while True:
-            await asyncio.sleep(interval / 1000)
-            await self._send_heartbeat()
-
     def _set_heartbeat(self, interval: int):
+        async def _heartbeat():
+            while True:
+                await asyncio.sleep(interval / 1000)
+                await self._send_heartbeat()
         if self._heartbeat_task:
             self._heartbeat_task.cancel()
-        self._heartbeat_task = asyncio.create_task(self._heartbeat(interval))
+        self._heartbeat_task = asyncio.create_task(_heartbeat())
 
     async def _handle(self, content: dict[str, Any]):
         operation = Operation(content["op"])
