@@ -143,15 +143,6 @@ class Role(Model, AsyncRenovatable["Role"]):
         color: int | None = None,
         shown: bool | None = None
     ):
-        """
-        异步修改身份组信息。
-
-        参数：
-            - name: 目标名称
-            - color: 目标颜色
-            - shown: 身份组是否在成员列表中单独展示
-        """
-
         _filter = {
             "name": int(name is not None),
             "color": int(color is not None),

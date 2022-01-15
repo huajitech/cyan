@@ -23,24 +23,67 @@ EventHandler = (
         [Any, Any], Awaitable[None] | Awaitable[NoReturn]
     ]
 )
+"""
+事件处理器。
+"""
 
 
 class Intent(Enum):
     """
-    `Intent`
+    事件注册 `Intent`。
     """
+    
     DEFAULT = 0
+    """
+    默认。
+    """
+
     GUILD = 1 << 0
+    """
+    频道事件。
+    """
+
     MEMBER = 1 << 1
+    """
+    成员事件。
+    """
+
     GUILD_MESSAGE = 1 << 10
+    """
+    频道消息事件。
+    """
+
     DIRECT_MESSAGE = 1 << 12
+    """
+    直接消息事件。
+    """
+
     MESSAGE_AUDIT = 1 << 27
+    """
+    消息审核事件。
+    """
+
     FORUM = 1 << 28
+    """
+    论坛事件。
+    """
+
     VOICE = 1 << 29
+    """
+    语音事件。
+    """
+
     MENTION = 1 << 30
+    """
+    提及（@）机器人事件。
+    """
 
 
 class EventType:
+    """
+    事件类型。
+    """
+
     _name: str
     _intent: Intent
 
@@ -50,10 +93,18 @@ class EventType:
 
     @property
     def name(self):
+        """
+        事件名称。
+        """
+
         return self._name
 
     @property
     def intent(self):
+        """
+        事件所需注册 `Intent`。
+        """
+
         return self._intent
 
 
@@ -67,22 +118,51 @@ class Event:
 
     @abstractstaticmethod
     def get_event_type() -> EventType:
+        """
+        获取当前事件的类型。
+        """
+
         raise NotImplementedError
 
     @abstractmethod
     def _parse_data(self, data: Any) -> Any:
+        """
+        解析数据。
+
+        参数：
+            - data: 将要解析的数据
+        """
+
         raise NotImplementedError
 
     def bind(self, handler: EventHandler):
+        """
+        绑定事件处理器。
+
+        参数：
+            - handler: 将要绑定的事件处理器
+        """
+
         self._handlers.add(handler)
 
     def handle(self):
+        """
+        装饰事件处理器以绑定至当前事件。
+        """
+
         def _decorate(func: EventHandler):
-            self._handlers.add(func)
+            self.bind(func)
 
         return _decorate
 
     async def distribute(self, data: Any):
+        """
+        分发事件数据。
+
+        参数：
+            - data: 用于解析及分发的数据
+        """
+
         event_data = self._parse_data(data)
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
@@ -93,17 +173,56 @@ class Event:
 
 
 class Operation(Enum):
+    """
+    操作。
+    """
+
     EVENT = 0
+    """
+    事件。
+    """
+
     HEARTBEAT = 1
+    """
+    心跳包。
+    """
+
     IDENTIFY = 2
+    """
+    认证。
+    """
+
     RESUME = 6
+    """
+    恢复。
+    """
+
     RECONNECT = 7
+    """
+    重新连接。
+    """
+
     INVALID_SESSION = 9
+    """
+    无效会话。
+    """
+
     CONNECTED = 10
+    """
+    已连接。
+    """
+
     HEARTBEAT_RECEIVED = 11
+    """
+    已接收心跳包。
+    """
 
 
 class EventSource:
+    """
+    事件源。
+    """
+
     _websocket: WebSocketClientProtocol
     _bot: "Bot"
     _serial_code: int
@@ -125,13 +244,25 @@ class EventSource:
 
     @property
     def bot(self):
+        """
+        事件源所属机器人实例。
+        """
+
         return self._bot
 
     @property
     def connected(self):
+        """
+        `WebSocket` 是否已连接。
+        """
+
         return self._connected and not self._websocket.closed
 
     async def connect(self):
+        """
+        连接服务器。
+        """
+
         response = await self.bot.get("/gateway")
         content = response.json()
         self._websocket = await connect(content["url"])
@@ -139,6 +270,10 @@ class EventSource:
         asyncio.create_task(self._receive())
 
     async def disconnect(self):
+        """
+        断开连接。
+        """
+
         if self._heartbeat_task:
             self._heartbeat_task.cancel()
         await self._websocket.close()
@@ -146,13 +281,28 @@ class EventSource:
         self._serial_code = -1
         self._connected = False
 
-    async def send(self, opcode: Operation, payload: Any = None):
-        content = {"op": opcode.value}
+    async def send(self, operation: Operation, payload: Any = None):
+        """
+        发送数据至服务器。
+
+        参数：
+            - operation: 操作
+            - payload: Payload
+        """
+
+        content = {"op": operation.value}
         content.update({"d": payload} if payload else {})
         data = json.dumps(content)
         await self._websocket.send(data)
 
     def get_event(self, _type: type[Event]):
+        """
+        获取指定类型的事件。
+
+        参数：
+            - _type: 所需获取事件的类型
+        """
+
         for event in self._events:
             if isinstance(event, _type):
                 return event
@@ -167,6 +317,13 @@ class EventSource:
         return event
 
     def listen(self, _type: type[Event]):
+        """
+        装饰事件处理器以监听指定事件。
+
+        参数：
+            - _type: 所需监听事件的类型
+        """
+
         return self.get_event(_type).handle()
 
     def _calculate_intents(self):

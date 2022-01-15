@@ -238,16 +238,6 @@ class Bot:
         return self._event_source
 
     async def _get_channel_core(self, identifier: str):
-        """
-        异步获取指定 ID 子频道或子频道组。
-
-        参数：
-            - identifier: 频道 ID
-
-        返回：
-            以 `Channel` 类型表示的子频道或以 `ChannelGroup` 类型表示的子频道组。
-        """
-
         from cyan.model.channel import parse as parse_channel
 
         response = await self.get(f"/channels/{identifier}")
@@ -255,13 +245,6 @@ class Bot:
 
     @staticmethod
     def _check_error(response: Response):
-        """
-        从服务器响应中检查错误。
-
-        返回：
-            传入的 `response` 参数。
-        """
-
         if int(response.status_code / 10) != 20:  # type: ignore
             content = response.json()
             raise OpenApiError(

@@ -159,13 +159,6 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         ]
 
     async def _get_channels_core(self):
-        """
-        异步获取当前频道的所有子频道及子频道组。
-
-        返回：
-            以 `Channel` 类型表示子频道及以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
-        """
-
         from cyan.model.channel import parse as channel_parse
 
         response = await self.bot.get(f"/guilds/{self.identifier}/channels")
