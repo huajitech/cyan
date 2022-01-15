@@ -1,8 +1,8 @@
 import asyncio
 
 from cyan.color import ARGB
-from cyan.model.channel import AppChannel, TextChannel
-from cyan.bot import Bot, Ticket
+from cyan.model import AppChannel, TextChannel
+from cyan import Bot, Ticket
 
 
 async def main():
@@ -59,7 +59,7 @@ async def main():
             members = await guild.get_members()
             print(f"频道 {guild.name} 成员：\n" + "\n".join([
                 f" ID：{member.as_user().identifier}，名称：{member.as_user().name}，"
-                f"昵称：{member.nickname}，"
+                f"昵称：{member.name}，"
                 f"身份组：{[role.name for role in (await member.get_roles())]}，"
                 f"加入时间：{member.joined_time}"
                 for member in members

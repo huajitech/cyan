@@ -3,10 +3,11 @@ from typing import Any
 
 from cyan.bot import Bot
 from cyan.model.guild import Guild
+from cyan.model.model import Model
 from cyan.model.user import User
 
 
-class Member:
+class Member(Model):
     """
     成员。
     """
@@ -28,11 +29,11 @@ class Member:
         self._props = props
 
     @property
-    def nickname(self) -> str:
-        """
-        成员昵称。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def name(self) -> str:
         return self._props["nick"]
 
     @property
@@ -71,7 +72,7 @@ class Member:
             当前实例的 `User` 形式。
         """
 
-        return User(self._props["user"])
+        return User(self.bot, self._props["user"])
 
     async def mute(self, duration: timedelta):
         """
@@ -79,7 +80,7 @@ class Member:
         """
 
         content = {"mute_seconds": str(duration.seconds)}
-        await self._bot.patch(
+        await self.bot.patch(
             f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
             content=content
         )
@@ -90,7 +91,7 @@ class Member:
         """
 
         content = {"mute_end_timestamp": str(time.timestamp())}
-        await self._bot.patch(
+        await self.bot.patch(
             f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
             content=content
         )

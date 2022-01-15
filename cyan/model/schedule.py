@@ -6,6 +6,7 @@ from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
 from cyan.model.member import Member
 from cyan.model.channel import Channel
+from cyan.model.model import Model
 
 
 class RemindType(Enum):
@@ -44,7 +45,7 @@ class RemindType(Enum):
     """
 
 
-class Schedule:
+class Schedule(Model):
     """
     日程。
     """
@@ -66,23 +67,19 @@ class Schedule:
         self._props = props
 
     @property
-    def identifier(self):
-        """
-        日程 ID。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
-    def name(self):
-        """
-        日常名称。
-        """
-
+    def name(self) -> str:
         return self._props["name"]
 
     @property
-    def description(self):
+    def description(self) -> str:
         """
         日程描述。
         """
@@ -121,7 +118,7 @@ class Schedule:
             以 `Member` 类型表示的子频道
         """
 
-        return Member(self._bot, await self.channel.get_guild(), self._props["creator"])
+        return Member(self.bot, await self.channel.get_guild(), self._props["creator"])
 
     @property
     def remind_type(self):
@@ -140,7 +137,7 @@ class Schedule:
 
         if self._props["jump_channel_id"] == DEFAULT_ID:
             return None
-        return await self._bot.get_channel(self._props["jump_channel_id"])
+        return await self.bot.get_channel(self._props["jump_channel_id"])
 
     # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/delete_schedule.html。
@@ -149,6 +146,6 @@ class Schedule:
         异步删除当前日程。
         """
 
-        await self._bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")
+        await self.bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")
 
     # TODO: 实现日程信息修改。

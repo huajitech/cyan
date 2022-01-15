@@ -1,15 +1,19 @@
 from typing import Any
 from httpx import AsyncClient
+from cyan.bot import Bot
+
+from cyan.model.model import Model
 
 
-class User:
+class User(Model):
     """
     用户。
     """
 
     _props: dict[str, Any]
+    _bot: Bot
 
-    def __init__(self, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]):
         """
         初始化 `User` 实例。
 
@@ -18,25 +22,22 @@ class User:
         """
 
         self._props = props
+        self._bot = bot
+
+    @property
+    def bot(self):
+        return self._bot
 
     @property
     def identifier(self) -> str:
-        """
-        用户 ID。
-        """
-
         return self._props["id"]
 
     @property
     def name(self) -> str:
-        """
-        用户名。
-        """
-
         return self._props["username"]
 
     @property
-    def bot(self) -> bool:
+    def is_bot(self) -> bool:
         """
         用户是否为机器人。
         """

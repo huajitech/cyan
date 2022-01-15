@@ -4,7 +4,8 @@ from typing import Any
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
-from cyan.utils.enum import get_enum_key
+from cyan.model.model import Model
+from cyan.util._enum import get_enum_key
 
 
 class TextChannelType(Enum):
@@ -46,7 +47,7 @@ class ChannelVisibility(Enum):
     """
 
 
-class ChannelGroup:
+class ChannelGroup(Model):
     """
     子频道组。
     """
@@ -67,19 +68,15 @@ class ChannelGroup:
         self._bot = bot
 
     @property
-    def identifier(self) -> str:
-        """
-        子频道组 ID。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
     def name(self) -> str:
-        """
-        子频道组名。
-        """
-
         return self._props["name"]
 
     @property
@@ -113,7 +110,7 @@ class ChannelGroup:
             以 `Guild` 类型表示的当前子频道附属的频道。
         """
 
-        return await self._bot.get_guild(self._props["guild_id"])
+        return await self.bot.get_guild(self._props["guild_id"])
 
     async def get_children(self):
         """
@@ -132,7 +129,7 @@ class ChannelGroup:
         ]
 
 
-class Channel:
+class Channel(Model):
     """
     子频道。
     """
@@ -199,7 +196,7 @@ class Channel:
             以 `Channel` 类型表示的当前子频道附属的子频道组。
         """
 
-        return await self._bot.get_channel_group(self._props["parent_id"])
+        return await self.bot.get_channel_group(self._props["parent_id"])
 
     def is_child_of(self, parent: ChannelGroup) -> bool:
         """
@@ -218,7 +215,7 @@ class Channel:
             以 `Guild` 类型表示的当前子频道附属的频道。
         """
 
-        return await self._bot.get_guild(self._props["guild_id"])
+        return await self.bot.get_guild(self._props["guild_id"])
 
 
 class TextChannel(Channel):
@@ -270,10 +267,10 @@ class AppChannel(Channel):
 
         from cyan.model.schedule import Schedule
 
-        response = await self._bot.get(f"/channels/{self.identifier}/schedules")
+        response = await self.bot.get(f"/channels/{self.identifier}/schedules")
         schedules = response.json()
         return (
-            [Schedule(self._bot, self, schedule) for schedule in schedules]
+            [Schedule(self.bot, self, schedule) for schedule in schedules]
             if schedules else []
         )
 
@@ -290,9 +287,9 @@ class AppChannel(Channel):
 
         from cyan.model.schedule import Schedule
 
-        response = await self._bot.get(f"/channels/{self.identifier}/schedules/{identifier}")
+        response = await self.bot.get(f"/channels/{self.identifier}/schedules/{identifier}")
         schedule = response.json()
-        return Schedule(self._bot, self, schedule)
+        return Schedule(self.bot, self, schedule)
 
     # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/post_schedule.html。
@@ -328,8 +325,8 @@ class AppChannel(Channel):
         }
         content = {"schedule": schedule}
         print(content)
-        response = await self._bot.post(f"/channels/{self.identifier}/schedules", content=content)
-        return Schedule(self._bot, self, response.json())
+        response = await self.bot.post(f"/channels/{self.identifier}/schedules", content=content)
+        return Schedule(self.bot, self, response.json())
 
 
 class ForumChannel(Channel):

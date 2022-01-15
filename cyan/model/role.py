@@ -4,6 +4,7 @@ from typing import Any
 from cyan.bot import Bot
 from cyan.color import ARGB
 from cyan.model.guild import Guild
+from cyan.model.model import Model
 
 
 class DefaultRoleId(Enum):
@@ -32,7 +33,7 @@ class DefaultRoleId(Enum):
     """
 
 
-class Role:
+class Role(Model):
     """
     身份组。
     """
@@ -54,19 +55,15 @@ class Role:
         self._props = props
 
     @property
-    def identifier(self) -> str:
-        """
-        身份组 ID。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
     def name(self) -> str:
-        """
-        身份组名称。
-        """
-
         return self._props["name"]
 
     @property
@@ -157,7 +154,7 @@ class Role:
         }
         info = {"name": name, "color": color, "hoist": int(bool(shown))}
         content = {"filter": _filter, "info": info}
-        response = await self._bot.patch(
+        response = await self.bot.patch(
             f"/guilds/{self.guild.identifier}/roles/{self.identifier}",
             content=content
         )
@@ -168,4 +165,4 @@ class Role:
         异步删除当前身份组。
         """
 
-        await self._bot.delete(f"/guilds/{self.guild.identifier}/roles/{self.identifier}")
+        await self.bot.delete(f"/guilds/{self.guild.identifier}/roles/{self.identifier}")

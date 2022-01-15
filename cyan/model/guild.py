@@ -5,13 +5,14 @@ from httpx import AsyncClient
 from cyan.color import ARGB
 from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
+from cyan.model.model import Model
 
 
 # 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
 _MEMBER_QUERY_LIMIT = 1000
 
 
-class Guild:
+class Guild(Model):
     """
     频道。
     """
@@ -32,19 +33,15 @@ class Guild:
         self._bot = bot
 
     @property
-    def identifier(self) -> str:
-        """
-        频道 ID。
-        """
+    def bot(self):
+        return self._bot
 
+    @property
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
     def name(self) -> str:
-        """
-        频道名。
-        """
-
         return self._props["name"]
 
     @property
@@ -93,12 +90,12 @@ class Guild:
                 {"after": cur} if cur else {}
             )
             try:
-                response = await self._bot.get(
+                response = await self.bot.get(
                     f"/guilds/{self.identifier}/members",
                     params
                 )
                 content = response.json()
-                members.extend([Member(self._bot, self, member) for member in content])
+                members.extend([Member(self.bot, self, member) for member in content])
                 if len(content) < _MEMBER_QUERY_LIMIT:
                     return members
                 cur = members[-1].as_user().identifier
@@ -120,9 +117,9 @@ class Guild:
 
         from cyan.model.member import Member
 
-        response = await self._bot.get(f"/guilds/{self.identifier}/members/{identifier}")
+        response = await self.bot.get(f"/guilds/{self.identifier}/members/{identifier}")
         member = response.json()
-        return Member(self._bot, self, member)
+        return Member(self.bot, self, member)
 
     async def get_channels(self):
         """
@@ -166,9 +163,9 @@ class Guild:
 
         from cyan.model.channel import parse as channel_parse
 
-        response = await self._bot.get(f"/guilds/{self.identifier}/channels")
+        response = await self.bot.get(f"/guilds/{self.identifier}/channels")
         channels = response.json()
-        return [channel_parse(self._bot, channel) for channel in channels]
+        return [channel_parse(self.bot, channel) for channel in channels]
 
     async def get_roles(self):
         """
@@ -180,9 +177,9 @@ class Guild:
 
         from cyan.model.role import Role
 
-        response = await self._bot.get(f"/guilds/{self.identifier}/roles")
+        response = await self.bot.get(f"/guilds/{self.identifier}/roles")
         roles = response.json()["roles"]
-        return [Role(self._bot, self, role) for role in roles]
+        return [Role(self.bot, self, role) for role in roles]
 
     async def get_role(self, identifier: str):
         """
@@ -232,11 +229,11 @@ class Guild:
             "hoist": int(bool(shown))
         }
         content = {"filter": _filter, "info": info}
-        response = await self._bot.post(
+        response = await self.bot.post(
             f"/guilds/{self.identifier}/roles",
             content=content
         )
-        return Role(self._bot, self, response.json()["role"])
+        return Role(self.bot, self, response.json()["role"])
 
     async def mute(self, duration: timedelta):
         """
@@ -247,7 +244,7 @@ class Guild:
         """
 
         content = {"mute_seconds": str(duration.seconds)}
-        await self._bot.patch(f"/guilds/{self.identifier}/mute", content=content)
+        await self.bot.patch(f"/guilds/{self.identifier}/mute", content=content)
 
     async def mute_until(self, time: datetime):
         """
@@ -258,7 +255,7 @@ class Guild:
         """
 
         content = {"mute_end_timestamp": str(int(time.timestamp()))}
-        await self._bot.patch(f"/guilds/{self.identifier}/mute", content=content)
+        await self.bot.patch(f"/guilds/{self.identifier}/mute", content=content)
 
     async def unmute(self):
         """
