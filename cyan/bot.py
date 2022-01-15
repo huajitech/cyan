@@ -3,6 +3,7 @@ from types import TracebackType
 from typing import Any
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
+from cyan.event import EventSource
 
 from cyan.exception import OpenApiError, InvalidTargetError
 
@@ -34,6 +35,7 @@ class Bot:
 
     _base_url: str
     _client: AsyncClient
+    _event_source: EventSource
 
     def __init__(self, api_base_url: str, ticket: Ticket):
         """
@@ -45,8 +47,10 @@ class Bot:
         """
 
         self._base_url = api_base_url
-        headers = {"Authorization": f"Bot {ticket.app_id}.{ticket.token}"}
+        authorization = f"Bot {ticket.app_id}.{ticket.token}"
+        headers = {"Authorization": authorization}
         self._client = AsyncClient(headers=headers)
+        self._event_source = EventSource(self, authorization)
 
     async def get(self, path: str, params: dict[str, Any] | None = None):
         """
@@ -136,6 +140,7 @@ class Bot:
         异步关闭当前机器人。
         """
 
+        await self._event_source.disconnect()
         await self._client.aclose()
 
     async def get_current_user(self):
@@ -228,6 +233,9 @@ class Bot:
         if isinstance(channel, ChannelGroup):
             return channel
         raise InvalidTargetError("指定的 ID 不为子频道组。")
+
+    def get_event_source(self):
+        return self._event_source
 
     async def _get_channel_core(self, identifier: str):
         """

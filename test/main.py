@@ -1,16 +1,34 @@
 import asyncio
 
 from cyan.color import ARGB
+from cyan.event.events import ChannelCreatedEvent, ChannelDeletedEvent
 from cyan.model import AppChannel, TextChannel
 from cyan import Bot, Ticket
+from cyan.model.channel import Channel
+
+
+api = "https://sandbox.api.sgroup.qq.com/"
+app_id = input("请输入 APP ID：")
+token = input("请输入 Token：")
+
+bot = Bot(api, Ticket(app_id, token))
+event_source = bot.get_event_source()
+
+
+@event_source.listen(ChannelCreatedEvent)
+async def channel_created(data: Channel):
+    print(f"子频道 {data.name} 已创建。")
+
+
+@event_source.listen(ChannelDeletedEvent)
+async def channel_deleted(data: Channel):
+    print(f"子频道 {data.name} 被删除。")
 
 
 async def main():
-    api = "https://sandbox.api.sgroup.qq.com/"
-    app_id = input("请输入 APP ID：")
-    token = input("请输入 Token：")
+    async with bot:
+        await event_source.connect()
 
-    async with Bot(api, Ticket(app_id, token)) as bot:
         current_user = await bot.get_current_user()
         print(
             "当前用户信息：\n "
@@ -101,6 +119,8 @@ async def main():
                     ]))
                     break
 
-            await role.discard()
+            while True:
+                await asyncio.sleep(1)
+
 
 asyncio.run(main())
