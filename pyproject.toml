@@ -4,6 +4,13 @@ version = "0.1.0"
 description = "A Python SDK for QQ Bot."
 authors = ["Ricky8955555 <397050061@qq.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://gitlab.huajitech.net/huajitech/cyan"
+keyword = ["bot", "qq", "qqbot"]
+packages = [
+  { include = "cyan" },
+]
+include = ["cyan/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
