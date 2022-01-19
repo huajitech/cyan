@@ -1,6 +1,6 @@
 from typing import Any
 
-from cyan.event import Event, EventType, Intent
+from cyan.event import Event, EventInfo, Intent
 from cyan.model.guild import Guild
 
 
@@ -17,8 +17,8 @@ class GuildCreatedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_CREATE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("GUILD_CREATE", Intent.GUILD)
 
 
 class GuildUpdatedEvent(_GuildEvent):
@@ -29,8 +29,8 @@ class GuildUpdatedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_UPDATE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("GUILD_UPDATE", Intent.GUILD)
 
 
 class GuildDeletedEvent(_GuildEvent):
@@ -41,5 +41,5 @@ class GuildDeletedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_DELETE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("GUILD_DELETE", Intent.GUILD)

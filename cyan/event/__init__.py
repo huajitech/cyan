@@ -84,9 +84,9 @@ class Intent(Enum):
     """
 
 
-class EventType:
+class EventInfo:
     """
-    事件类型。
+    事件信息。
     """
 
     _name: str
@@ -122,9 +122,9 @@ class Event:
         self._bot = bot
 
     @abstractstaticmethod
-    def get_event_type() -> EventType:
+    def get_event_info() -> EventInfo:
         """
-        获取当前事件的类型。
+        获取当前事件信息。
         """
 
         raise NotImplementedError
@@ -225,6 +225,37 @@ class Operation(Enum):
     """
 
 
+class _EventProvider:
+    _type_dict: dict[type, Event]
+    _event_name_dict: dict[str, set[Event]]
+    _registered_intents: set[Intent]
+
+    def __init__(self):
+        self._type_dict = dict[type, Event]()
+        self._event_name_dict = dict[str, set[Event]]()
+        self._registered_intents = set[Intent]((Intent.DEFAULT,))
+
+    def get_intents(self):
+        return self._registered_intents
+
+    def get_by_type(self, bot: "Bot", _type: type[Event]):
+        event = self._type_dict.get(_type, None)
+        if event:
+            return event
+        event = _type(bot)
+        self._type_dict[_type] = event
+        event_info = _type.get_event_info()
+        events = self._event_name_dict.get(event_info.name, None)
+        if not events:
+            self._event_name_dict[event_info.name] = events = set[Event]()
+        events.add(event)
+        self._registered_intents.add(event_info.intent)
+        return event
+
+    def get_by_event_name(self, event_name: str):
+        return self._event_name_dict.get(event_name, set[Event]())
+
+
 class EventSource:
     """
     事件源。
@@ -233,21 +264,23 @@ class EventSource:
     _websocket: WebSocketClientProtocol
     _bot: "Bot"
     _serial_code: int
-    _events: set[Event]
     _session: str | None
     _authorization: str
     _connected: bool
     _heartbeat_task: Task[NoReturn] | None
+    _event_provider: _EventProvider
+    _task: Task[None] | None
 
     def __init__(self, bot: "Bot", authorization: str):
         self._websocket = WebSocketClientProtocol()
         self._bot = bot
         self._serial_code = -1
-        self._events = set[Event]()
         self._session = None
         self._authorization = authorization
         self._connected = False
         self._heartbeat_task = None
+        self._event_provider = _EventProvider()
+        self._task = None
 
     @property
     def bot(self):
@@ -274,7 +307,7 @@ class EventSource:
         content = response.json()
         self._websocket = await connect(content["url"])
         self._connected = True
-        asyncio.create_task(self._receive())
+        self._task = asyncio.create_task(self._receive())
 
     async def disconnect(self):
         """
@@ -310,18 +343,12 @@ class EventSource:
             - _type: 所需获取事件的类型
         """
 
-        for event in self._events:
-            if isinstance(event, _type):
-                return event
-        event = _type(self._bot)
-        self._events.add(event)
-        if self.connected:
-            intent = _type.get_event_type().intent
-            for registered_event in self._events:
-                if registered_event.get_event_type().intent == intent:
-                    return event
+        if (
+            self.connected and _type.get_event_info()
+            .intent not in self._event_provider.get_intents()
+        ):
             raise InvalidOperationError("WebSocket 已连接时不可获取未订阅 Intent 的事件。")
-        return event
+        return self._event_provider.get_by_type(self._bot, _type)
 
     def listen(self, _type: type[Event]):
         """
@@ -333,8 +360,12 @@ class EventSource:
 
         return self.get_event(_type).handle()
 
+    async def wait_until_stopped(self):
+        if self._task:
+            await self._task
+
     def _calculate_intents(self):
-        intents = set(event.get_event_type().intent for event in self._events)
+        intents = self._event_provider.get_intents()
         intents_number = 0
         for intent in intents:
             intents_number |= intent.value
@@ -366,10 +397,11 @@ class EventSource:
         async for data in self._websocket:
             content = json.loads(data)
             await self._handle(content)
+            raise Exception()
 
-    async def _call_events(self, event_type: str, data: Any):
-        for event in self._events:
-            if event.get_event_type().name == event_type:
+    async def _call_events(self, event_name: str, data: Any):
+        for event in self._event_provider.get_by_event_name(event_name):
+            if event.get_event_info().name == event_name:
                 await event.distribute(data)
 
     async def _send_heartbeat(self):

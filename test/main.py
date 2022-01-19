@@ -120,8 +120,7 @@ async def main():
 
             await role.discard()
 
-            while True:
-                await asyncio.sleep(1)
+            await event_source.wait_until_stopped()
 
 
 @event_source.listen(ChannelCreatedEvent)

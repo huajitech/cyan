@@ -1,6 +1,6 @@
 from typing import Any
 
-from cyan.event import Event, EventType, Intent
+from cyan.event import Event, EventInfo, Intent
 from cyan.model.member import Member
 
 
@@ -19,8 +19,8 @@ class MemberJoinedEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_MEMBER_ADD", Intent.MEMBER)
+    def get_event_info():
+        return EventInfo("GUILD_MEMBER_ADD", Intent.MEMBER)
 
 
 class MemberUpdatedEvent(_MemberEvent):
@@ -31,8 +31,8 @@ class MemberUpdatedEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_MEMBER_UPDATE", Intent.MEMBER)
+    def get_event_info():
+        return EventInfo("GUILD_MEMBER_UPDATE", Intent.MEMBER)
 
 
 class MemberLeftEvent(_MemberEvent):
@@ -43,5 +43,5 @@ class MemberLeftEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("GUILD_MEMBER_REMOVE", Intent.MEMBER)
+    def get_event_info():
+        return EventInfo("GUILD_MEMBER_REMOVE", Intent.MEMBER)

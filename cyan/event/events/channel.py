@@ -1,6 +1,6 @@
 from typing import Any
 
-from cyan.event import Event, EventType, Intent, NotSupported
+from cyan.event import Event, EventInfo, Intent, NotSupported
 from cyan.model.channel import Channel, parse
 
 
@@ -20,8 +20,8 @@ class ChannelCreatedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("CHANNEL_CREATE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("CHANNEL_CREATE", Intent.GUILD)
 
 
 class ChannelUpdatedEvent(_ChannelEvent):
@@ -32,8 +32,8 @@ class ChannelUpdatedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("CHANNEL_UPDATE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("CHANNEL_UPDATE", Intent.GUILD)
 
 
 class ChannelDeletedEvent(_ChannelEvent):
@@ -44,5 +44,5 @@ class ChannelDeletedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_type():
-        return EventType("CHANNEL_DELETE", Intent.GUILD)
+    def get_event_info():
+        return EventInfo("CHANNEL_DELETE", Intent.GUILD)

@@ -1,11 +1,11 @@
 from typing import Any
-from cyan.event import Event, EventType, Intent
+from cyan.event import Event, EventInfo, Intent
 
 
 class ReadyEvent(Event):
     @staticmethod
-    def get_event_type():
-        return EventType("READY", Intent.DEFAULT)
+    def get_event_info():
+        return EventInfo("READY", Intent.DEFAULT)
 
     async def _parse_data(self, data: Any) -> Any:
         return ReadyEventData(data)
