@@ -16,8 +16,7 @@ from cyan.event.events import (
 from cyan.model import AppChannel, TextChannel, Channel, Guild, Member
 from cyan import Bot, Ticket
 from cyan.model.message import Message
-from cyan.model.message.elements import PlainText
-from cyan.model.message.elements.content import ChannelLink, Mention
+from cyan.model.message.elements import PlainText, ChannelLink, Mention
 
 
 api = "https://sandbox.api.sgroup.qq.com/"
