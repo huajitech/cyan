@@ -3,7 +3,7 @@ from asyncio.tasks import Task
 import inspect
 import json
 from enum import Enum
-from abc import abstractmethod, abstractstaticmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, NoReturn
 from websockets.client import connect
 from websockets.legacy.client import WebSocketClientProtocol
@@ -53,9 +53,9 @@ class Intent(Enum):
     成员事件。
     """
 
-    GUILD_MESSAGE = 1 << 10
+    GUILD_EXPRESSION = 1 << 10
     """
-    频道消息事件。
+    频道表态事件。
     """
 
     DIRECT_MESSAGE = 1 << 12
@@ -121,7 +121,8 @@ class Event:
         self._handlers = set[EventHandler]()
         self._bot = bot
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def get_event_info() -> EventInfo:
         """
         获取当前事件信息。
@@ -397,7 +398,6 @@ class EventSource:
         async for data in self._websocket:
             content = json.loads(data)
             await self._handle(content)
-            raise Exception()
 
     async def _call_events(self, event_name: str, data: Any):
         for event in self._event_provider.get_by_event_name(event_name):

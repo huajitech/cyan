@@ -10,10 +10,14 @@ from cyan.event.events import (
     GuildUpdatedEvent,
     MemberJoinedEvent,
     MemberUpdatedEvent,
-    MemberLeftEvent
+    MemberLeftEvent,
+    ChannelMessageReceivedEvent
 )
 from cyan.model import AppChannel, TextChannel, Channel, Guild, Member
 from cyan import Bot, Ticket
+from cyan.model.message import Message
+from cyan.model.message.elements import PlainText
+from cyan.model.message.elements.content import ChannelLink, Mention
 
 
 api = "https://sandbox.api.sgroup.qq.com/"
@@ -120,7 +124,7 @@ async def main():
 
             await role.discard()
 
-            await event_source.wait_until_stopped()
+        await event_source.wait_until_stopped()
 
 
 @event_source.listen(ChannelCreatedEvent)
@@ -166,6 +170,28 @@ async def member_left(data: Member):
 @event_source.listen(MemberUpdatedEvent)
 async def member_updated(data: Member):
     print(f"用户 {data.as_user().name} 在频道 {data.guild.name} 更新资料。")
+
+
+@event_source.listen(ChannelMessageReceivedEvent)
+async def channel_message_received(data: Message):
+    print(
+        f"用户 {data.sender.name} 在频道 {(await data.get_guild()).name} 发送消息：\n"
+        f"    {''.join(map(str, data.content))}"
+    )
+    raw_content = data.content
+    await data.reply(
+        PlainText(
+            "我收到了子频道 "
+        ) + ChannelLink(
+            await data.get_channel()
+        ) + PlainText(
+            " 用户 "
+        ) + Mention(
+            data.sender
+        ) + PlainText(
+            " 的信息，让我来复读一下：\n"
+        ) + raw_content
+    )
 
 
 asyncio.run(main())

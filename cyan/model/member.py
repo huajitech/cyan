@@ -3,7 +3,7 @@ from typing import Any
 
 from cyan.bot import Bot
 from cyan.model.guild import Guild
-from cyan.model.model import Model
+from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.user import User
 
@@ -42,12 +42,12 @@ class Member(Model, AsyncRenovatable["Member"]):
         return self._props["nick"]
 
     @property
-    def joined_time(self) -> datetime:
+    def joined_time(self):
         """
         成员加入时间。
         """
 
-        return self._props["joined_at"]
+        return datetime.fromisoformat(self._props["joined_at"])
 
     @property
     def guild(self):

@@ -16,6 +16,7 @@ include = ["cyan/py.typed"]
 python = "^3.10"
 httpx = "^0.21.1"
 websockets = "^10.1"
+frozendict = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

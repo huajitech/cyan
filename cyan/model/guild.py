@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from cyan.color import ARGB
 from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
-from cyan.model.model import Model
+from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 
 

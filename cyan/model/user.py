@@ -2,7 +2,7 @@ from typing import Any
 from httpx import AsyncClient
 from cyan.bot import Bot
 
-from cyan.model.model import Model
+from cyan.model import Model
 
 
 class User(Model):

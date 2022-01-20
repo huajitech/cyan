@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
 from cyan.model.member import Member
-from cyan.model.model import Model
+from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 
 

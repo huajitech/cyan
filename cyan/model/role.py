@@ -4,7 +4,7 @@ from typing import Any
 from cyan.bot import Bot
 from cyan.color import ARGB
 from cyan.model.guild import Guild
-from cyan.model.model import Model
+from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 
 

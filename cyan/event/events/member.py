@@ -5,7 +5,7 @@ from cyan.model.member import Member
 
 
 class _MemberEvent(Event):
-    async def _parse_data(self, data: Any):
+    async def _parse_data(self, data: dict[str, Any]):
         guild_identifier = data["guild_id"]
         guild = await self._bot.get_guild(guild_identifier)
         return Member(self._bot, guild, data)

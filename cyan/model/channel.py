@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
 from cyan.model.guild import Guild
-from cyan.model.model import Model
+from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.util._enum import get_enum_key
 
@@ -233,6 +233,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         返回：
             如果当前子频道为指定子频道组的成员，返回 `True`；否则，返回 `False`。
         """
+
         return self._props["parent_id"] == parent.identifier
 
     async def renovate(self):
@@ -243,6 +244,31 @@ class TextChannel(Channel):
     """
     文字子频道。
     """
+
+    from cyan.model.message import Message, MessageElement
+
+    async def reply(self, target: Message, message: Iterable[MessageElement] | Message):
+        await self._send(message, target)
+
+    async def send(self, message: Iterable[MessageElement] | Message):
+        await self._send(message, None)
+
+    async def _send(
+        self,
+        message: Iterable[MessageElement] | Message,
+        replying_target: Message | None
+    ):
+        from cyan.model.message import Message, MessageContent
+
+        if isinstance(message, Message):
+            content = message.content.to_dict()
+        elif isinstance(message, MessageContent):
+            content = message.to_dict()
+        else:
+            content = MessageContent(message).to_dict()
+        if replying_target:
+            content["msg_id"] = replying_target.identifier
+        await self.bot.post(f"/channels/{self.identifier}/messages", content=content)
 
     @property
     def text_channel_type(self):
