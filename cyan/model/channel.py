@@ -423,7 +423,11 @@ _CHANNEL_TYPE_MAPPING = {
 }
 
 
-async def parse(bot: Bot, _dict: dict[str, Any], guild: Guild | None = None) -> Channel | ChannelGroup:
+async def parse(
+    bot: Bot,
+    _dict: dict[str, Any],
+    guild: Guild | None = None
+) -> Channel | ChannelGroup:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 

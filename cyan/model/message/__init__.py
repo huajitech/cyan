@@ -132,7 +132,7 @@ class MessageContent(list[MessageElement]):
         返回：
             以 `MessageContent` 类型表示的消息内容。
         """
-        
+
         elements = list[MessageElement]()
         for parser in _message_element_parsers:
             result = parser(bot, frozendict(_dict))
