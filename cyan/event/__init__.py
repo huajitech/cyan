@@ -80,7 +80,7 @@ class Intent(Enum):
 
     MENTION = 1 << 30
     """
-    提及（@）机器人事件。
+    提及机器人事件。
     """
 
 
@@ -126,6 +126,9 @@ class Event:
     def get_event_info() -> EventInfo:
         """
         获取当前事件信息。
+
+        返回：
+            以 `EventInfo` 类型表示的事件信息。
         """
 
         raise NotImplementedError
@@ -137,6 +140,9 @@ class Event:
 
         参数：
             - data: 将要解析的数据
+
+        返回：
+            解析后的数据。
         """
 
         raise NotImplementedError
@@ -342,6 +348,9 @@ class EventSource:
 
         参数：
             - _type: 所需获取事件的类型
+
+        返回：
+            指定类型事件的实例。
         """
 
         if (

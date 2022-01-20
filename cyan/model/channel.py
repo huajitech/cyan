@@ -248,9 +248,23 @@ class TextChannel(Channel):
     from cyan.model.message import Message, MessageElement
 
     async def reply(self, target: Message, message: Iterable[MessageElement] | Message):
+        """
+        回复指定消息。
+
+        参数：
+            - target: 将要被回复的消息
+            - message: 回应消息
+        """
         await self._send(message, target)
 
     async def send(self, message: Iterable[MessageElement] | Message):
+        """
+        发送消息。
+
+        参数：
+            - message: 将要发送的消息
+        """
+
         await self._send(message, None)
 
     async def _send(
@@ -409,14 +423,18 @@ _CHANNEL_TYPE_MAPPING = {
 }
 
 
-async def parse(bot: Bot, d: dict[str, Any], guild: Guild | None = None) -> Channel | ChannelGroup:
+async def parse(bot: Bot, _dict: dict[str, Any], guild: Guild | None = None) -> Channel | ChannelGroup:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
+
+    参数：
+        - _dict: 将用于解析的字典
+        - guild: 目标的附属频道
 
     返回：
         当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组，否则返回以 `Channel` 类型表示的子频道。
     """
 
-    channel_type = _CHANNEL_TYPE_MAPPING.get(d["type"], UnknownChannel)
-    guild = guild or await bot.get_guild(d["guild_id"])
-    return channel_type(bot, guild, d)
+    channel_type = _CHANNEL_TYPE_MAPPING.get(_dict["type"], UnknownChannel)
+    guild = guild or await bot.get_guild(_dict["guild_id"])
+    return channel_type(bot, guild, _dict)

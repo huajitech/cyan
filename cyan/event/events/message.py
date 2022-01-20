@@ -11,7 +11,7 @@ class _MessageReceivedEvent(Event):
 
 class ChannelMessageReceivedEvent(_MessageReceivedEvent):
     """
-    当接收到子频道用户所发送含提及（@）机器人消息时触发。
+    当接收到子频道用户所发送含提及机器人消息时触发。
 
     触发时回调的数据类型为 `Message`。
     """
