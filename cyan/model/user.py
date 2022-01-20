@@ -1,7 +1,7 @@
 from typing import Any
 from httpx import AsyncClient
-from cyan.bot import Bot
 
+from cyan.bot import Bot
 from cyan.model import Model
 
 

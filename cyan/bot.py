@@ -3,8 +3,8 @@ from types import TracebackType
 from typing import Any
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
-from cyan.event import EventSource
 
+from cyan.event import EventSource
 from cyan.exception import OpenApiError, InvalidTargetError
 
 # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html。

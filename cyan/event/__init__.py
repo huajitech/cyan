@@ -1,7 +1,7 @@
 import asyncio
-from asyncio.tasks import Task
 import inspect
 import json
+from asyncio.tasks import Task
 from enum import Enum
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, NoReturn

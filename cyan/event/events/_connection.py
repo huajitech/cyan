@@ -1,4 +1,5 @@
 from typing import Any
+
 from cyan.event import Event, EventInfo, Intent
 
 
