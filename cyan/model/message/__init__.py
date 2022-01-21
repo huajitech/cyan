@@ -10,25 +10,7 @@ from cyan.model.user import User
 
 
 if TYPE_CHECKING:
-    from cyan.model.message import Message
     from cyan.model.channel import TextChannel
-
-
-@dataclass
-class MessageElementParseResult:
-    """
-    消息元素解析结果。
-    """
-
-    top: bool
-    """
-    元素是否置顶。
-    """
-
-    elements: list["MessageElement"]
-    """
-    解析结果所有元素的 `list` 类型集合。
-    """
 
 
 class MessageElement:
@@ -47,15 +29,22 @@ class MessageElement:
 
         raise NotImplementedError
 
-    def __add__(self, obj: Any):
-        from cyan.model.message.elements.content import PlainText
 
-        if isinstance(obj, MessageElement):
-            return MessageContent([self, obj])
-        if isinstance(obj, MessageContent):
-            obj.insert(0, self)
-            return obj
-        return MessageContent([self, PlainText(str(obj))])
+@dataclass
+class MessageElementParseResult:
+    """
+    消息元素解析结果。
+    """
+
+    top: bool
+    """
+    元素是否置顶。
+    """
+
+    elements: list[MessageElement]
+    """
+    解析结果所有元素的 `list` 类型集合。
+    """
 
 
 class ContentElement(MessageElement):
@@ -145,16 +134,6 @@ class MessageContent(list[MessageElement]):
                 elements.extend(result.elements)
         return MessageContent(elements)
 
-    def __add__(self, obj: Any):
-        from cyan.model.message.elements.content import PlainText
-
-        if isinstance(obj, MessageElement):
-            return MessageContent(super().__add__([obj]))
-        elif isinstance(obj, str):
-            return MessageContent(super().__add__([PlainText(obj)]))
-        else:
-            return MessageContent(super().__add__(obj))
-
 
 class Message(Model):
     _bot: Bot
@@ -234,7 +213,7 @@ class Message(Model):
         guild = await self.get_guild()
         return await guild.get_member(self.sender.identifier)
 
-    async def reply(self, message: Iterable[MessageElement] | "Message"):
+    async def reply(self, *message: "Sendable"):
         """
         异步回复当前消息。
 
@@ -243,7 +222,7 @@ class Message(Model):
         """
 
         channel = await self.get_channel()
-        await channel.reply(self, message)
+        await channel.reply(self, *message)
 
     @staticmethod
     def from_dict(bot: Bot, _dict: dict[str, Any]):
@@ -262,4 +241,38 @@ class Message(Model):
         return Message(bot, _dict, content)
 
 
-from . import elements  # type: ignore
+Sendable = MessageElement | str | Message | Iterable[MessageElement]
+
+
+def create_message_content(*elements: Sendable):
+    """
+    创建 `MessageContent` 实例。
+
+    指定元素类型若为 `MessageElement` 则直接呈现;
+    若为 `str` 则转换为 `PlainText` 类型呈现；
+    若为 `Iterable[MessageElement]` 则取出其中元素呈现；
+    若为 `Message` 则获取其中内容并取出其中元素呈现。
+
+    参数：
+        - *elements: 元素
+
+    返回：
+        包含指定元素的 `MessageContent`。
+    """
+
+    from cyan.model.message.elements._content import PlainText
+
+    content = MessageContent()
+    for element in elements:
+        if isinstance(element, MessageElement):
+            content.append(element)
+        elif isinstance(element, str):
+            content.append(PlainText(element))
+        elif isinstance(element, Message):
+            content.extend(element.content)
+        else:
+            content.extend(element)
+    return content
+
+
+from cyan.model.message import elements  # type: ignore

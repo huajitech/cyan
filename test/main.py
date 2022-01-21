@@ -179,17 +179,12 @@ async def channel_message_received(data: Message):
     )
     raw_content = data.content
     await data.reply(
-        PlainText(
-            "我收到了子频道 "
-        ) + ChannelLink(
-            await data.get_channel()
-        ) + PlainText(
-            " 用户 "
-        ) + Mention(
-            data.sender
-        ) + PlainText(
-            " 的信息，让我来复读一下：\n"
-        ) + raw_content
+        PlainText("我收到了子频道 "),
+        ChannelLink(await data.get_channel()),
+        PlainText(" 用户 "),
+        Mention(data.sender),
+        PlainText(" 的信息，让我来复读一下：\n"),
+        raw_content
     )
 
 

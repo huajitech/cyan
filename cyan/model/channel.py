@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Iterable
+from typing import Any
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
@@ -245,9 +245,9 @@ class TextChannel(Channel):
     文字子频道。
     """
 
-    from cyan.model.message import Message, MessageElement
+    from cyan.model.message import Message, MessageContent, Sendable
 
-    async def reply(self, target: Message, message: Iterable[MessageElement] | Message):
+    async def reply(self, target: Message, *message: Sendable):
         """
         回复指定消息。
 
@@ -255,9 +255,12 @@ class TextChannel(Channel):
             - target: 将要被回复的消息
             - message: 回应消息
         """
-        await self._send(message, target)
 
-    async def send(self, message: Iterable[MessageElement] | Message):
+        from cyan.model.message import create_message_content
+
+        await self._send(create_message_content(*message), target)
+
+    async def send(self, *message: Sendable):
         """
         发送消息。
 
@@ -265,21 +268,18 @@ class TextChannel(Channel):
             - message: 将要发送的消息
         """
 
-        await self._send(message, None)
+        from cyan.model.message import create_message_content
+
+        await self._send(create_message_content(*message), None)
 
     async def _send(
         self,
-        message: Iterable[MessageElement] | Message,
+        message: MessageContent,
         replying_target: Message | None
     ):
-        from cyan.model.message import Message, MessageContent
+        from cyan.model.message import MessageContent
 
-        if isinstance(message, Message):
-            content = message.content.to_dict()
-        elif isinstance(message, MessageContent):
-            content = message.to_dict()
-        else:
-            content = MessageContent(message).to_dict()
+        content = MessageContent(message).to_dict()
         if replying_target:
             content["msg_id"] = replying_target.identifier
         await self.bot.post(f"/channels/{self.identifier}/messages", content=content)
