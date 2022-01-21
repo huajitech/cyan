@@ -162,7 +162,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         参数：
             - member: 将要从当前身份组移除的成员
         """
-        
+
         if self.identifier == DefaultRoleId.OPERATOR:
             raise InvalidOperationError(
                 "“子频道管理员”身份组不支持移除成员，如需移除子频道管理员请调用 Channel.remove_operator 方法。"
