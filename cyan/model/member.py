@@ -3,12 +3,11 @@ from typing import Any
 
 from cyan.bot import Bot
 from cyan.model.guild import Guild
-from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.user import User
 
 
-class Member(Model, AsyncRenovatable["Member"]):
+class Member(User, AsyncRenovatable["Member"]):
     """
     成员。
     """
@@ -16,6 +15,7 @@ class Member(Model, AsyncRenovatable["Member"]):
     _bot: Bot
     _guild: Guild
     _props: dict[str, Any]
+    _user: User
 
     def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
         """
@@ -28,15 +28,24 @@ class Member(Model, AsyncRenovatable["Member"]):
         self._bot = bot
         self._guild = guild
         self._props = props
+        self._user = User(self.bot, self._props["user"])
 
     @property
     def bot(self):
         return self._bot
 
     @property
+    def identifier(self):
+        return self._user.identifier
+
+    @property
     def name(self) -> str:
+        return self._user.name
+
+    @property
+    def alias(self) -> str:
         """
-        成员名称。
+        成员别称。
         """
 
         return self._props["nick"]
@@ -57,6 +66,10 @@ class Member(Model, AsyncRenovatable["Member"]):
 
         return self._guild
 
+    @property
+    def is_bot(self) -> bool:
+        return self._user.is_bot
+
     async def get_roles(self):
         """
         异步获取当前成员的所有所属身份组。
@@ -69,16 +82,6 @@ class Member(Model, AsyncRenovatable["Member"]):
         role_map = dict([(role.identifier, role) for role in roles])
         return [role_map[role] for role in self._props["roles"]]
 
-    def as_user(self) -> User:
-        """
-        转换成员为用户。
-
-        返回：
-            当前实例的 `User` 形式。
-        """
-
-        return User(self.bot, self._props["user"])
-
     async def mute(self, duration: timedelta):
         """
         异步禁言当前成员指定时长。
@@ -86,7 +89,7 @@ class Member(Model, AsyncRenovatable["Member"]):
 
         content = {"mute_seconds": str(duration.seconds)}
         await self.bot.patch(
-            f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
+            f"/guilds/{self.guild.identifier}/members/{self.identifier}/mute",
             content=content
         )
 
@@ -97,7 +100,7 @@ class Member(Model, AsyncRenovatable["Member"]):
 
         content = {"mute_end_timestamp": str(time.timestamp())}
         await self.bot.patch(
-            f"/guilds/{self.guild.identifier}/members/{self.as_user().identifier}/mute",
+            f"/guilds/{self.guild.identifier}/members/{self.identifier}/mute",
             content=content
         )
 
@@ -107,6 +110,13 @@ class Member(Model, AsyncRenovatable["Member"]):
         """
 
         await self.mute(timedelta())
+
+    async def discard(self):
+        """
+        异步移除当前成员。
+        """
+
+        await self.bot.delete(f"/guilds/{self.guild.identifier}/members/{self.identifier}")
 
     async def renovate(self):
         guild = await self.guild.renovate()

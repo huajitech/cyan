@@ -384,7 +384,6 @@ class AppChannel(Channel):
             "jump_channel_id": destination.identifier if destination else DEFAULT_ID,
             "remind_type": str(remind_type.value)
         }
-        print(schedule)
         content = {"schedule": schedule}
         response = await self.bot.post(f"/channels/{self.identifier}/schedules", content=content)
         return Schedule(self.bot, self, response.json())

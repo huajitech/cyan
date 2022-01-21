@@ -102,7 +102,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
                 members.extend([Member(self.bot, self, member) for member in content])
                 if len(content) < _MEMBER_QUERY_LIMIT:
                     return members
-                cur = members[-1].as_user().identifier
+                cur = members[-1].identifier
             except OpenApiError as ex:
                 # 若当前成员为频道最后一个元素时，API 会抛出代码为 130000 错误。
                 if ex.code == 130000:

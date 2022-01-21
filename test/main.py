@@ -78,8 +78,8 @@ async def main():
 
             members = await guild.get_members()
             print(f"频道 {guild.name} 成员：\n" + "\n".join([
-                f" ID：{member.as_user().identifier}，名称：{member.as_user().name}，"
-                f"昵称：{member.name}，"
+                f" ID：{member.identifier}，名称：{member.name}，"
+                f"别称：{member.alias}，"
                 f"身份组：{[role.name for role in (await member.get_roles())]}，"
                 f"加入时间：{member.joined_time}"
                 for member in members
@@ -165,17 +165,17 @@ async def guild_updated(data: Guild):
 
 @event_source.listen(MemberJoinedEvent)
 async def member_joined(data: Member):
-    print(f"用户 {data.as_user().name} 加入频道 {data.guild.name}。")
+    print(f"用户 {data.name} 加入频道 {data.guild.name}。")
 
 
 @event_source.listen(MemberLeftEvent)
 async def member_left(data: Member):
-    print(f"用户 {data.as_user().name} 离开频道 {data.guild.name}。")
+    print(f"用户 {data.name} 离开频道 {data.guild.name}。")
 
 
 @event_source.listen(MemberUpdatedEvent)
 async def member_updated(data: Member):
-    print(f"用户 {data.as_user().name} 在频道 {data.guild.name} 更新资料。")
+    print(f"用户 {data.name} 在频道 {data.guild.name} 更新资料。")
 
 
 @event_source.listen(ChannelMessageReceivedEvent)
