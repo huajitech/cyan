@@ -76,7 +76,7 @@ async def main():
                 for role in roles
             ]))
 
-            await role.discard()
+            await guild.remove_role(role)
 
             members = await guild.get_members()
             print(f"频道 {guild.name} 成员：\n" + "\n".join([
@@ -127,7 +127,7 @@ async def main():
                         f"提醒类型：{schedule.remind_type}"
                         for schedule in schedules
                     ]))
-                    await schedule.discard()
+                    await schedule.cancel()
                     break
 
         await event_source.wait_until_stopped()

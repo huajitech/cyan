@@ -11,6 +11,7 @@ from cyan.model.renovatable import AsyncRenovatable
 
 if TYPE_CHECKING:
     from cyan.model.member import Member
+    from cyan.model.role import Role
 
 
 # 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
@@ -329,6 +330,26 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             f"/guilds/{self.identifier}/members/{member.identifier}"
             f"/roles/{DefaultRoleId.ADMINISTRATOR}"
         )
+
+    async def remove(self, member: "Member"):
+        """
+        异步从当前频道移除指定成员。
+
+        参数：
+            - member: 将要从当前频道移除的成员
+        """
+
+        await self.bot.delete(f"/guilds/{self.identifier}/members/{member.identifier}")
+
+    async def remove_role(self, role: "Role"):
+        """
+        异步从当前频道移除指定身份组。
+
+        参数：
+            - role: 将要从当前频道移除的身份组
+        """
+
+        await self.bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
 
     async def renovate(self):
         return await self.bot.get_guild(self.identifier)

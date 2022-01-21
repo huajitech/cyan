@@ -147,9 +147,9 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
     # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/delete_schedule.html。
-    async def discard(self):
+    async def cancel(self):
         """
-        异步删除当前日程。
+        异步取消当前日程。
         """
 
         await self.bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")

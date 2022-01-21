@@ -111,13 +111,6 @@ class Member(User, AsyncRenovatable["Member"]):
 
         await self.mute(timedelta())
 
-    async def discard(self):
-        """
-        异步移除当前成员。
-        """
-
-        await self.bot.delete(f"/guilds/{self.guild.identifier}/members/{self.identifier}")
-
     async def renovate(self):
         guild = await self.guild.renovate()
         return await guild.get_member(self.identifier)
