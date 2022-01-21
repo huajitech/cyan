@@ -161,7 +161,7 @@ class Mention(ParsableContentElement):
 
     @staticmethod
     def get_parse_regex():
-        return re.compile(r"<@!([\d\w]+)>")
+        return re.compile(r"<@!{0,1}([\d\w]+)>")
 
     @staticmethod
     def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]):
