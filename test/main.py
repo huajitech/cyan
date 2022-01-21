@@ -17,7 +17,7 @@ from cyan.event.events import (
 from cyan import Bot, Ticket
 from cyan.model import AppChannel, TextChannel, Channel, Guild, Member, RemindType, Message
 from cyan.model.channel import AppChannelType, ScheduleChannel
-from cyan.model.message.elements import PlainText, ChannelLink, Mention
+from cyan.model.message.elements import ChannelLink, Mention
 
 
 api = "https://sandbox.api.sgroup.qq.com/"
@@ -188,14 +188,10 @@ async def channel_message_received(data: Message):
         f"用户 {data.sender.name} 在频道 {(await data.get_guild()).name} 发送消息：\n"
         f"    {''.join(map(str, data.content))}"
     )
-    raw_content = data.content
     await data.reply(
-        PlainText("我收到了子频道 "),
-        ChannelLink(await data.get_channel()),
-        PlainText(" 用户 "),
-        Mention(data.sender),
-        PlainText(" 的信息，让我来复读一下：\n"),
-        raw_content
+        "我收到了子频道 ", ChannelLink(await data.get_channel()),
+        " 用户 ", Mention(data.sender),
+        " 的消息，让我来复读一下：\n", data
     )
 
 
