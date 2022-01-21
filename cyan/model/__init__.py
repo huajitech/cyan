@@ -33,3 +33,6 @@ from .role import *
 from .channel import *
 from .schedule import *
 from .message import Message as Message
+from .message import MessageContent as MessageContent
+from .message import MessageAuditInfo as MessageAuditInfo
+from .message import MessageElement as MessageElement
