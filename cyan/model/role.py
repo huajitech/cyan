@@ -150,6 +150,14 @@ class Role(Model, AsyncRenovatable["Role"]):
             raise InvalidOperationError(
                 "“子频道管理员”身份组不支持添加成员，如需设置子频道管理员请调用 Channel.add_operator 方法。"
             )
+        if self.identifier == DefaultRoleId.ADMINISTRATOR:
+            raise InvalidOperationError(
+                "“管理员”身份组不支持添加成员，如需移除管理员请调用 Guild.add_administrator 方法。"
+            )
+        if self.identifier == DefaultRoleId.OWNER or self.identifier == DefaultRoleId.DEFAULT:
+            raise InvalidOperationError(
+                "当前身份组不支持添加成员。"
+            )
 
         await self.bot.put(
             f"/guilds/{self.guild.identifier}/members/{member.identifier}/roles/{self.identifier}"
@@ -166,6 +174,14 @@ class Role(Model, AsyncRenovatable["Role"]):
         if self.identifier == DefaultRoleId.OPERATOR:
             raise InvalidOperationError(
                 "“子频道管理员”身份组不支持移除成员，如需移除子频道管理员请调用 Channel.remove_operator 方法。"
+            )
+        if self.identifier == DefaultRoleId.ADMINISTRATOR:
+            raise InvalidOperationError(
+                "“管理员”身份组不支持移除成员，如需移除管理员请调用 Guild.remove_administrator 方法。"
+            )
+        if self.identifier == DefaultRoleId.OWNER or self.identifier == DefaultRoleId.DEFAULT:
+            raise InvalidOperationError(
+                "当前身份组不支持移除成员。"
             )
 
         await self.bot.delete(

@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from httpx import AsyncClient
 
 from cyan.color import ARGB
@@ -7,6 +7,10 @@ from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
 from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
+
+
+if TYPE_CHECKING:
+    from cyan.model.member import Member
 
 
 # 参考 https://bot.q.qq.com/wiki/develop/pythonsdk/api/member/get_guild_members.html#queryparams。
@@ -277,6 +281,54 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
 
         await self.mute(timedelta())
+
+    async def get_administrators(self):
+        """
+        异步获取当前频道的所有管理员。
+
+        返回：
+            以 `Member` 类型表示管理员的 `list` 集合。
+        """
+
+        from cyan.model.role import DefaultRoleId
+
+        members = await self.get_members()
+        return [
+            member for member in members
+            if DefaultRoleId.ADMINISTRATOR in [
+                role.identifier for role in await member.get_roles()
+            ]
+        ]
+
+    async def add_administrator(self, member: "Member"):
+        """
+        异步添加管理员到当前频道。
+
+        参数：
+            - member: 将要添加到当前频道的成员
+        """
+
+        from cyan.model.role import DefaultRoleId
+
+        await self.bot.put(
+            f"/guilds/{self.identifier}/members/{member.identifier}"
+            f"/roles/{DefaultRoleId.ADMINISTRATOR}"
+        )
+
+    async def remove_administrator(self, member: "Member"):
+        """
+        异步从当前频道移除指定管理员。
+
+        参数：
+            - member: 将要从当前频道移除的管理员
+        """
+
+        from cyan.model.role import DefaultRoleId
+
+        await self.bot.delete(
+            f"/guilds/{self.identifier}/members/{member.identifier}"
+            f"/roles/{DefaultRoleId.ADMINISTRATOR}"
+        )
 
     async def renovate(self):
         return await self.bot.get_guild(self.identifier)
