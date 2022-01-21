@@ -165,11 +165,12 @@ class Mention(ParsableContentElement):
 
     @staticmethod
     def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]):
-        mentions = _dict["mentions"]
-        for mention in mentions:
-            user = User(bot, mention)
-            if mention["id"] == match.group(1):
-                return Mention(user)
+        mentions = _dict.get("mentions", None)
+        if mentions:
+            for mention in mentions:
+                user = User(bot, mention)
+                if mention["id"] == match.group(1):
+                    return Mention(user)
         return None
 
     def to_content(self):
