@@ -397,8 +397,6 @@ class AppChannel(Channel):
         schedule = response.json()
         return Schedule(self.bot, self, schedule)
 
-    # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
-    # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/post_schedule.html。
     async def create_schedule(
         self,
         name: str,
