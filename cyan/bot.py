@@ -52,6 +52,14 @@ class Bot:
         self._client = AsyncClient(headers=headers)
         self._event_source = EventSource(self, authorization)
 
+    @property
+    def event_source(self):
+        """
+        事件源。
+        """
+
+        return self._event_source
+
     async def get(self, path: str, params: dict[str, Any] | None = None):
         """
         异步向服务器请求 GET 操作。
@@ -234,9 +242,6 @@ class Bot:
         if isinstance(channel, ChannelGroup):
             return channel
         raise InvalidTargetError("指定的 ID 不为子频道组。")
-
-    def get_event_source(self):
-        return self._event_source
 
     async def _get_channel_core(self, identifier: str):
         from cyan.model.channel import parse as parse_channel

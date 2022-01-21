@@ -25,7 +25,7 @@ app_id = input("请输入 APP ID：")
 token = input("请输入 Token：")
 
 bot = Bot(api, Ticket(app_id, token))
-event_source = bot.get_event_source()
+event_source = bot.event_source
 
 
 async def main():
