@@ -8,7 +8,9 @@ from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
 from cyan.model.guild import Guild
 from cyan.model import Model
+from cyan.model.member import Member
 from cyan.model.renovatable import AsyncRenovatable
+from cyan.model.role import DefaultRoleId
 from cyan.util._enum import get_enum_key
 
 
@@ -235,6 +237,36 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
 
         return self._props["parent_id"] == parent.identifier
+
+    async def add_operator(self, member: Member):
+        """
+        异步添加管理员到当前子频道。
+
+        参数：
+            - member: 将要添加到当前子频道的成员
+        """
+
+        channel = {"id": self.identifier}
+        await self.bot.put(
+            f"/guilds/{self.guild.identifier}/members/{member.identifier}"
+            f"/roles/{DefaultRoleId.OPERATOR}",
+            content={"channel": channel}
+        )
+
+    async def remove_operator(self, member: Member):
+        """
+        异步从当前子频道移除指定管理员。
+
+        参数：
+            - member: 将要从当前子频道移除的管理员
+        """
+
+        channel = {"id": self.identifier}
+        await self.bot.delete(
+            f"/guilds/{self.guild.identifier}/members/{member.identifier}"
+            f"/roles/{DefaultRoleId.OPERATOR}",
+            content={"channel": channel}
+        )
 
     async def renovate(self):
         return await self.bot.get_channel(self.identifier)

@@ -148,7 +148,7 @@ class Role(Model, AsyncRenovatable["Role"]):
 
         if self.identifier == DefaultRoleId.OPERATOR:
             raise InvalidOperationError(
-                "“子频道管理员”身份组不支持添加成员，如需设置子频道管理员请调用 Channel.set_operator 方法。"
+                "“子频道管理员”身份组不支持添加成员，如需设置子频道管理员请调用 Channel.add_operator 方法。"
             )
 
         await self.bot.put(

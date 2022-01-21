@@ -102,7 +102,7 @@ class Bot:
         response = await self._client.put(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
-    async def delete(self, path: str, params: dict[str, Any] | None = None):
+    async def delete(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
         """
         异步向服务器请求 DELETE 操作。
 
@@ -115,7 +115,9 @@ class Bot:
         """
 
         url = urljoin(self._base_url, path)
-        response = await self._client.delete(url, params=params)  # type: ignore
+        response = await self._client.request(  # type: ignore
+            "DELETE", url, params=params, json=content
+        )
         return Bot._check_error(response)
 
     async def patch(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
