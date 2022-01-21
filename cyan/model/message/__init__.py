@@ -233,7 +233,7 @@ def create_message_content(*elements: Sendable):
     """
     创建 `MessageContent` 实例。
 
-    指定元素类型若为 `MessageElement` 则直接呈现;
+    指定元素类型若为 `MessageElement` 则直接呈现；
     若为 `str` 则转换为 `PlainText` 类型呈现；
     若为 `Iterable[MessageElement]` 则取出其中元素呈现；
     若为 `Message` 则获取其中内容并取出其中元素呈现。
