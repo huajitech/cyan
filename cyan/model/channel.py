@@ -6,6 +6,7 @@ from cyan import OpenApiError
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
+from cyan.exception import InvalidOperationError
 from cyan.model.guild import Guild
 from cyan.model import Model
 from cyan.model.member import Member
@@ -15,6 +16,10 @@ from cyan.util._enum import get_enum_key
 
 
 class TextChannelType(Enum):
+    """
+    文字子频道类型。
+    """
+
     CHAT = 0
     """
     闲聊。
@@ -36,7 +41,52 @@ class TextChannelType(Enum):
     """
 
 
+class AppChannelType(Enum):
+    """
+    应用子频道类型。
+    """
+
+    HONOR_OF_KINGS = 1000000
+    """
+    王者开黑大厅。
+    """
+
+    GAME = 1000001
+    """
+    互动小游戏。
+    """
+
+    VOTE = 1000010
+    """
+    腾讯投票。
+    """
+
+    QQ_SPEED = 1000051
+    """
+    QQ 飞车开黑大厅。
+    """
+
+    SCHEDULE = 1000050
+    """
+    日程提醒。
+    """
+
+    CODM = 1000070
+    """
+    CoDM 开黑大厅。
+    """
+
+    GAME_FOR_PEACE = 1010000
+    """
+    和平精英开黑大厅。
+    """
+
+
 class ChannelVisibility(Enum):
+    """
+    子频道可见性。
+    """
+
     EVERYONE = 0
     """
     所有人。
@@ -45,6 +95,27 @@ class ChannelVisibility(Enum):
     ADMINISTRATOR = 1
     """
     所有者及管理员。
+    """
+
+    APOINTEE = 2
+    """
+    所有者、管理员及指定人员。
+    """
+
+
+class ChannelPermission(Enum):
+    """
+    子频道权限。
+    """
+
+    DEFAULT = 0
+    """
+    默认。
+    """
+
+    EVERYONE = 1
+    """
+    所有人。
     """
 
     APOINTEE = 2
@@ -199,6 +270,14 @@ class Channel(Model, AsyncRenovatable["Channel"]):
 
         return ChannelVisibility(self._props["private_type"])
 
+    @property
+    def permission(self):
+        """
+        子频道权限。
+        """
+
+        return ChannelPermission(self._props["speak_permission"])
+
     async def get_owner(self):
         """
         异步获取子频道所有者。
@@ -279,6 +358,17 @@ class TextChannel(Channel):
 
     from cyan.model.message import Message, MessageContent, Sendable
 
+    @property
+    def text_channel_type(self) -> TextChannelType | int:
+        """
+        文字子频道类型。
+
+        当类型值在 `TextChannelType` 中时为对应 `TextChannelType`；
+        否则为指示当前文字子频道类型的 `int` 值。
+        """
+
+        return get_enum_key(TextChannelType, self._props["sub_type"])
+
     async def reply(self, target: Message, *message: Sendable):
         """
         异步回复指定消息。
@@ -329,14 +419,6 @@ class TextChannel(Channel):
             return MessageAuditInfo(self.bot, data)
         return Message.from_dict(self.bot, data)
 
-    @property
-    def text_channel_type(self):
-        """
-        文字子频道类型。
-        """
-
-        return get_enum_key(TextChannelType, self._props["sub_type"])
-
 
 class VoiceChannel(Channel):
     """
@@ -359,7 +441,37 @@ class AppChannel(Channel):
     应用子频道。
     """
 
+    @property
+    def app_channel_type(self) -> AppChannelType | int:
+        """
+        应用子频道类型。
+
+        当类型值在 `AppChannelType` 中时为对应 `AppChannelType`；
+        否则为指示当前应用子频道类型的 `int` 值。
+        """
+
+        return get_enum_key(AppChannelType, self._props["application_id"])
+
+
+class ScheduleChannel(AppChannel):
+    """
+    日程子频道。
+    """
+
     from cyan.model.schedule import RemindType
+
+    @staticmethod
+    def from_app_channel(channel: AppChannel):
+        """
+        转换 `AppChannel` 实例为 `ScheduleChannel` 实例。
+
+        参数：
+            - channel: 所需转换的应用子频道（应用子频道类型必须为日程提醒）
+        """
+
+        if channel.app_channel_type == AppChannelType.SCHEDULE:
+            return ScheduleChannel(channel.bot, channel.guild, channel._props)
+        raise InvalidOperationError("目标应用子频道类型不为日程提醒。")
 
     # TODO: 实现为获取所有日程（通过传入指定 since 参数以实现，但据目前所提供的 API 下测试失败）。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/get_schedules.html。

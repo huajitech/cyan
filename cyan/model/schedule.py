@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
+from cyan.exception import OperationFailedError
 from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.user import User
@@ -157,5 +158,10 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
     # TODO: 实现日程信息修改。
 
     async def renovate(self):
-        channel: "AppChannel" = await self.channel.renovate()  # type: ignore
-        return await channel.get_schedule(self.identifier)
+        from cyan.model.channel import ScheduleChannel
+
+        channel = await self.channel.renovate()
+        if not isinstance(channel, AppChannel):
+            raise OperationFailedError("当前日程所属子频道不为应用子频道。")
+        schedule_channel = ScheduleChannel.from_app_channel(channel)
+        return await schedule_channel.get_schedule(self.identifier)

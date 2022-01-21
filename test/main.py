@@ -16,6 +16,7 @@ from cyan.event.events import (
 )
 from cyan import Bot, Ticket
 from cyan.model import AppChannel, TextChannel, Channel, Guild, Member, RemindType, Message
+from cyan.model.channel import AppChannelType, ScheduleChannel
 from cyan.model.message.elements import PlainText, ChannelLink, Mention
 
 
@@ -107,8 +108,11 @@ async def main():
 
             if channels:
                 for channel in channels:
-                    if not isinstance(channel, AppChannel):
+                    if not isinstance(
+                        channel, AppChannel
+                    ) or channel.app_channel_type != AppChannelType.SCHEDULE:
                         continue
+                    channel = ScheduleChannel.from_app_channel(channel)
                     schedule = await channel.create_schedule(
                         "Cyan 仓库开放庆祝！",
                         datetime.now() + timedelta(hours=1),

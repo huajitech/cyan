@@ -6,6 +6,14 @@ class CyanException(Exception):
     pass
 
 
+class OperationFailedError(CyanException):
+    """
+    当操作失败时抛出。
+    """
+
+    pass
+
+
 class InvalidOperationError(CyanException):
     """
     当操作不合法时抛出。
