@@ -1,14 +1,15 @@
-from enum import Enum
 from typing import Any
 
 from cyan.bot import Bot
 from cyan.color import ARGB
+from cyan.exception import InvalidOperationError
 from cyan.model.guild import Guild
 from cyan.model import Model
+from cyan.model.member import Member
 from cyan.model.renovatable import AsyncRenovatable
 
 
-class DefaultRoleId(Enum):
+class DefaultRoleId:
     """
     默认身份组 ID。
     """
@@ -136,6 +137,40 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
 
         await self._modify(shown=False)
+
+    async def add(self, member: Member):
+        """
+        异步添加成员到当前身份组。
+
+        参数：
+            - member: 将要添加到当前身份组的成员
+        """
+
+        if self.identifier == DefaultRoleId.OPERATOR:
+            raise InvalidOperationError(
+                "“子频道管理员”身份组不支持添加成员，如需设置子频道管理员请调用 Channel.set_operator 方法。"
+            )
+
+        await self.bot.put(
+            f"/guilds/{self.guild.identifier}/members/{member.identifier}/roles/{self.identifier}"
+        )
+
+    async def remove(self, member: Member):
+        """
+        异步从当前身份组移除指定成员。
+
+        参数：
+            - member: 将要从当前身份组移除的成员
+        """
+        
+        if self.identifier == DefaultRoleId.OPERATOR:
+            raise InvalidOperationError(
+                "“子频道管理员”身份组不支持移除成员，如需移除子频道管理员请调用 Channel.remove_operator 方法。"
+            )
+
+        await self.bot.delete(
+            f"/guilds/{self.guild.identifier}/members/{member.identifier}/roles/{self.identifier}"
+        )
 
     async def _modify(
         self,
