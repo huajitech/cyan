@@ -437,5 +437,4 @@ class EventSource:
             case Operation.CONNECTED:
                 self._set_heartbeat(content["d"]["heartbeat_interval"])
                 await self._identify()
-            case Operation.HEARTBEAT:
-                await self._send_heartbeat()
+        await self._send_heartbeat()
