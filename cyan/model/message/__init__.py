@@ -109,31 +109,6 @@ class MessageContent(list[MessageElement]):
             element.apply(elements)
         return elements
 
-    @staticmethod
-    def from_dict(bot: Bot, _dict: dict[str, Any]):
-        """
-        解析消息内容字典为 `MessageContent` 实例。
-
-        参数：
-            - bot: 请求解析的机器人实例
-            - _dict: 将用于解析的消息内容字典
-
-        返回：
-            以 `MessageContent` 类型表示的消息内容。
-        """
-
-        elements = list[MessageElement]()
-        for parser in _message_element_parsers:
-            result = parser(bot, frozendict(_dict))
-            if not result:
-                continue
-            if result.top:
-                result.elements.extend(elements)
-                elements = result.elements
-            else:
-                elements.extend(result.elements)
-        return MessageContent(elements)
-
 
 class Message(Model):
     _bot: Bot
@@ -237,7 +212,17 @@ class Message(Model):
             以 `Message` 类型表示的消息。
         """
 
-        content = MessageContent.from_dict(bot, _dict)
+        elements = list[MessageElement]()
+        for parser in _message_element_parsers:
+            result = parser(bot, frozendict(_dict))
+            if not result:
+                continue
+            if result.top:
+                result.elements.extend(elements)
+                elements = result.elements
+            else:
+                elements.extend(result.elements)
+        content = MessageContent(elements)
         return Message(bot, _dict, content)
 
 
@@ -273,6 +258,23 @@ def create_message_content(*elements: Sendable):
         else:
             content.extend(element)
     return content
+
+
+class MessageAuditInfo(Model):
+    _bot: Bot
+    _props: dict[str, Any]
+
+    def __init__(self, bot: Bot, props: dict[str, Any]):
+        self._bot = bot
+        self._props = props
+
+    @property
+    def bot(self):
+        return self._bot
+
+    @property
+    def identifier(self):
+        return self._props["data"]["message_audit"]["audit_id"]
 
 
 from cyan.model.message import elements  # type: ignore

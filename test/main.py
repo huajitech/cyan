@@ -76,6 +76,8 @@ async def main():
                 for role in roles
             ]))
 
+            await role.discard()
+
             members = await guild.get_members()
             print(f"频道 {guild.name} 成员：\n" + "\n".join([
                 f" ID：{member.identifier}，名称：{member.name}，"
@@ -127,8 +129,6 @@ async def main():
                     ]))
                     await schedule.discard()
                     break
-
-            await role.discard()
 
         await event_source.wait_until_stopped()
 

@@ -249,11 +249,15 @@ class TextChannel(Channel):
 
     async def reply(self, target: Message, *message: Sendable):
         """
-        回复指定消息。
+        异步回复指定消息。
 
         参数：
             - target: 将要被回复的消息
             - message: 回应消息
+
+        返回：
+            当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
+            否则，返回表示以 `Message` 类型表示的所发送消息。
         """
 
         from cyan.model.message import create_message_content
@@ -262,10 +266,14 @@ class TextChannel(Channel):
 
     async def send(self, *message: Sendable):
         """
-        发送消息。
+        异步发送消息。
 
         参数：
             - message: 将要发送的消息
+
+        返回：
+            当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
+            否则，返回表示以 `Message` 类型表示的所发送消息。
         """
 
         from cyan.model.message import create_message_content
@@ -277,12 +285,17 @@ class TextChannel(Channel):
         message: MessageContent,
         replying_target: Message | None
     ):
-        from cyan.model.message import MessageContent
+        from cyan.model.message import Message, MessageContent, MessageAuditInfo
 
         content = MessageContent(message).to_dict()
         if replying_target:
             content["msg_id"] = replying_target.identifier
-        await self.bot.post(f"/channels/{self.identifier}/messages", content=content)
+        response = await self.bot.post(f"/channels/{self.identifier}/messages", content=content)
+        data: dict[str, Any] = response.json()
+        code = data.get("code", None)
+        if code == 304023 or code == 304024:
+            return MessageAuditInfo(self.bot, data)
+        return Message.from_dict(self.bot, data)
 
     @property
     def text_channel_type(self):
