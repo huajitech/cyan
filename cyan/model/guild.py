@@ -91,9 +91,8 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         members = list[Member]()
         while True:
             params: dict[str, Any] = {"limit": _MEMBER_QUERY_LIMIT}
-            params.update(
-                {"after": cur} if cur else {}
-            )
+            if cur:
+                params.update({"after": cur})
             try:
                 response = await self.bot.get(
                     f"/guilds/{self.identifier}/members",
@@ -164,6 +163,23 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         response = await self.bot.get(f"/guilds/{self.identifier}/channels")
         channels = response.json()
         return [await channel_parse(self.bot, channel, self) for channel in channels]
+
+    async def get_owner(self):
+        """
+        异步获取频道所有者。
+
+        返回：
+            当存在频道所有者时，返回以 `Member` 类型表示的当前频道所有者；
+            若不存在，则返回 `None`。
+        """
+
+        identifier = self._props["owner_id"]
+        try:
+            return await self.get_member(identifier)
+        except OpenApiError as ex:
+            if ex.code == 50001:
+                return None
+            raise
 
     async def get_roles(self):
         """

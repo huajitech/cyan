@@ -2,6 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+from cyan import OpenApiError
+
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
 from cyan.model.guild import Guild
@@ -40,12 +42,12 @@ class ChannelVisibility(Enum):
 
     ADMINISTRATOR = 1
     """
-    创建者及管理员。
+    所有者及管理员。
     """
 
     APOINTEE = 2
     """
-    创建者、管理员及指定人员。
+    所有者、管理员及指定人员。
     """
 
 
@@ -105,28 +107,22 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
 
     async def get_owner(self):
         """
-        获取子频道组创建者。
+        获取子频道组所有者。
 
         返回：
-            当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
+            当存在子频道组所有者时，返回以 `Member` 类型表示的当前子频道所有者；
             若不存在，则返回 `None`。
         """
 
         identifier = self._props["owner_id"]
         if identifier == DEFAULT_ID:
             return None
-        guild = await self.get_guild()
-        return await guild.get_member(identifier)
-
-    async def get_guild(self):
-        """
-        获取子频道组附属的频道。
-
-        返回：
-            以 `Guild` 类型表示的当前子频道附属的频道。
-        """
-
-        return await self.bot.get_guild(self._props["guild_id"])
+        try:
+            return await self.guild.get_member(identifier)
+        except OpenApiError as ex:
+            if ex.code == 50001:
+                return None
+            raise
 
     async def get_children(self):
         """
@@ -136,8 +132,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
             以 `Channel` 类型表示成员子频道的 `list` 集合。
         """
 
-        guild = await self.get_guild()
-        channels = await guild.get_channels()
+        channels = await self.guild.get_channels()
         return [
             channel
             for channel in channels
@@ -204,17 +199,22 @@ class Channel(Model, AsyncRenovatable["Channel"]):
 
     async def get_owner(self):
         """
-        异步获取子频道组创建者。
+        异步获取子频道所有者。
 
         返回：
-            当存在子频道组创建者时，返回以 `Member` 类型表示的当前子频道创建者；
+            当存在子频道所有者时，返回以 `Member` 类型表示的当前子频道所有者；
             若不存在，则返回 `None`。
         """
 
         identifier = self._props["owner_id"]
         if identifier == DEFAULT_ID:
             return None
-        return self.guild.get_member(identifier)
+        try:
+            return await self.guild.get_member(identifier)
+        except OpenApiError as ex:
+            if ex.code == 50001:
+                return None
+            raise
 
     async def get_parent(self):
         """
@@ -359,7 +359,7 @@ class AppChannel(Channel):
         name: str,
         start_time: datetime,
         end_time: datetime,
-        remind_type: RemindType,
+        remind_type: RemindType = RemindType.SILENT,
         description: str = "",
         destination: Channel | None = None
     ):
@@ -379,11 +379,12 @@ class AppChannel(Channel):
         schedule = {
             "name": name,
             "description": description,
-            "start_timestamp": int(start_time.timestamp() * 1000),
-            "end_timestamp": int(end_time.timestamp() * 1000),
+            "start_timestamp": str(int(start_time.timestamp() * 1000)),
+            "end_timestamp": str(int(end_time.timestamp() * 1000)),
             "jump_channel_id": destination.identifier if destination else DEFAULT_ID,
             "remind_type": str(remind_type.value)
         }
+        print(schedule)
         content = {"schedule": schedule}
         response = await self.bot.post(f"/channels/{self.identifier}/schedules", content=content)
         return Schedule(self.bot, self, response.json())

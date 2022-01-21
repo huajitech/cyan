@@ -25,7 +25,7 @@ class DefaultRoleId(Enum):
 
     OWNER = "4"
     """
-    创建者。
+    所有者。
     """
 
     OPERATOR = "5"

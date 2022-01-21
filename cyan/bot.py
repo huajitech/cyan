@@ -188,9 +188,8 @@ class Bot:
         guilds = list[Guild]()
         while True:
             params: dict[str, Any] = {"limit": _GUILD_QUERY_LIMIT}
-            params.update(
-                {"after": cur} if cur else {}
-            )
+            if cur:
+                params.update({"after": cur})
             response = await self.get("/users/@me/guilds", params)
             content = response.json()
             guilds.extend([Guild(self, guild) for guild in content])

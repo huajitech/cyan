@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta
 
 from cyan.color import ARGB
 from cyan.event.events import (
@@ -13,9 +14,8 @@ from cyan.event.events import (
     MemberLeftEvent,
     ChannelMessageReceivedEvent
 )
-from cyan.model import AppChannel, TextChannel, Channel, Guild, Member
 from cyan import Bot, Ticket
-from cyan.model.message import Message
+from cyan.model import AppChannel, TextChannel, Channel, Guild, Member, RemindType, Message
 from cyan.model.message.elements import PlainText, ChannelLink, Mention
 
 
@@ -88,7 +88,7 @@ async def main():
             channel_groups = await guild.get_channel_groups()
             print(f"频道 {guild.name} 子频道组：\n" + "\n".join([
                 f" ID：{group.identifier}，名称：{group.name}，"
-                f"创建者：{getattr(await group.get_owner(), 'nickname', None)}"
+                f"所有者：{getattr(await group.get_owner(), 'nickname', None)}"
                 for group in channel_groups
             ]))
 
@@ -99,7 +99,7 @@ async def main():
                     f"文字频道类型：{channel.text_channel_type}，"
                     if isinstance(channel, TextChannel) else ""
                 ) + f"附属子频道组：{(await channel.get_parent()).name}，"
-                f"创建者：{getattr(await channel.get_owner(), 'nickname', None)}"
+                f"所有者：{getattr(await channel.get_owner(), 'name', None)}"
                 for channel in channels
             ]))
 
@@ -107,6 +107,12 @@ async def main():
                 for channel in channels:
                     if not isinstance(channel, AppChannel):
                         continue
+                    schedule = await channel.create_schedule(
+                        "Cyan 仓库开放庆祝！",
+                        datetime.now() + timedelta(hours=1),
+                        datetime.now() + timedelta(hours=6),
+                        RemindType.EARLY
+                    )
                     schedules = await channel.get_schedules()
                     if not schedules:
                         continue
@@ -114,11 +120,12 @@ async def main():
                         f" ID：{schedule.identifier}，名称：{schedule.name}，"
                         f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
                         f"结束时间：{schedule.end_time}，"
-                        f"创建者：{schedule.creator.as_user().name}，"
+                        f"创建者：{schedule.creator.name}，"
                         f"跳转子频道：{getattr(await schedule.get_destination(), 'name', None)}，"
                         f"提醒类型：{schedule.remind_type}"
                         for schedule in schedules
                     ]))
+                    await schedule.discard()
                     break
 
             await role.discard()

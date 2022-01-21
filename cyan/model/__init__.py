@@ -31,3 +31,5 @@ from .guild import *
 from .member import *
 from .role import *
 from .channel import *
+from .schedule import *
+from .message import Message as Message

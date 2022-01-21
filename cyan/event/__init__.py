@@ -338,7 +338,8 @@ class EventSource:
         """
 
         content = {"op": operation.value}
-        content.update({"d": payload} if payload else {})
+        if payload:
+            content.update({"d": payload})
         data = json.dumps(content)
         await self._websocket.send(data)
 

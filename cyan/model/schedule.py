@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any
 
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
-from cyan.model.member import Member
 from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
+from cyan.model.user import User
 
 
 if TYPE_CHECKING:
@@ -124,7 +124,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         日程创建者。
         """
 
-        return Member(self.bot, self.channel.guild, self._props["creator"])
+        return User(self.bot, self._props["creator"]["user"])
 
     @property
     def remind_type(self):
