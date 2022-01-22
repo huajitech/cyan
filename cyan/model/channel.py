@@ -450,7 +450,7 @@ class AppChannel(Channel):
         否则为指示当前应用子频道类型的 `int` 值。
         """
 
-        return get_enum_key(AppChannelType, self._props["application_id"])
+        return get_enum_key(AppChannelType, int(self._props["application_id"]))
 
 
 class ScheduleChannel(AppChannel):
