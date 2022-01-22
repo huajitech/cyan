@@ -1,11 +1,13 @@
 import asyncio
 import inspect
 import json
+import warnings
 from asyncio.tasks import Task
 from enum import Enum
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, NoReturn
 from websockets.client import connect
+from websockets.exceptions import ConnectionClosed
 from websockets.legacy.client import WebSocketClientProtocol
 
 from cyan.exception import InvalidOperationError
@@ -181,9 +183,16 @@ class Event:
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
             argnames = inspect.signature(handler).parameters.keys()
-            await handler(**{
-                name: value for name, value in args.items() if name in argnames  # type: ignore
-            })
+            try:
+                await handler(**{
+                    name: value for name, value in args.items() if name in argnames  # type: ignore
+                })
+            except Exception as ex:
+                message = str(ex)
+                warnings.warn(
+                    f"调用事件处理器 {handler} 时捕获到异常 {type(ex).__name__}" + 
+                    (":\n" + message if message else "。")
+                )
 
 
 class Operation(Enum):
@@ -263,6 +272,10 @@ class _EventProvider:
         return self._event_name_dict.get(event_name, set[Event]())
 
 
+class _ConnectionResumed(Exception):
+    pass
+
+
 class EventSource:
     """
     事件源。
@@ -307,7 +320,7 @@ class EventSource:
 
     async def connect(self):
         """
-        连接服务器。
+        异步连接服务器。
         """
 
         response = await self.bot.get("/gateway")
@@ -318,11 +331,13 @@ class EventSource:
 
     async def disconnect(self):
         """
-        断开连接。
+        异步断开连接。
         """
 
         if self._heartbeat_task:
             self._heartbeat_task.cancel()
+        if self._task:
+            self._task.cancel()
         await self._websocket.close()
         self._session = None
         self._serial_code = -1
@@ -330,7 +345,7 @@ class EventSource:
 
     async def send(self, operation: Operation, payload: Any = None):
         """
-        发送数据至服务器。
+        异步发送数据至服务器。
 
         参数：
             - operation: 操作
@@ -372,8 +387,17 @@ class EventSource:
         return self.get_event(_type).handle()
 
     async def wait_until_stopped(self):
-        if self._task:
-            await self._task
+        """
+        异步等待至事件源停止接收消息。
+        """
+
+        while True:
+            if self._task:
+                try:
+                    await self._task
+                except _ConnectionResumed:
+                    continue
+            return
 
     def _calculate_intents(self):
         intents = self._event_provider.get_intents()
@@ -403,11 +427,19 @@ class EventSource:
 
     async def _on_ready(self, data: "ReadyEventData"):
         self._session = data.session
+        raise Exception
 
     async def _receive(self):
         async for data in self._websocket:
-            content = json.loads(data)
-            await self._handle(content)
+            try:           
+                content = json.loads(data)
+                await self._handle(content)
+            except ConnectionClosed as ex:
+                if ex.code != 4009:
+                    raise
+                await self.connect()
+                await self._resume()
+                raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any):
         for event in self._event_provider.get_by_event_name(event_name):
