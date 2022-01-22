@@ -428,7 +428,6 @@ class EventSource:
 
     async def _on_ready(self, data: "ReadyEventData"):
         self._session = data.session
-        raise Exception
 
     async def _receive(self):
         async for data in self._websocket:
