@@ -324,6 +324,10 @@ class EventSource:
         异步连接服务器。
         """
 
+        await self._connect()
+        await self._identify()
+
+    async def _connect(self):
         response = await self.bot.get("/gateway")
         content = response.json()
         self._websocket = await connect(content["url"])
@@ -437,7 +441,7 @@ class EventSource:
             except ConnectionClosed as ex:
                 if ex.code != 4009:
                     raise
-                await self.connect()
+                await self._connect()
                 await self._resume()
                 raise _ConnectionResumed
 
@@ -468,6 +472,5 @@ class EventSource:
                 await self._resume()
             case Operation.CONNECTED:
                 self._set_heartbeat(content["d"]["heartbeat_interval"])
-                await self._identify()
             case Operation.HEARTBEAT:
                 await self._send_heartbeat()
