@@ -317,13 +317,15 @@ class EventSource:
         `WebSocket` 是否已连接。
         """
 
-        return self._connected and not self._websocket.closed
+        return self._connected
 
     async def connect(self):
         """
         异步连接服务器。
         """
 
+        if self.connected:
+            raise InvalidOperationError("已连接至服务器。")
         await self._connect()
         await self._identify()
 
@@ -339,6 +341,8 @@ class EventSource:
         异步断开连接。
         """
 
+        if not self.connected:
+            raise InvalidOperationError("未连接至服务器。")
         if self._heartbeat_task:
             self._heartbeat_task.cancel()
         if self._task:

@@ -150,7 +150,8 @@ class Bot:
         异步关闭当前机器人。
         """
 
-        await self._event_source.disconnect()
+        if self._event_source.connected:
+            await self._event_source.disconnect()
         await self._client.aclose()
 
     async def get_current_user(self):
