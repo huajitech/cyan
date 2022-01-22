@@ -190,8 +190,9 @@ class Event:
             except Exception as ex:
                 message = str(ex)
                 warnings.warn(
-                    f"调用事件处理器 {handler} 时捕获到异常 {type(ex).__name__}" + 
-                    (":\n" + message if message else "。")
+                    f"调用事件处理器 {handler} 时捕获到异常 {type(ex).__name__}" + (
+                        ":\n" + message if message else "。"
+                    )
                 )
 
 
@@ -431,7 +432,7 @@ class EventSource:
 
     async def _receive(self):
         async for data in self._websocket:
-            try:           
+            try:
                 content = json.loads(data)
                 await self._handle(content)
             except ConnectionClosed as ex:
