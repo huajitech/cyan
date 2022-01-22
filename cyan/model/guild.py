@@ -97,7 +97,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         while True:
             params: dict[str, Any] = {"limit": _MEMBER_QUERY_LIMIT}
             if cur:
-                params.update({"after": cur})
+                params["after"] = cur
             try:
                 response = await self.bot.get(
                     f"/guilds/{self.identifier}/members",
