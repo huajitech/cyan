@@ -6,6 +6,16 @@
 
 Cyan 是一个简单易用的 QQ 机器人 Python SDK，基于 Python 的类型注解和异步特性。
 
+## 项目状态
+
+项目目前处于测试阶段，这意味着 SDK 所提供的操作不稳定，不建议用于生产环境。
+
+## 仓库
+
+HuajiTech GitLab（主仓库）：https://gitlab.huajitech.net/huajitech/cyan
+
+GitHub：https://github.com/huajitech/cyan
+
 ## 特性
 
 - 异步操作：使用 `httpx`、`websockets` 异步框架及 Python 的异步特性
