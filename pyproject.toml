@@ -21,13 +21,15 @@ frozendict = "^2.2.0"
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
 pyright = "^0.0.13"
+sphinx = "^4.4.0"
+sphinx-rtd-theme = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pyright]
-include = ["cyan"]
+include = ["cyan", "examples"]
 exclude = ["**/node_modules", "**/__pycache__"]
 typeCheckingMode = "strict"
 reportImportCycles = "none"

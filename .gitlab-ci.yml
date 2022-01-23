@@ -1,9 +1,12 @@
 image: nikolaik/python-nodejs:latest
 
 variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYPI_MIRROR: https://pypi.tuna.tsinghua.edu.cn/simple
   NPM_MIRROR: https://registry.npmmirror.com
+
+stages:
+  - test
+  - build
+  - deploy
 
 cache:
   paths:
@@ -12,16 +15,67 @@ cache:
     - $HOME/.cache
 
 before_script:
-  # For debugging
   - python -V
   - node -v
+  - poetry install
 
 test:
+  stage: test
   only:
     changes:
       - cyan/**/*
       - example/**/*
   script:
-    - poetry install
     - poetry run pyright
     - poetry run flake8
+
+build:
+  stage: build
+  only:
+    refs:
+      - tags
+    changes:
+      - cyan/**/*
+  script:
+    - poetry build
+  artifacts:
+    paths:
+      - dist
+
+publish:
+  stage: deploy
+  only:
+    refs:
+      - tags
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - poetry publish
+
+release:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  only:
+    refs:
+      - tags
+  script:
+    - echo "Running the release job."
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'Cyan v$CI_COMMIT_TAG'
+    description: '这是 GitLab CI 自动部署，更新日志将会手动更新。'
+
+pages:
+  stage: deploy
+  only:
+    refs:
+      - tags
+  script:
+    - cd docs
+    - poetry run sphinx-apidoc -o . ../cyan
+    - poetry run sphinx-build -b html . ./build
+    - mv ./build ../public
+  artifacts:
+    paths:
+      - public

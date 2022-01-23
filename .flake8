@@ -1,3 +1,4 @@
 [flake8]
 ignore = F401, F403, F811, E402
 max-line-length = 99
+include = cyan, examples

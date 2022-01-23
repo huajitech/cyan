@@ -254,7 +254,7 @@ def create_message_content(*elements: Sendable):
     若为 `Message` 则获取其中内容并取出其中元素呈现。
 
     参数：
-        - *elements: 元素
+        - elements: 元素
 
     返回：
         包含指定元素的 `MessageContent`。
