@@ -445,20 +445,13 @@ class EventSource:
             except ConnectionClosed as ex:
                 if ex.code != 4009:
                     raise
-                print("Reconnecting...")
                 await self._connect()
-                print("Reconnected")
                 try:
-                    print("Try resuming...")
                     await self._resume()
-                    print("Session resumed.")
                 except ConnectionClosed as ex:
-                    print("Resumption failed.")
                     if ex.code != 4009:
                         raise
-                    print("Reconnecting without resumption...")
                     await self.connect()
-                    print("Reconnected")
                 raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any):
