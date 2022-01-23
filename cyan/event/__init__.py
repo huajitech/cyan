@@ -478,6 +478,3 @@ class EventSource:
                 self._set_heartbeat(content["d"]["heartbeat_interval"])
             case Operation.HEARTBEAT:
                 await self._send_heartbeat()
-
-
-from .events import *
