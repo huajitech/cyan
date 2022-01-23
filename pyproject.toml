@@ -6,6 +6,7 @@ authors = ["Ricky8955555 <397050061@qq.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://gitlab.huajitech.net/huajitech/cyan"
+documentation = "https://huajitech.proj.zone/cyan"
 keywords = ["bot", "qq", "qqbot"]
 packages = [
   { include = "cyan" },

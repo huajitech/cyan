@@ -34,6 +34,15 @@ GitHub：https://github.com/huajitech/cyan
 - 类型注释：SDK 100% 使用类型注解，通过 `Pyright` 的**严格**检查，用户可使用支持类型检查的 IDE 减少 Bug 出现的可能性
 - 支持扩展：SDK 开放与 API 交互的函数，用户可通过提供的函数与 API 交互，实现 SDK 未实现的功能
 
+## 如何使用
+
+通过 `pip` 安装 Cyan：
+```bash
+pip install cyansdk
+```
+
+文档：https://huajitech.proj.zone/cyan
+
 ## 示例
 
 ```py
