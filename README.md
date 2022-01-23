@@ -15,7 +15,7 @@ Cyan 是一个 Python QQ 机器人 SDK，基于 Python 的类型注解和异步�
 
 ## 示例
 
-```Python
+```py
 from cyan import Session, Ticket
 from cyan.event.events import ChannelMessageReceivedEvent
 from cyan.model import Message
