@@ -96,6 +96,18 @@ class MessageContent(list[MessageElement]):
     消息内容。
     """
 
+    def extract_plain_text(self):
+        """
+        提取纯文本。
+
+        返回：
+            以 `str` 类型表示消息内容的所有纯文本。
+        """
+
+        from cyan.model.message.elements._content import PlainText
+
+        return " ".join([element.content for element in self if isinstance(element, PlainText)])
+
     def to_dict(self):
         """
         转换为可被 API 解析的字典。
@@ -108,6 +120,9 @@ class MessageContent(list[MessageElement]):
         for element in self:
             element.apply(elements)
         return elements
+
+    def __str__(self):
+        return "".join(map(str, self))
 
 
 class Message(Model):
