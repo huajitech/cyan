@@ -402,6 +402,23 @@ class TextChannel(Channel):
 
         await self._send(create_message_content(*message), None)
 
+    async def get_message(self, identifier: str):
+        """
+        异步获取指定 ID 消息。
+
+        参数：
+            - identifier: 消息 ID
+
+        返回：
+            以 `Message` 类型表示的消息。
+        """
+
+        from cyan.model.message import Message
+
+        response = await self.bot.get(f"/channels/{self.identifier}/messages/{identifier}")
+        message = response.json()
+        return Message.from_dict(self.bot, message)
+
     async def _send(
         self,
         message: MessageContent,
