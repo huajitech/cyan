@@ -446,7 +446,12 @@ class EventSource:
                 if ex.code != 4009:
                     raise
                 await self._connect()
-                await self._resume()
+                try:
+                    await self._resume()
+                except ConnectionClosed as ex:
+                    if ex.code != 4009:
+                        raise
+                    await self.connect()
                 raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any):
