@@ -1,8 +1,6 @@
-<div style="text-align: center">
+<div align="center">
     <img src="logo.png" width="200" alt="cyan">
 </div>
-
----
 
 ## 简介
 
