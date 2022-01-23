@@ -2,6 +2,17 @@
     <img src="logo.png" width="200" alt="cyan">
 </div>
 
+<div align="center">
+
+[![Pipeline Status](https://gitlab.huajitech.net/huajitech/cyan/badges/main/pipeline.svg)](https://gitlab.huajitech.net/huajitech/cyan/-/commits/main)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://gitlab.huajitech.net/huajitech/cyan)
+[![PyPI - License](https://img.shields.io/pypi/l/cyanbot)](https://gitlab.huajitech.net/huajitech/cyan)
+[![PyPI](https://img.shields.io/pypi/v/cyanbot)](https://gitlab.huajitech.net/huajitech/cyan)
+
+</div>
+
+---
+
 ## 简介
 
 Cyan 是一个简单易用的 QQ 机器人 Python SDK，基于 Python 的类型注解和异步特性。
