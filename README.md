@@ -6,8 +6,8 @@
 
 [![Pipeline Status](https://gitlab.huajitech.net/huajitech/cyan/badges/main/pipeline.svg)](https://gitlab.huajitech.net/huajitech/cyan/-/commits/main)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://gitlab.huajitech.net/huajitech/cyan)
-[![PyPI - License](https://img.shields.io/pypi/l/cyanbot)](https://gitlab.huajitech.net/huajitech/cyan)
-[![PyPI](https://img.shields.io/pypi/v/cyanbot)](https://gitlab.huajitech.net/huajitech/cyan)
+[![PyPI - License](https://img.shields.io/pypi/l/cyansdk)](https://gitlab.huajitech.net/huajitech/cyan)
+[![PyPI](https://img.shields.io/pypi/v/cyansdk)](https://gitlab.huajitech.net/huajitech/cyan)
 
 </div>
 
