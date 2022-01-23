@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime, timedelta
 
 from cyan.color import ARGB
@@ -14,9 +13,18 @@ from cyan.event.events import (
     MemberLeftEvent,
     ChannelMessageReceivedEvent
 )
-from cyan import Bot, Ticket
-from cyan.model import AppChannel, TextChannel, Channel, Guild, Member, RemindType, Message
-from cyan.model.channel import AppChannelType, ScheduleChannel
+from cyan import Bot, Session, Ticket
+from cyan.model import (
+    AppChannel,
+    TextChannel,
+    Channel,
+    Guild,
+    Member,
+    RemindType,
+    Message,
+    AppChannelType,
+    ScheduleChannel
+)
 from cyan.model.message.elements import ChannelLink, Mention
 
 
@@ -24,165 +32,160 @@ api = "https://sandbox.api.sgroup.qq.com/"
 app_id = input("请输入 APP ID：")
 token = input("请输入 Token：")
 
-bot = Bot(api, Ticket(app_id, token))
-event_source = bot.event_source
+session = Session(api, Ticket(app_id, token))
 
 
-async def main():
-    async with bot:
-        await event_source.connect()
+@session.on_started
+async def started(bot: Bot):
+    current_user = await bot.get_current_user()
+    print(
+        "当前用户信息：\n "
+        f"ID: {current_user.identifier}，名称：{current_user.name}，"
+        f"是否为机器人：{current_user.is_bot}"
+    )
 
-        current_user = await bot.get_current_user()
+    guilds = await bot.get_guilds()
+    print(
+        "频道：\n" + "\n".join([
+            f" ID：{guild.identifier}，名称：{guild.name}，"
+            f"容量：{guild.capacity}，描述：{guild.description}"
+            for guild in guilds
+        ])
+    )
+
+    if guilds:
+        guild = guilds[0]
+
+        role = await guild.create_role("Foo.Bar", ARGB(0xFF, 0xFF, 0xEE, 0x11), False)
+
         print(
-            "当前用户信息：\n "
-            f"ID: {current_user.identifier}，名称：{current_user.name}，"
-            f"是否为机器人：{current_user.is_bot}"
+            f"在 {guild.name} 创建身份组结果：\n"
+            f" ID：{role.identifier}，名称：{role.name}，"
+            f"颜色：{role.color}，是否单独展示：{role.shown}"
         )
 
-        guilds = await bot.get_guilds()
+        await role.set_name("Cyan yyds!")
+        await role.set_color(ARGB(0xFF, 0x00, 0xCD, 0xCD))
+        await role.show()
+
         print(
-            "频道：\n" + "\n".join([
-                f" ID：{guild.identifier}，名称：{guild.name}，"
-                f"容量：{guild.capacity}，描述：{guild.description}"
-                for guild in guilds
-            ])
+            f"修改身份组 {role.identifier} 结果：\n"
+            f" ID：{role.identifier}，名称：{role.name}，"
+            f"颜色：{role.color}，是否单独展示：{role.shown}"
         )
 
-        if guilds:
-            guild = guilds[0]
+        roles = await guild.get_roles()
+        print(f"频道 {guild.name} 身份组：\n" + "\n".join([
+            f" ID：{role.identifier}，名称：{role.name}，"
+            f"颜色：{role.color}，容量：{role.capacity}，"
+            f"是否单独展示：{role.shown}"
+            for role in roles
+        ]))
 
-            role = await guild.create_role("Foo.Bar", ARGB(0xFF, 0xFF, 0xEE, 0x11), False)
+        await guild.remove_role(role)
 
-            print(
-                f"在 {guild.name} 创建身份组结果：\n"
-                f" ID：{role.identifier}，名称：{role.name}，"
-                f"颜色：{role.color}，是否单独展示：{role.shown}"
-            )
+        members = await guild.get_members()
+        print(f"频道 {guild.name} 成员：\n" + "\n".join([
+            f" ID：{member.identifier}，名称：{member.name}，"
+            f"别称：{member.alias}，"
+            f"身份组：{[role.name for role in (await member.get_roles())]}，"
+            f"加入时间：{member.joined_time}"
+            for member in members
+        ]))
 
-            await role.set_name("Cyan yyds!")
-            await role.set_color(ARGB(0xFF, 0x00, 0xCD, 0xCD))
-            await role.show()
+        channel_groups = await guild.get_channel_groups()
+        print(f"频道 {guild.name} 子频道组：\n" + "\n".join([
+            f" ID：{group.identifier}，名称：{group.name}，"
+            f"所有者：{getattr(await group.get_owner(), 'nickname', None)}"
+            for group in channel_groups
+        ]))
 
-            print(
-                f"修改身份组 {role.identifier} 结果：\n"
-                f" ID：{role.identifier}，名称：{role.name}，"
-                f"颜色：{role.color}，是否单独展示：{role.shown}"
-            )
+        channels = await guild.get_channels()
+        print(f"频道 {guild.name} 子频道：\n" + "\n".join([
+            f" ID：{channel.identifier}，名称：{channel.name}，"
+            f"类型：{channel.__class__.__name__}，" + (
+                f"文字频道类型：{channel.text_channel_type}，"
+                if isinstance(channel, TextChannel) else ""
+            ) + f"附属子频道组：{(await channel.get_parent()).name}，"
+            f"所有者：{getattr(await channel.get_owner(), 'name', None)}"
+            for channel in channels
+        ]))
 
-            roles = await guild.get_roles()
-            print(f"频道 {guild.name} 身份组：\n" + "\n".join([
-                f" ID：{role.identifier}，名称：{role.name}，"
-                f"颜色：{role.color}，容量：{role.capacity}，"
-                f"是否单独展示：{role.shown}"
-                for role in roles
-            ]))
-
-            await guild.remove_role(role)
-
-            members = await guild.get_members()
-            print(f"频道 {guild.name} 成员：\n" + "\n".join([
-                f" ID：{member.identifier}，名称：{member.name}，"
-                f"别称：{member.alias}，"
-                f"身份组：{[role.name for role in (await member.get_roles())]}，"
-                f"加入时间：{member.joined_time}"
-                for member in members
-            ]))
-
-            channel_groups = await guild.get_channel_groups()
-            print(f"频道 {guild.name} 子频道组：\n" + "\n".join([
-                f" ID：{group.identifier}，名称：{group.name}，"
-                f"所有者：{getattr(await group.get_owner(), 'nickname', None)}"
-                for group in channel_groups
-            ]))
-
-            channels = await guild.get_channels()
-            print(f"频道 {guild.name} 子频道：\n" + "\n".join([
-                f" ID：{channel.identifier}，名称：{channel.name}，"
-                f"类型：{channel.__class__.__name__}，" + (
-                    f"文字频道类型：{channel.text_channel_type}，"
-                    if isinstance(channel, TextChannel) else ""
-                ) + f"附属子频道组：{(await channel.get_parent()).name}，"
-                f"所有者：{getattr(await channel.get_owner(), 'name', None)}"
-                for channel in channels
-            ]))
-
-            if channels:
-                for channel in channels:
-                    if not isinstance(
-                        channel, AppChannel
-                    ) or channel.app_channel_type != AppChannelType.SCHEDULE:
-                        continue
-                    channel = ScheduleChannel.from_app_channel(channel)
-                    schedule = await channel.create_schedule(
-                        "Cyan 仓库开放庆祝！",
-                        datetime.now() + timedelta(hours=1),
-                        datetime.now() + timedelta(hours=6),
-                        RemindType.EARLY
-                    )
-                    schedules = await channel.get_schedules()
-                    if not schedules:
-                        continue
-                    print(f"子频道 {channel.name} 日程：\n" + "\n".join([
-                        f" ID：{schedule.identifier}，名称：{schedule.name}，"
-                        f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
-                        f"结束时间：{schedule.end_time}，"
-                        f"创建者：{schedule.creator.name}，"
-                        f"跳转子频道：{getattr(await schedule.get_destination(), 'name', None)}，"
-                        f"提醒类型：{schedule.remind_type}"
-                        for schedule in schedules
-                    ]))
-                    await schedule.cancel()
-                    break
-
-        await event_source.wait_until_stopped()
+        if channels:
+            for channel in channels:
+                if not isinstance(
+                    channel, AppChannel
+                ) or channel.app_channel_type != AppChannelType.SCHEDULE:
+                    continue
+                channel = ScheduleChannel.from_app_channel(channel)
+                schedule = await channel.create_schedule(
+                    "Cyan 仓库开放庆祝！",
+                    datetime.now() + timedelta(hours=1),
+                    datetime.now() + timedelta(hours=6),
+                    RemindType.EARLY
+                )
+                schedules = await channel.get_schedules()
+                if not schedules:
+                    continue
+                print(f"子频道 {channel.name} 日程：\n" + "\n".join([
+                    f" ID：{schedule.identifier}，名称：{schedule.name}，"
+                    f"描述：{schedule.description}，开始时间：{schedule.start_time}，"
+                    f"结束时间：{schedule.end_time}，"
+                    f"创建者：{schedule.creator.name}，"
+                    f"跳转子频道：{getattr(await schedule.get_destination(), 'name', None)}，"
+                    f"提醒类型：{schedule.remind_type}"
+                    for schedule in schedules
+                ]))
+                await schedule.cancel()
+                break
 
 
-@event_source.listen(ChannelCreatedEvent)
+@session.on(ChannelCreatedEvent)
 async def channel_created(data: Channel):
     print(f"子频道 {data.name} 已创建。")
 
 
-@event_source.listen(ChannelDeletedEvent)
+@session.on(ChannelDeletedEvent)
 async def channel_deleted(data: Channel):
     print(f"子频道 {data.name} 被删除。")
 
 
-@event_source.listen(ChannelUpdatedEvent)
+@session.on(ChannelUpdatedEvent)
 async def channel_updated(data: Channel):
     print(f"子频道 {data.name} 资料更新。")
 
 
-@event_source.listen(GuildCreatedEvent)
+@session.on(GuildCreatedEvent)
 async def guild_created(data: Guild):
     print(f"频道 {data.name} 已创建。")
 
 
-@event_source.listen(GuildDeletedEvent)
+@session.on(GuildDeletedEvent)
 async def guild_deleted(data: Guild):
     print(f"频道 {data.name} 被删除。")
 
 
-@event_source.listen(GuildUpdatedEvent)
+@session.on(GuildUpdatedEvent)
 async def guild_updated(data: Guild):
     print(f"频道 {data.name} 资料更新。")
 
 
-@event_source.listen(MemberJoinedEvent)
+@session.on(MemberJoinedEvent)
 async def member_joined(data: Member):
     print(f"用户 {data.name} 加入频道 {data.guild.name}。")
 
 
-@event_source.listen(MemberLeftEvent)
+@session.on(MemberLeftEvent)
 async def member_left(data: Member):
     print(f"用户 {data.name} 离开频道 {data.guild.name}。")
 
 
-@event_source.listen(MemberUpdatedEvent)
+@session.on(MemberUpdatedEvent)
 async def member_updated(data: Member):
     print(f"用户 {data.name} 在频道 {data.guild.name} 更新资料。")
 
 
-@event_source.listen(ChannelMessageReceivedEvent)
+@session.on(ChannelMessageReceivedEvent)
 async def channel_message_received(data: Message):
     print(
         f"用户 {data.sender.name} 在频道 {(await data.get_guild()).name} 发送消息：\n"
@@ -194,5 +197,4 @@ async def channel_message_received(data: Message):
         " 的消息，让我来复读一下：\n", data
     )
 
-
-asyncio.run(main())
+session.run()
