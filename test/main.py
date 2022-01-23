@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from cyan.color import ARGB
-from cyan.event.events import (
+from cyan.event import (
     ChannelCreatedEvent,
     ChannelDeletedEvent,
     ChannelUpdatedEvent,
