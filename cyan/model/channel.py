@@ -12,6 +12,7 @@ from cyan.model import Model
 from cyan.model.member import Member
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.role import DefaultRoleId
+from cyan.model.schedule import Schedule, RemindType
 from cyan.util._enum import get_enum_key
 
 
@@ -133,7 +134,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
     _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
         """
         初始化 `ChannelGroup` 实例。
 
@@ -147,7 +148,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         self._bot = bot
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -163,7 +164,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         return self._props["name"]
 
     @property
-    def guild(self):
+    def guild(self) -> Guild:
         """
         子频道组附属频道。
         """
@@ -171,14 +172,14 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         return self._guild
 
     @property
-    def visibility(self):
+    def visibility(self) -> ChannelVisibility:
         """
         子频道组可见性。
         """
 
         return ChannelVisibility(self._props["private_type"])
 
-    async def get_owner(self):
+    async def get_owner(self) -> Member | None:
         """
         获取子频道组所有者。
 
@@ -197,7 +198,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
                 return None
             raise
 
-    async def get_children(self):
+    async def get_children(self) -> list["Channel"]:
         """
         获取子频道组的成员。
 
@@ -212,7 +213,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
             if channel.is_child_of(self)
         ]
 
-    async def renovate(self):
+    async def renovate(self) -> "ChannelGroup":
         return await self.bot.get_channel_group(self.identifier)
 
 
@@ -225,7 +226,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
     _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
         """
         初始化 `Channel` 实例。
 
@@ -239,7 +240,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         self._bot = bot
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -255,7 +256,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         return self._props["name"]
 
     @property
-    def guild(self):
+    def guild(self) -> Guild:
         """
         子频道附属频道。
         """
@@ -263,7 +264,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         return self._guild
 
     @property
-    def visibility(self):
+    def visibility(self) -> ChannelVisibility:
         """
         子频道可见性。
         """
@@ -271,14 +272,14 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         return ChannelVisibility(self._props["private_type"])
 
     @property
-    def permission(self):
+    def permission(self) -> ChannelPermission:
         """
         子频道权限。
         """
 
         return ChannelPermission(self._props["speak_permission"])
 
-    async def get_owner(self):
+    async def get_owner(self) -> Member | None:
         """
         异步获取子频道所有者。
 
@@ -297,7 +298,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
                 return None
             raise
 
-    async def get_parent(self):
+    async def get_parent(self) -> ChannelGroup:
         """
         异步获取子频道附属的子频道组。
 
@@ -317,7 +318,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
 
         return self._props["parent_id"] == parent.identifier
 
-    async def add_operator(self, member: Member):
+    async def add_operator(self, member: Member) -> None:
         """
         异步添加管理员到当前子频道。
 
@@ -332,7 +333,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
             content={"channel": channel}
         )
 
-    async def remove_operator(self, member: Member):
+    async def remove_operator(self, member: Member) -> None:
         """
         异步从当前子频道移除指定管理员。
 
@@ -347,7 +348,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
             content={"channel": channel}
         )
 
-    async def renovate(self):
+    async def renovate(self) -> "Channel":
         return await self.bot.get_channel(self.identifier)
 
 
@@ -356,7 +357,7 @@ class TextChannel(Channel):
     文字子频道。
     """
 
-    from cyan.model.message import Message, MessageContent, Sendable
+    from cyan.model.message import Message, MessageAuditInfo, MessageContent, Sendable
 
     @property
     def text_channel_type(self) -> TextChannelType | int:
@@ -369,7 +370,7 @@ class TextChannel(Channel):
 
         return get_enum_key(TextChannelType, self._props["sub_type"])
 
-    async def reply(self, target: Message, *message: Sendable):
+    async def reply(self, target: Message, *message: Sendable) -> MessageAuditInfo | Message:
         """
         异步回复指定消息。
 
@@ -384,9 +385,9 @@ class TextChannel(Channel):
 
         from cyan.model.message import create_message_content
 
-        await self._send(create_message_content(*message), target)
+        return await self._send(create_message_content(*message), target)
 
-    async def send(self, *message: Sendable):
+    async def send(self, *message: Sendable) -> MessageAuditInfo | Message:
         """
         异步发送消息。
 
@@ -400,9 +401,9 @@ class TextChannel(Channel):
 
         from cyan.model.message import create_message_content
 
-        await self._send(create_message_content(*message), None)
+        return await self._send(create_message_content(*message), None)
 
-    async def get_message(self, identifier: str):
+    async def get_message(self, identifier: str) -> Message:
         """
         异步获取指定 ID 消息。
 
@@ -423,7 +424,7 @@ class TextChannel(Channel):
         self,
         message: MessageContent,
         replying_target: Message | None
-    ):
+    ) -> MessageAuditInfo | Message:
         from cyan.model.message import Message, MessageContent, MessageAuditInfo
 
         content = MessageContent(message).to_dict()
@@ -475,10 +476,8 @@ class ScheduleChannel(AppChannel):
     日程子频道。
     """
 
-    from cyan.model.schedule import RemindType
-
     @staticmethod
-    def from_app_channel(channel: AppChannel):
+    def from_app_channel(channel: AppChannel) -> "ScheduleChannel":
         """
         转换 `AppChannel` 实例为 `ScheduleChannel` 实例。
 
@@ -492,15 +491,13 @@ class ScheduleChannel(AppChannel):
 
     # TODO: 实现为获取所有日程（通过传入指定 since 参数以实现，但据目前所提供的 API 下测试失败）。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/get_schedules.html。
-    async def get_schedules(self):
+    async def get_schedules(self) -> list[Schedule]:
         """
         异步获取子频道当天日程列表。
 
         返回：
             以 `Schedule` 类型表示日程的 `list` 集合。
         """
-
-        from cyan.model.schedule import Schedule
 
         response = await self.bot.get(f"/channels/{self.identifier}/schedules")
         schedules = response.json()
@@ -509,7 +506,7 @@ class ScheduleChannel(AppChannel):
             if schedules else []
         )
 
-    async def get_schedule(self, identifier: str):
+    async def get_schedule(self, identifier: str) -> Schedule:
         """
         异步获取子频道的指定 ID 日程。
 
@@ -519,8 +516,6 @@ class ScheduleChannel(AppChannel):
         返回：
             以 `Schedule` 类型表示的日程。
         """
-
-        from cyan.model.schedule import Schedule
 
         response = await self.bot.get(f"/channels/{self.identifier}/schedules/{identifier}")
         schedule = response.json()
@@ -534,7 +529,7 @@ class ScheduleChannel(AppChannel):
         remind_type: RemindType = RemindType.SILENT,
         description: str = "",
         destination: Channel | None = None
-    ):
+    ) -> Schedule:
         """
         异步在当前子频道创建日程。
 
@@ -545,8 +540,6 @@ class ScheduleChannel(AppChannel):
             - description: 日程描述
             - destination: 日程指向目标子频道
         """
-
-        from cyan.model.schedule import Schedule
 
         schedule = {
             "name": name,
@@ -575,12 +568,12 @@ class UnknownChannel(Channel):
     """
 
     @property
-    def channel_type(self):
+    def channel_type(self) -> int:
         """
         子频道类型。
         """
 
-        return get_enum_key(TextChannelType, self._props["type"])
+        return self._props["type"]
 
 
 _CHANNEL_TYPE_MAPPING = {

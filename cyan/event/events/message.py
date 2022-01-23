@@ -5,7 +5,7 @@ from cyan.model.message import Message
 
 
 class _MessageReceivedEvent(Event):
-    async def _parse_data(self, data: dict[str, Any]):
+    async def _parse_data(self, data: dict[str, Any]) -> Message:
         return Message.from_dict(self._bot, data)
 
 
@@ -17,5 +17,5 @@ class ChannelMessageReceivedEvent(_MessageReceivedEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("AT_MESSAGE_CREATE", Intent.MENTION)

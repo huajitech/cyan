@@ -3,7 +3,7 @@ import warnings
 from typing import Awaitable, Callable, NoReturn
 
 from cyan.bot import Bot, Ticket
-from cyan.event import Event
+from cyan.event import Event, EventHandler
 
 
 BotStartedHandler = Callable[[Bot], Awaitable[None | NoReturn]]
@@ -17,7 +17,7 @@ class Session:
     _bot: Bot
     _started_handlers: set[BotStartedHandler]
 
-    def __init__(self, api_base_url: str, ticket: Ticket):
+    def __init__(self, api_base_url: str, ticket: Ticket) -> None:
         """
         初始化 `Session` 示例。
 
@@ -29,7 +29,7 @@ class Session:
         self._bot = Bot(api_base_url, ticket)
         self._started_handlers = set[BotStartedHandler]()
 
-    def on_started(self, func: BotStartedHandler):
+    def on_started(self, func: BotStartedHandler) -> BotStartedHandler:
         """
         装饰事件处理器以监听机器人启动事件。
         """
@@ -37,7 +37,7 @@ class Session:
         self._started_handlers.add(func)
         return func
 
-    def on(self, _type: type[Event]):
+    def on(self, _type: type[Event]) -> Callable[[EventHandler], None]:
         """
         装饰事件处理器以监听指定事件。
 
@@ -47,14 +47,14 @@ class Session:
 
         return self._bot.event_source.listen(_type)
 
-    def run(self):
+    def run(self) -> None:
         """
         运行当前会话。
         """
 
         asyncio.run(self._run())
 
-    async def _run(self):
+    async def _run(self) -> None:
         async with self._bot as bot:
             source = bot.event_source
             await source.connect()

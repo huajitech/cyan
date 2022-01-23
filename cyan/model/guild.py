@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional, Union
 from httpx import AsyncClient
 
 from cyan.color import ARGB
@@ -10,6 +10,7 @@ from cyan.model.renovatable import AsyncRenovatable
 
 
 if TYPE_CHECKING:
+    from cyan.model.channel import Channel, ChannelGroup
     from cyan.model.member import Member
     from cyan.model.role import Role
 
@@ -26,7 +27,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
     _props: dict[str, Any]
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
         """
         初始化 `Guild` 实例。
 
@@ -39,7 +40,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         self._bot = bot
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -70,7 +71,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         return self._props.get("description", "")
 
-    async def get_icon(self):
+    async def get_icon(self) -> bytes:
         """
         异步获取频道头像。
 
@@ -82,7 +83,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         response = await client.get(self._props["icon"])  # type: ignore
         return response.content
 
-    async def get_members(self):
+    async def get_members(self) -> list["Member"]:
         """
         异步获取当前频道的所有成员。
 
@@ -113,7 +114,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
                 if ex.code == 130000:
                     return members
 
-    async def get_member(self, identifier: str):
+    async def get_member(self, identifier: str) -> "Member":
         """
         异步获取当前频道的指定 ID 成员。
 
@@ -130,7 +131,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         member = response.json()
         return Member(self.bot, self, member)
 
-    async def get_channels(self):
+    async def get_channels(self) -> list["Channel"]:
         """
         异步获取当前频道的所有子频道。
 
@@ -146,7 +147,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             if isinstance(channel, Channel)
         ]
 
-    async def get_channel_groups(self):
+    async def get_channel_groups(self) -> list["ChannelGroup"]:
         """
         异步获取当前频道的所有子频道组。
 
@@ -162,14 +163,14 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             if isinstance(channel, ChannelGroup)
         ]
 
-    async def _get_channels_core(self):
+    async def _get_channels_core(self) -> list[Union["Channel", "ChannelGroup"]]:
         from cyan.model.channel import parse as channel_parse
 
         response = await self.bot.get(f"/guilds/{self.identifier}/channels")
         channels = response.json()
         return [await channel_parse(self.bot, channel, self) for channel in channels]
 
-    async def get_owner(self):
+    async def get_owner(self) -> Optional["Member"]:
         """
         异步获取频道所有者。
 
@@ -186,7 +187,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
                 return None
             raise
 
-    async def get_roles(self):
+    async def get_roles(self) -> list["Role"]:
         """
         异步获取当前频道的所有身份组。
 
@@ -200,7 +201,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         roles = response.json()["roles"]
         return [Role(self.bot, self, role) for role in roles]
 
-    async def get_role(self, identifier: str):
+    async def get_role(self, identifier: str) -> "Role":
         """
         异步获取当前频道的指定 ID 身份组。
 
@@ -222,7 +223,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         name: str | None = None,
         color: ARGB | None = None,
         shown: bool | None = None
-    ):
+    ) -> "Role":
         """
         异步在当前频道创建身份组。
 
@@ -254,7 +255,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         )
         return Role(self.bot, self, response.json()["role"])
 
-    async def mute(self, duration: timedelta):
+    async def mute(self, duration: timedelta) -> None:
         """
         异步禁言当前频道指定时长。
 
@@ -265,7 +266,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         content = {"mute_seconds": str(duration.seconds)}
         await self.bot.patch(f"/guilds/{self.identifier}/mute", content=content)
 
-    async def mute_until(self, time: datetime):
+    async def mute_until(self, time: datetime) -> None:
         """
         异步禁言当前频道至指定时间。
 
@@ -276,14 +277,14 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         content = {"mute_end_timestamp": str(int(time.timestamp()))}
         await self.bot.patch(f"/guilds/{self.identifier}/mute", content=content)
 
-    async def unmute(self):
+    async def unmute(self) -> None:
         """
         异步解除当前频道的禁言。
         """
 
         await self.mute(timedelta())
 
-    async def get_administrators(self):
+    async def get_administrators(self) -> list["Member"]:
         """
         异步获取当前频道的所有管理员。
 
@@ -301,7 +302,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             ]
         ]
 
-    async def add_administrator(self, member: "Member"):
+    async def add_administrator(self, member: "Member") -> None:
         """
         异步添加管理员到当前频道。
 
@@ -316,7 +317,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             f"/roles/{DefaultRoleId.ADMINISTRATOR}"
         )
 
-    async def remove_administrator(self, member: "Member"):
+    async def remove_administrator(self, member: "Member") -> None:
         """
         异步从当前频道移除指定管理员。
 
@@ -331,7 +332,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             f"/roles/{DefaultRoleId.ADMINISTRATOR}"
         )
 
-    async def remove(self, member: "Member"):
+    async def remove(self, member: "Member") -> None:
         """
         异步从当前频道移除指定成员。
 
@@ -341,7 +342,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         await self.bot.delete(f"/guilds/{self.identifier}/members/{member.identifier}")
 
-    async def remove_role(self, role: "Role"):
+    async def remove_role(self, role: "Role") -> None:
         """
         异步从当前频道移除指定身份组。
 
@@ -351,5 +352,5 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         await self.bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
 
-    async def renovate(self):
+    async def renovate(self) -> "Guild":
         return await self.bot.get_guild(self.identifier)

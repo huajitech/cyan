@@ -39,7 +39,7 @@ class OpenApiError(CyanException):
     _message: str
     _status_code: int
 
-    def __init__(self, status_code: int, code: int, message: str):
+    def __init__(self, status_code: int, code: int, message: str) -> None:
         """
         初始化 `ApiError` 实例。
 
@@ -54,7 +54,7 @@ class OpenApiError(CyanException):
         self._status_code = status_code
 
     @property
-    def code(self):
+    def code(self) -> int:
         """
         错误代码。
         """
@@ -62,7 +62,7 @@ class OpenApiError(CyanException):
         return self._code
 
     @property
-    def status_code(self):
+    def status_code(self) -> int:
         """
         HTTP 状态码。
         """
@@ -70,7 +70,7 @@ class OpenApiError(CyanException):
         return self._status_code
 
     @property
-    def message(self):
+    def message(self) -> str:
         """
         错误消息。
         """

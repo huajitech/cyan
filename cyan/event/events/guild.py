@@ -5,7 +5,7 @@ from cyan.model.guild import Guild
 
 
 class _GuildEvent(Event):
-    async def _parse_data(self, data: Any):
+    async def _parse_data(self, data: Any) -> Guild:
         return Guild(self._bot, data)
 
 
@@ -17,7 +17,7 @@ class GuildCreatedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_CREATE", Intent.GUILD)
 
 
@@ -29,7 +29,7 @@ class GuildUpdatedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_UPDATE", Intent.GUILD)
 
 
@@ -41,5 +41,5 @@ class GuildDeletedEvent(_GuildEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_DELETE", Intent.GUILD)

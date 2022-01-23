@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
@@ -11,7 +11,7 @@ from cyan.model.user import User
 
 
 if TYPE_CHECKING:
-    from cyan.model.channel import AppChannel
+    from cyan.model.channel import ScheduleChannel, Channel
 
 
 class RemindType(Enum):
@@ -56,10 +56,10 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
     """
 
     _bot: Bot
-    _channel: "AppChannel"
+    _channel: "ScheduleChannel"
     _props: dict[str, Any]
 
-    def __init__(self, bot: Bot, channel: "AppChannel", props: dict[str, Any]):
+    def __init__(self, bot: Bot, channel: "ScheduleChannel", props: dict[str, Any]) -> None:
         """
         初始化 `Schedule` 实例。
 
@@ -72,7 +72,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         self._props = props
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -96,7 +96,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return self._props.get("description", None)
 
     @property
-    def start_time(self):
+    def start_time(self) -> datetime:
         """
         日程开始时间。
         """
@@ -104,7 +104,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return datetime.fromtimestamp(int(self._props["start_timestamp"]) / 1000)
 
     @property
-    def end_time(self):
+    def end_time(self) -> datetime:
         """
         日程结束时间。
         """
@@ -112,7 +112,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return datetime.fromtimestamp(int(self._props["end_timestamp"]) / 1000)
 
     @property
-    def channel(self):
+    def channel(self) -> "ScheduleChannel":
         """
         日程所属子频道。
         """
@@ -120,7 +120,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return self._channel
 
     @property
-    def creator(self):
+    def creator(self) -> User:
         """
         日程创建者。
         """
@@ -128,13 +128,13 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return User(self.bot, self._props["creator"]["user"])
 
     @property
-    def remind_type(self):
+    def remind_type(self) -> RemindType:
         """
         日程提醒类型。
         """
         return RemindType(int(self._props["remind_type"]))
 
-    async def get_destination(self):
+    async def get_destination(self) -> Optional["Channel"]:
         """
         异步获取日程指向的目标子频道。
 
@@ -148,7 +148,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
     # TODO: 该方法有待测试，据目前所提供的 API 下测试失败。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/delete_schedule.html。
-    async def cancel(self):
+    async def cancel(self) -> None:
         """
         异步取消当前日程。
         """
@@ -157,8 +157,8 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
     # TODO: 实现日程信息修改。
 
-    async def renovate(self):
-        from cyan.model.channel import ScheduleChannel
+    async def renovate(self) -> "Schedule":
+        from cyan.model.channel import AppChannel, ScheduleChannel
 
         channel = await self.channel.renovate()
         if not isinstance(channel, AppChannel):

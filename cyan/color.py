@@ -9,7 +9,7 @@ class ARGB:
     _blue: int
 
     @property
-    def alpha(self):
+    def alpha(self) -> int:
         """
         Alpha 透明度通道。
         """
@@ -17,7 +17,7 @@ class ARGB:
         return self._alpha
 
     @property
-    def red(self):
+    def red(self) -> int:
         """
         红色通道。
         """
@@ -25,7 +25,7 @@ class ARGB:
         return self._red
 
     @property
-    def green(self):
+    def green(self) -> int:
         """
         绿色通道。
         """
@@ -33,14 +33,14 @@ class ARGB:
         return self._green
 
     @property
-    def blue(self):
+    def blue(self) -> int:
         """
         蓝色通道。
         """
 
         return self._blue
 
-    def __init__(self, alpha: int, red: int, green: int, blue: int):
+    def __init__(self, alpha: int, red: int, green: int, blue: int) -> None:
         """
         初始化 `ARGB` 实例。
 
@@ -59,7 +59,7 @@ class ARGB:
         self._green = green
         self._blue = blue
 
-    def to_hex(self):
+    def to_hex(self) -> int:
         """
         转换 `ARGB` 为 HEX 颜色值。
 
@@ -70,7 +70,7 @@ class ARGB:
         return (self.alpha << 24) + (self.red << 16) + (self.green << 8) + self.blue
 
     @staticmethod
-    def from_hex(number: int):
+    def from_hex(number: int) -> "ARGB":
         """
         转换 `ARGB` HEX 颜色值的 `int` 形式为 `ARGB`。
 
@@ -84,5 +84,5 @@ class ARGB:
         blue = number & 0x000000FF
         return ARGB(alpha, red, green, blue)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"({self.alpha}, {self.red}, {self.green}, {self.blue})"

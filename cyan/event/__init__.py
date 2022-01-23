@@ -30,9 +30,12 @@ EventHandler = (
 """
 
 
-class NotSupported:
-    def __new__(cls):
-        return NotSupported
+class NotSupported(Exception):
+    """
+    当操作不支持时抛出。
+    """
+
+    pass
 
 
 class Intent(Enum):
@@ -94,12 +97,12 @@ class EventInfo:
     _name: str
     _intent: Intent
 
-    def __init__(self, name: str, intent: Intent):
+    def __init__(self, name: str, intent: Intent) -> None:
         self._name = name
         self._intent = intent
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         事件名称。
         """
@@ -107,7 +110,7 @@ class EventInfo:
         return self._name
 
     @property
-    def intent(self):
+    def intent(self) -> Intent:
         """
         事件所需注册 `Intent`。
         """
@@ -119,7 +122,7 @@ class Event:
     _handlers: set[EventHandler]
     _bot: "Bot"
 
-    def __init__(self, bot: "Bot"):
+    def __init__(self, bot: "Bot") -> None:
         self._handlers = set[EventHandler]()
         self._bot = bot
 
@@ -149,7 +152,7 @@ class Event:
 
         raise NotImplementedError
 
-    def bind(self, *handler: EventHandler):
+    def bind(self, *handler: EventHandler) -> None:
         """
         绑定事件处理器。
 
@@ -159,7 +162,7 @@ class Event:
 
         self._handlers.update(handler)
 
-    def handle(self):
+    def handle(self) -> Callable[[EventHandler], None]:
         """
         装饰事件处理器以绑定至当前事件。
         """
@@ -169,7 +172,7 @@ class Event:
 
         return _decorate
 
-    async def distribute(self, data: Any):
+    async def distribute(self, data: Any) -> None:
         """
         分发事件数据。
 
@@ -177,9 +180,12 @@ class Event:
             - data: 用于解析及分发的数据
         """
 
-        event_data = await self._parse_data(data)
-        if event_data == NotSupported:
+        try:
+            event_data = await self._parse_data(data)
+        except NotSupported:
             return
+        except Exception:
+            raise
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
             argnames = inspect.signature(handler).parameters.keys()
@@ -247,15 +253,15 @@ class _EventProvider:
     _event_name_dict: dict[str, set[Event]]
     _registered_intents: set[Intent]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._type_dict = dict[type, Event]()
         self._event_name_dict = dict[str, set[Event]]()
         self._registered_intents = set[Intent]((Intent.DEFAULT,))
 
-    def get_intents(self):
+    def get_intents(self) -> set[Intent]:
         return self._registered_intents
 
-    def get_by_type(self, bot: "Bot", _type: type[Event]):
+    def get_by_type(self, bot: "Bot", _type: type[Event]) -> Event:
         event = self._type_dict.get(_type, None)
         if event:
             return event
@@ -269,7 +275,7 @@ class _EventProvider:
         self._registered_intents.add(event_info.intent)
         return event
 
-    def get_by_event_name(self, event_name: str):
+    def get_by_event_name(self, event_name: str) -> set[Event]:
         return self._event_name_dict.get(event_name, set[Event]())
 
 
@@ -304,7 +310,7 @@ class EventSource:
         self._task = None
 
     @property
-    def bot(self):
+    def bot(self) -> "Bot":
         """
         事件源所属机器人实例。
         """
@@ -312,14 +318,14 @@ class EventSource:
         return self._bot
 
     @property
-    def connected(self):
+    def connected(self) -> bool:
         """
         `WebSocket` 是否已连接。
         """
 
         return self._connected
 
-    async def connect(self):
+    async def connect(self) -> None:
         """
         异步连接服务器。
         """
@@ -329,14 +335,14 @@ class EventSource:
         await self._connect()
         await self._identify()
 
-    async def _connect(self):
+    async def _connect(self) -> None:
         response = await self.bot.get("/gateway")
         content = response.json()
         self._websocket = await connect(content["url"])
         self._connected = True
         self._task = asyncio.create_task(self._receive())
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         """
         异步断开连接。
         """
@@ -352,7 +358,7 @@ class EventSource:
         self._serial_code = -1
         self._connected = False
 
-    async def send(self, operation: Operation, payload: Any = None):
+    async def send(self, operation: Operation, payload: Any = None) -> None:
         """
         异步发送数据至服务器。
 
@@ -367,7 +373,7 @@ class EventSource:
         data = json.dumps(content)
         await self._websocket.send(data)
 
-    def get_event(self, _type: type[Event]):
+    def get_event(self, _type: type[Event]) -> Event:
         """
         获取指定类型的事件。
 
@@ -385,7 +391,7 @@ class EventSource:
             raise InvalidOperationError("WebSocket 已连接时不可获取未订阅 Intent 的事件。")
         return self._event_provider.get_by_type(self._bot, _type)
 
-    def listen(self, _type: type[Event]):
+    def listen(self, _type: type[Event]) -> Callable[[EventHandler], None]:
         """
         装饰事件处理器以监听指定事件。
 
@@ -395,7 +401,7 @@ class EventSource:
 
         return self.get_event(_type).handle()
 
-    async def wait_until_stopped(self):
+    async def wait_until_stopped(self) -> None:
         """
         异步等待至事件源停止接收消息。
         """
@@ -408,14 +414,14 @@ class EventSource:
                     continue
             return
 
-    def _calculate_intents(self):
+    def _calculate_intents(self) -> int:
         intents = self._event_provider.get_intents()
         intents_number = 0
         for intent in intents:
             intents_number |= intent.value
         return intents_number
 
-    async def _resume(self):
+    async def _resume(self) -> None:
         payload = {
             "token": self._authorization,
             "session_id": self._session,
@@ -423,7 +429,7 @@ class EventSource:
         }
         await self.send(Operation.RESUME, payload)
 
-    async def _identify(self):
+    async def _identify(self) -> None:
         from cyan.event.events._connection import ReadyEvent
 
         self.get_event(ReadyEvent).bind(self._on_ready)
@@ -434,10 +440,10 @@ class EventSource:
         }
         await self.send(Operation.IDENTIFY, payload)
 
-    async def _on_ready(self, data: "ReadyEventData"):
+    async def _on_ready(self, data: "ReadyEventData") -> None:
         self._session = data.session
 
-    async def _receive(self):
+    async def _receive(self) -> None:
         async for data in self._websocket:
             try:
                 content = json.loads(data)
@@ -454,15 +460,15 @@ class EventSource:
                     await self.connect()
                 raise _ConnectionResumed
 
-    async def _call_events(self, event_name: str, data: Any):
+    async def _call_events(self, event_name: str, data: Any) -> None:
         for event in self._event_provider.get_by_event_name(event_name):
             if event.get_event_info().name == event_name:
                 await event.distribute(data)
 
-    async def _send_heartbeat(self):
+    async def _send_heartbeat(self) -> None:
         await self.send(Operation.HEARTBEAT, self._serial_code)
 
-    def _set_heartbeat(self, interval: int):
+    def _set_heartbeat(self, interval: int) -> None:
         async def _heartbeat():
             while True:
                 await asyncio.sleep(interval / 1000)
@@ -471,7 +477,7 @@ class EventSource:
             self._heartbeat_task.cancel()
         self._heartbeat_task = asyncio.create_task(_heartbeat())
 
-    async def _handle(self, content: dict[str, Any]):
+    async def _handle(self, content: dict[str, Any]) -> None:
         operation = Operation(content["op"])
         self._serial_code = content.get("s", self._serial_code)
         match operation:

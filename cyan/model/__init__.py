@@ -21,7 +21,7 @@ class Model:
         """
         raise NotImplementedError
 
-    def __eq__(self, obj: Any):
+    def __eq__(self, obj: Any) -> bool:
         _type = type(self)
         return isinstance(obj, _type) and obj.bot == self.bot and obj.identifier == self.identifier
 

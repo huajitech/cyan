@@ -5,7 +5,7 @@ from cyan.model.member import Member
 
 
 class _MemberEvent(Event):
-    async def _parse_data(self, data: dict[str, Any]):
+    async def _parse_data(self, data: dict[str, Any]) -> Member:
         guild_identifier = data["guild_id"]
         guild = await self._bot.get_guild(guild_identifier)
         return Member(self._bot, guild, data)
@@ -19,7 +19,7 @@ class MemberJoinedEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_MEMBER_ADD", Intent.MEMBER)
 
 
@@ -31,7 +31,7 @@ class MemberUpdatedEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_MEMBER_UPDATE", Intent.MEMBER)
 
 
@@ -43,5 +43,5 @@ class MemberLeftEvent(_MemberEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("GUILD_MEMBER_REMOVE", Intent.MEMBER)

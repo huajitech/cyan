@@ -4,6 +4,7 @@ from typing import Any
 from cyan.bot import Bot
 from cyan.model.guild import Guild
 from cyan.model.renovatable import AsyncRenovatable
+from cyan.model.role import Role
 from cyan.model.user import User
 
 
@@ -17,7 +18,7 @@ class Member(User, AsyncRenovatable["Member"]):
     _props: dict[str, Any]
     _user: User
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
         """
         初始化 `Member` 实例。
 
@@ -31,11 +32,11 @@ class Member(User, AsyncRenovatable["Member"]):
         self._user = User(self.bot, self._props["user"])
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         return self._user.identifier
 
     @property
@@ -51,7 +52,7 @@ class Member(User, AsyncRenovatable["Member"]):
         return self._props["nick"]
 
     @property
-    def joined_time(self):
+    def joined_time(self) -> datetime:
         """
         成员加入时间。
         """
@@ -59,7 +60,7 @@ class Member(User, AsyncRenovatable["Member"]):
         return datetime.fromisoformat(self._props["joined_at"])
 
     @property
-    def guild(self):
+    def guild(self) -> Guild:
         """
         成员所属频道。
         """
@@ -70,7 +71,7 @@ class Member(User, AsyncRenovatable["Member"]):
     def is_bot(self) -> bool:
         return self._user.is_bot
 
-    async def get_roles(self):
+    async def get_roles(self) -> list[Role]:
         """
         异步获取当前成员的所有所属身份组。
 
@@ -82,7 +83,7 @@ class Member(User, AsyncRenovatable["Member"]):
         role_map = dict([(role.identifier, role) for role in roles])
         return [role_map[role] for role in self._props["roles"]]
 
-    async def mute(self, duration: timedelta):
+    async def mute(self, duration: timedelta) -> None:
         """
         异步禁言当前成员指定时长。
         """
@@ -93,7 +94,7 @@ class Member(User, AsyncRenovatable["Member"]):
             content=content
         )
 
-    async def mute_until(self, time: datetime):
+    async def mute_until(self, time: datetime) -> None:
         """
         异步禁言当前成员至指定时间。
         """
@@ -104,13 +105,13 @@ class Member(User, AsyncRenovatable["Member"]):
             content=content
         )
 
-    async def unmute(self):
+    async def unmute(self) -> None:
         """
         异步解除当前成员的禁言。
         """
 
         await self.mute(timedelta())
 
-    async def renovate(self):
+    async def renovate(self) -> "Member":
         guild = await self.guild.renovate()
         return await guild.get_member(self.identifier)

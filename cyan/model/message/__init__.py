@@ -2,10 +2,12 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from frozendict import frozendict
-from typing import TYPE_CHECKING, Any, Callable, Iterable
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Union
 
 from cyan.bot import Bot
 from cyan.model import Model
+from cyan.model.guild import Guild
+from cyan.model.member import Member
 from cyan.model.user import User
 
 
@@ -59,7 +61,7 @@ class ContentElement(MessageElement):
 
         raise NotImplementedError
 
-    def apply(self, _dict: dict[str, Any]):
+    def apply(self, _dict: dict[str, Any]) -> None:
         content = _dict.get("content", "")
         content += self.to_content()
         _dict["content"] = content
@@ -80,7 +82,7 @@ MessageElementParser = Callable[[Bot, dict[str, Any]], MessageElementParseResult
 _message_element_parsers = list[MessageElementParser]()
 
 
-def message_element_parser():
+def message_element_parser() -> Callable[[MessageElementParser], None]:
     """
     装饰消息元素解析器以用于消息元素解析。
     """
@@ -96,7 +98,7 @@ class MessageContent(list[MessageElement]):
     消息内容。
     """
 
-    def extract_plain_text(self):
+    def extract_plain_text(self) -> str:
         """
         提取纯文本。
 
@@ -108,7 +110,7 @@ class MessageContent(list[MessageElement]):
 
         return " ".join([element.content for element in self if isinstance(element, PlainText)])
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """
         转换为可被 API 解析的字典。
 
@@ -121,7 +123,7 @@ class MessageContent(list[MessageElement]):
             element.apply(elements)
         return elements
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "".join(map(str, self))
 
 
@@ -135,21 +137,21 @@ class Message(Model):
         bot: Bot,
         props: dict[str, Any],
         content: MessageContent
-    ):
+    ) -> None:
         self._bot = bot
         self._props = props
         self._content = content
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         return self._props["id"]
 
     @property
-    def content(self):
+    def content(self) -> MessageContent:
         """
         消息内容。
         """
@@ -157,7 +159,7 @@ class Message(Model):
         return MessageContent(self._content)
 
     @property
-    def sender(self):
+    def sender(self) -> User:
         """
         消息发送者。
         """
@@ -165,7 +167,7 @@ class Message(Model):
         return User(self.bot, self._props["author"])
 
     @property
-    def time(self):
+    def time(self) -> datetime:
         """
         消息发送时间。
         """
@@ -182,7 +184,7 @@ class Message(Model):
 
         return await self.bot.get_channel(self._props["channel_id"])  # type: ignore
 
-    async def get_guild(self):
+    async def get_guild(self) -> Guild:
         """
         异步获取消息的附属频道。
 
@@ -192,7 +194,7 @@ class Message(Model):
 
         return await self.bot.get_guild(self._props["guild_id"])
 
-    async def get_sender_as_member(self):
+    async def get_sender_as_member(self) -> Member:
         """
         异步获取消息发送者的 `Member` 实例。
 
@@ -203,7 +205,7 @@ class Message(Model):
         guild = await self.get_guild()
         return await guild.get_member(self.sender.identifier)
 
-    async def reply(self, *message: "Sendable"):
+    async def reply(self, *message: "Sendable") -> Union["Message", "MessageAuditInfo"]:
         """
         异步回复当前消息。
 
@@ -212,10 +214,10 @@ class Message(Model):
         """
 
         channel = await self.get_channel()
-        await channel.reply(self, *message)
+        return await channel.reply(self, *message)
 
     @staticmethod
-    def from_dict(bot: Bot, _dict: dict[str, Any]):
+    def from_dict(bot: Bot, _dict: dict[str, Any]) -> "Message":
         """
         解析消息内容字典为 `Message` 实例。
 
@@ -244,7 +246,7 @@ class Message(Model):
 Sendable = MessageElement | str | Message | Iterable[MessageElement]
 
 
-def create_message_content(*elements: Sendable):
+def create_message_content(*elements: Sendable) -> MessageContent:
     """
     创建 `MessageContent` 实例。
 
@@ -279,16 +281,16 @@ class MessageAuditInfo(Model):
     _bot: Bot
     _props: dict[str, Any]
 
-    def __init__(self, bot: Bot, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
         self._bot = bot
         self._props = props
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         return self._props["data"]["message_audit"]["audit_id"]
 
 

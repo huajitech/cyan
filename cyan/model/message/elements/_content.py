@@ -1,8 +1,7 @@
 import re
 from re import Match, Pattern
 from abc import abstractmethod
-from typing import Any
-from typing import Any, TypeVar
+from typing import Any, Optional, TypeVar
 
 from cyan.bot import Bot
 from cyan.model.channel import Channel
@@ -52,7 +51,7 @@ _element_parsables = list[type[ParsableContentElement]]()
 _T_ContentElement = TypeVar("_T_ContentElement", bound=ParsableContentElement)
 
 
-def parsable_content_element(cls: type[_T_ContentElement]):
+def parsable_content_element(cls: type[_T_ContentElement]) -> type[_T_ContentElement]:
     """
     装饰 `ParsableContentElement` 以用于 `ContentElement` 消息元素解析。
     """
@@ -62,7 +61,7 @@ def parsable_content_element(cls: type[_T_ContentElement]):
 
 
 @message_element_parser()
-def parse_content(bot: Bot, _dict: dict[str, Any]):
+def parse_content(bot: Bot, _dict: dict[str, Any]) -> MessageElementParseResult | None:
     content: str = _dict["content"]
     if not content:
         return None
@@ -101,7 +100,7 @@ class PlainText(ContentElement):
 
     _content: str
 
-    def __init__(self, content: str):
+    def __init__(self, content: str) -> None:
         """
         初始化 `PlainText` 实例。
 
@@ -112,7 +111,7 @@ class PlainText(ContentElement):
         self._content = content
 
     @property
-    def content(self):
+    def content(self) -> str:
         """
         纯文本内容。
         """
@@ -122,10 +121,10 @@ class PlainText(ContentElement):
     def to_content(self) -> str:
         return self.content
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.content
 
-    def __eq__(self, obj: Any):
+    def __eq__(self, obj: Any) -> bool:
         if isinstance(obj, PlainText):
             return obj._content == self.content
         if isinstance(obj, str):
@@ -141,7 +140,7 @@ class Mention(ParsableContentElement):
 
     _target: User
 
-    def __init__(self, target: User):
+    def __init__(self, target: User) -> None:
         """
         初始化 `Mention` 实例。
 
@@ -152,7 +151,7 @@ class Mention(ParsableContentElement):
         self._target = target
 
     @property
-    def target(self):
+    def target(self) -> User:
         """
         提及目标。
         """
@@ -160,11 +159,11 @@ class Mention(ParsableContentElement):
         return self._target
 
     @staticmethod
-    def get_parse_regex():
+    def get_parse_regex() -> Pattern[str]:
         return re.compile(r"<@!{0,1}([\d\w]+)>")
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]):
+    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> Optional["Mention"]:
         mentions = _dict.get("mentions", None)
         if mentions:
             for mention in mentions:
@@ -173,10 +172,10 @@ class Mention(ParsableContentElement):
                     return Mention(user)
         return None
 
-    def to_content(self):
+    def to_content(self) -> str:
         return f"<@{self.target.identifier}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"@{self.target.name}"
 
 
@@ -186,7 +185,7 @@ class MentionAll(ParsableContentElement):
     提及全体成员。
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         初始化 `MentionAll` 实例。
         """
@@ -194,17 +193,17 @@ class MentionAll(ParsableContentElement):
         pass
 
     @staticmethod
-    def get_parse_regex():
+    def get_parse_regex() -> Pattern[str]:
         return re.compile(r"@everyone")
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]):
+    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> "MentionAll":
         return MentionAll()
 
-    def to_content(self):
+    def to_content(self) -> str:
         return "@everyone"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "@全体成员"
 
 
@@ -215,7 +214,7 @@ class ChannelLink(ContentElement):
 
     _target: Channel
 
-    def __init__(self, target: Channel):
+    def __init__(self, target: Channel) -> None:
         """
         初始化 `ChannelLink` 实例。
 
@@ -225,15 +224,15 @@ class ChannelLink(ContentElement):
         self._target = target
 
     @property
-    def target(self):
+    def target(self) -> Channel:
         """
         目标子频道。
         """
 
         return self._target
 
-    def to_content(self):
+    def to_content(self) -> str:
         return f"<#{self.target.identifier}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"#{self.target.name}"

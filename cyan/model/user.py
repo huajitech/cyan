@@ -13,7 +13,7 @@ class User(Model):
     _props: dict[str, Any]
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]):
+    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
         """
         初始化 `User` 实例。
 
@@ -25,7 +25,7 @@ class User(Model):
         self._bot = bot
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -48,7 +48,7 @@ class User(Model):
 
         return self._props["bot"]
 
-    async def get_avatar(self):
+    async def get_avatar(self) -> bytes:
         """
         异步获取用户头像。
 

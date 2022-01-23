@@ -1,12 +1,14 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from cyan.bot import Bot
 from cyan.color import ARGB
 from cyan.exception import InvalidOperationError
 from cyan.model.guild import Guild
 from cyan.model import Model
-from cyan.model.member import Member
 from cyan.model.renovatable import AsyncRenovatable
+
+if TYPE_CHECKING:
+    from cyan.model.member import Member
 
 
 class DefaultRoleId:
@@ -44,7 +46,7 @@ class Role(Model, AsyncRenovatable["Role"]):
     _guild: Guild
     _props: dict[str, Any]
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]):
+    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
         """
         初始化 `Role` 实例。
 
@@ -57,7 +59,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         self._props = props
 
     @property
-    def bot(self):
+    def bot(self) -> Bot:
         return self._bot
 
     @property
@@ -81,7 +83,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         return self._props["member_limit"]
 
     @property
-    def color(self):
+    def color(self) -> ARGB:
         """
         身份组颜色。
         """
@@ -97,14 +99,14 @@ class Role(Model, AsyncRenovatable["Role"]):
         return bool(self._props["hoist"])
 
     @property
-    def guild(self):
+    def guild(self) -> Guild:
         """
         身份组所属频道。
         """
 
         return self._guild
 
-    async def set_name(self, name: str):
+    async def set_name(self, name: str) -> None:
         """
         异步修改身份组名称。
 
@@ -114,7 +116,7 @@ class Role(Model, AsyncRenovatable["Role"]):
 
         await self._modify(name=name)
 
-    async def set_color(self, color: ARGB):
+    async def set_color(self, color: ARGB) -> None:
         """
         异步修改身份组颜色。
 
@@ -124,21 +126,21 @@ class Role(Model, AsyncRenovatable["Role"]):
 
         await self._modify(color=color.to_hex())
 
-    async def show(self):
+    async def show(self) -> None:
         """
         异步启用身份组在成员列表中的单独展示。
         """
 
         await self._modify(shown=True)
 
-    async def hide(self):
+    async def hide(self) -> None:
         """
         异步关闭身份组在成员列表中的单独展示。
         """
 
         await self._modify(shown=False)
 
-    async def add(self, member: Member):
+    async def add(self, member: "Member") -> None:
         """
         异步添加成员到当前身份组。
 
@@ -159,7 +161,7 @@ class Role(Model, AsyncRenovatable["Role"]):
             f"/guilds/{self.guild.identifier}/members/{member.identifier}/roles/{self.identifier}"
         )
 
-    async def remove(self, member: Member):
+    async def remove(self, member: "Member") -> None:
         """
         异步从当前身份组移除指定成员。
 
@@ -185,7 +187,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         name: str | None = None,
         color: int | None = None,
         shown: bool | None = None
-    ):
+    ) -> None:
         _filter = {
             "name": int(name is not None),
             "color": int(color is not None),
@@ -199,6 +201,6 @@ class Role(Model, AsyncRenovatable["Role"]):
         )
         self._props = response.json()["role"]
 
-    async def renovate(self):
+    async def renovate(self) -> "Role":
         guild = await self.guild.renovate()
         return await guild.get_role(self.identifier)

@@ -5,10 +5,10 @@ from cyan.model.channel import Channel, parse
 
 
 class _ChannelEvent(Event):
-    async def _parse_data(self, data: Any):
+    async def _parse_data(self, data: Any) -> Channel:
         channel = await parse(self._bot, data)
         if not isinstance(channel, Channel):
-            return NotSupported
+            raise NotSupported
         return channel
 
 
@@ -20,7 +20,7 @@ class ChannelCreatedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("CHANNEL_CREATE", Intent.GUILD)
 
 
@@ -32,7 +32,7 @@ class ChannelUpdatedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("CHANNEL_UPDATE", Intent.GUILD)
 
 
@@ -44,5 +44,5 @@ class ChannelDeletedEvent(_ChannelEvent):
     """
 
     @staticmethod
-    def get_event_info():
+    def get_event_info() -> EventInfo:
         return EventInfo("CHANNEL_DELETE", Intent.GUILD)

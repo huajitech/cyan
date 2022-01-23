@@ -1,14 +1,19 @@
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any
+from typing import TYPE_CHECKING, Any, Union
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
 from cyan.event import EventSource
 from cyan.exception import OpenApiError, InvalidTargetError
 
+if TYPE_CHECKING:
+    from cyan.model.user import User
+    from cyan.model.guild import Guild
+    from cyan.model.channel import Channel, ChannelGroup
+
 # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html。
-_GUILD_QUERY_LIMIT = 100
+_GUILD_QUERY_LIMIT: int = 100
 
 
 @dataclass
@@ -37,7 +42,7 @@ class Bot:
     _client: AsyncClient
     _event_source: EventSource
 
-    def __init__(self, api_base_url: str, ticket: Ticket):
+    def __init__(self, api_base_url: str, ticket: Ticket) -> None:
         """
         初始化 `Bot` 实例。
 
@@ -53,14 +58,14 @@ class Bot:
         self._event_source = EventSource(self, authorization)
 
     @property
-    def event_source(self):
+    def event_source(self) -> EventSource:
         """
         事件源。
         """
 
         return self._event_source
 
-    async def get(self, path: str, params: dict[str, Any] | None = None):
+    async def get(self, path: str, params: dict[str, Any] | None = None) -> Response:
         """
         异步向服务器请求 GET 操作。
 
@@ -76,7 +81,12 @@ class Bot:
         response = await self._client.get(url, params=params)  # type: ignore
         return Bot._check_error(response)
 
-    async def post(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
+    async def post(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        content: Any = None
+    ) -> Response:
         """
         异步向服务器请求 POST 操作。
 
@@ -93,7 +103,12 @@ class Bot:
         response = await self._client.post(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
-    async def put(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
+    async def put(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        content: Any = None
+    ) -> Response:
         """
         异步向服务器请求 PUT 操作。
 
@@ -110,7 +125,12 @@ class Bot:
         response = await self._client.put(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
-    async def delete(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
+    async def delete(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        content: Any = None
+    ) -> Response:
         """
         异步向服务器请求 DELETE 操作。
 
@@ -128,7 +148,12 @@ class Bot:
         )
         return Bot._check_error(response)
 
-    async def patch(self, path: str, params: dict[str, Any] | None = None, content: Any = None):
+    async def patch(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        content: Any = None
+    ) -> Response:
         """
         异步向服务器请求 PATCH 操作。
 
@@ -145,7 +170,7 @@ class Bot:
         response = await self._client.patch(url, params=params, json=content)  # type: ignore
         return Bot._check_error(response)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         """
         异步关闭当前机器人。
         """
@@ -154,7 +179,7 @@ class Bot:
             await self._event_source.disconnect()
         await self._client.aclose()
 
-    async def get_current_user(self):
+    async def get_current_user(self) -> "User":
         """
         异步获取当前机器人用户。
 
@@ -169,7 +194,7 @@ class Bot:
         user["bot"] = True
         return User(self, user)
 
-    async def get_guild(self, identifier: str):
+    async def get_guild(self, identifier: str) -> "Guild":
         """
         异步获取指定 ID 频道。
 
@@ -185,7 +210,7 @@ class Bot:
         response = await self.get(f"/guilds/{identifier}")
         return Guild(self, response.json())
 
-    async def get_guilds(self):
+    async def get_guilds(self) -> list["Guild"]:
         """
         异步获取当前机器人的所有频道。
 
@@ -208,7 +233,7 @@ class Bot:
                 return guilds
             cur = guilds[-1].identifier
 
-    async def get_channel(self, identifier: str):
+    async def get_channel(self, identifier: str) -> "Channel":
         """
         异步获取指定 ID 子频道。
 
@@ -226,7 +251,7 @@ class Bot:
             return channel
         raise InvalidTargetError("指定的 ID 不为子频道。")
 
-    async def get_channel_group(self, identifier: str):
+    async def get_channel_group(self, identifier: str) -> "ChannelGroup":
         """
         异步获取指定 ID 子频道。
 
@@ -244,14 +269,14 @@ class Bot:
             return channel
         raise InvalidTargetError("指定的 ID 不为子频道组。")
 
-    async def _get_channel_core(self, identifier: str):
+    async def _get_channel_core(self, identifier: str) -> Union["Channel", "ChannelGroup"]:
         from cyan.model.channel import parse as parse_channel
 
         response = await self.get(f"/channels/{identifier}")
         return await parse_channel(self, response.json())
 
     @staticmethod
-    def _check_error(response: Response):
+    def _check_error(response: Response) -> Response:
         if int(response.status_code / 10) != 20:  # type: ignore
             content = response.json()
             raise OpenApiError(
@@ -261,7 +286,7 @@ class Bot:
             )
         return response
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "Bot":
         return self
 
     async def __aexit__(
@@ -269,5 +294,5 @@ class Bot:
         exc_type: type[BaseException] = ...,
         exc_value: BaseException = ...,
         traceback: TracebackType = ...
-    ):
+    ) -> None:
         await self.aclose()
