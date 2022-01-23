@@ -17,9 +17,11 @@ before_script:
   - node -v
 
 test:
+  only:
+    changes:
+      - cyan/**/*
+      - example/**/*
   script:
-    - pip install poetry -q -i $PYPI_MIRROR
     - poetry install
-
     - poetry run pyright
     - poetry run flake8
