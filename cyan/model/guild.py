@@ -7,9 +7,11 @@ from cyan.exception import InvalidTargetError, OpenApiError
 from cyan.bot import Bot
 from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
+from cyan.model.announcement import Announcement
 
 
 if TYPE_CHECKING:
+    from cyan.model.message import Message
     from cyan.model.channel import Channel, ChannelGroup
     from cyan.model.member import Member
     from cyan.model.role import Role
@@ -351,6 +353,30 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
 
         await self.bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
+
+    async def announce(self, message: "Message") -> Announcement:
+        """
+        异步在当前频道公告指定消息。
+
+        参数：
+            - message: 将要在当前频道公告的消息
+
+        返回：
+            以 `Announcement` 类型表示的公告。
+        """
+
+        channel = await message.get_channel()
+        content = {"message_id": message.identifier, "channel_id": channel.identifier}
+        response = await self.bot.post(f"/guilds/{self.identifier}/announces", content=content)
+        announcement = response.json()
+        return Announcement(self.bot, announcement)
+
+    async def recall_announcement(self) -> None:
+        """
+        异步撤销当前频道的公告。
+        """
+
+        await self.bot.delete(f"/guilds/{self.identifier}/announces/all")
 
     async def renovate(self) -> "Guild":
         return await self.bot.get_guild(self.identifier)

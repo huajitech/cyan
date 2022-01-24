@@ -2,11 +2,10 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from cyan import OpenApiError
-
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
-from cyan.exception import InvalidOperationError
+from cyan.exception import InvalidOperationError, OpenApiError
+from cyan.model.announcement import Announcement
 from cyan.model.guild import Guild
 from cyan.model import Model
 from cyan.model.member import Member
@@ -436,6 +435,32 @@ class TextChannel(Channel):
         if code == 304023 or code == 304024:
             return MessageAuditInfo(self.bot, data)
         return Message.from_dict(self.bot, data)
+    
+    async def announce(self, message: Message) -> Announcement:
+        """
+        异步在当前子频道公告指定消息。
+
+        参数：
+            - message: 将要在当前频道公告的消息
+
+        返回：
+            以 `Announcement` 类型表示的公告。
+        """
+
+        content = {"message_id": message.identifier}
+        response = await self.bot.post(
+            f"/channels/{self.identifier}/announces",
+            content=content
+        )
+        announcement = response.json()
+        return Announcement(self.bot, announcement)
+
+    async def recall_announcement(self) -> None:
+        """
+        异步撤销当前子频道的公告。
+        """
+
+        await self.bot.delete(f"/channels/{self.identifier}/announces/all")
 
 
 class VoiceChannel(Channel):
