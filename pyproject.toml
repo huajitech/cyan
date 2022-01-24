@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cyansdk"
-version = "0.1.1"
+version = "0.2.0"
 description = "A Python SDK for QQ Bot."
 authors = ["Ricky8955555 <397050061@qq.com>"]
 license = "MIT"
