@@ -98,6 +98,13 @@ class EventInfo:
     _intent: Intent
 
     def __init__(self, name: str, intent: Intent) -> None:
+        """
+        初始化 `EventInfo` 实例。
+
+        参数：
+            - name: 事件名称
+            - intent: 事件所需注册的 `Intent`
+        """
         self._name = name
         self._intent = intent
 
@@ -112,7 +119,7 @@ class EventInfo:
     @property
     def intent(self) -> Intent:
         """
-        事件所需注册 `Intent`。
+        事件所需注册的 `Intent`。
         """
 
         return self._intent
@@ -123,6 +130,13 @@ class Event:
     _bot: "Bot"
 
     def __init__(self, bot: "Bot") -> None:
+        """
+        初始化 `Event` 实例。
+
+        参数：
+            - bot: 事件所属机器人
+        """
+
         self._handlers = set[EventHandler]()
         self._bot = bot
 
@@ -299,6 +313,14 @@ class EventSource:
     _task: Task[None] | None
 
     def __init__(self, bot: "Bot", authorization: str):
+        """
+        初始化 `EventSource` 实例。
+
+        参数：
+            - bot: 事件源所属机器人
+            - authorization: 认证信息
+        """
+
         self._websocket = WebSocketClientProtocol()
         self._bot = bot
         self._serial_code = -1

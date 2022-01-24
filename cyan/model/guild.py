@@ -34,7 +34,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         初始化 `Guild` 实例。
 
         参数：
-            - bot: 机器人
+            - bot: 频道所属机器人
             - props: 属性
         """
 

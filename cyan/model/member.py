@@ -23,6 +23,8 @@ class Member(User, AsyncRenovatable["Member"]):
         初始化 `Member` 实例。
 
         参数：
+            - bot: 成员所属机器人
+            - guild: 成员所属频道
             - props: 属性
         """
 

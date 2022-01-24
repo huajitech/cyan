@@ -64,6 +64,8 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         初始化 `Schedule` 实例。
 
         参数：
+            - bot: 日程所属机器人
+            - channel: 日程所属频道
             - props: 属性
         """
 

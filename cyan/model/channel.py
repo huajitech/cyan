@@ -138,7 +138,8 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         初始化 `ChannelGroup` 实例。
 
         参数：
-            - bot: 机器人
+            - bot: 子频道组所属机器人
+            - guild: 子频道组所属频道
             - props: 属性
         """
 
@@ -230,7 +231,8 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         初始化 `Channel` 实例。
 
         参数：
-            - bot: 机器人
+            - bot: 子频道所属机器人
+            - guild: 子频道所属频道
             - props: 属性
         """
 

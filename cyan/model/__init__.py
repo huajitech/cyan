@@ -9,7 +9,7 @@ class Model:
     @abstractmethod
     def bot(self) -> Bot:
         """
-        `Model` 所属机器人实例。
+        `Model` 所属机器人。
         """
         raise NotImplementedError
 

@@ -18,6 +18,7 @@ class User(Model):
         初始化 `User` 实例。
 
         参数：
+            - bot: 用户所属机器人
             - props: 属性
         """
 

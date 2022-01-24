@@ -22,7 +22,7 @@ class Announcement(Model):
         初始化 `Announcement` 实例。
 
         参数：
-            - bot: 机器人
+            - bot: 公告所属机器人
             - props: 属性
         """
 

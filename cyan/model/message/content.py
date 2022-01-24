@@ -221,7 +221,8 @@ class ChannelLink(ContentElement):
         """
         初始化 `ChannelLink` 实例。
 
-        - target: 目标子频道
+        参数：
+            - target: 目标子频道
         """
 
         self._target = target

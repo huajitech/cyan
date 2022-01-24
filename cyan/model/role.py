@@ -51,6 +51,8 @@ class Role(Model, AsyncRenovatable["Role"]):
         初始化 `Role` 实例。
 
         参数：
+            - bot: 身份组所属机器人
+            - guild: 身份组所属频道
             - props: 属性
         """
 
@@ -69,7 +71,7 @@ class Role(Model, AsyncRenovatable["Role"]):
     @property
     def name(self) -> str:
         """
-        成员组名称。
+        身份组名称。
         """
 
         return self._props["name"]

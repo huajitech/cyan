@@ -143,6 +143,14 @@ class Message(Model):
         props: dict[str, Any],
         content: MessageContent
     ) -> None:
+        """
+        初始化 `Message` 实例。
+
+        参数：
+            - bot: 消息所属机器人
+            - props: 属性
+            - content: 消息内容
+        """
         self._bot = bot
         self._props = props
         self._content = content
@@ -291,6 +299,14 @@ class MessageAuditInfo(Model):
     _props: dict[str, Any]
 
     def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
+        """
+        初始化 `MessageAuditInfo` 实例。
+
+        参数：
+            - bot: 消息审核信息所属机器人
+            - props: 属性
+        """
+
         self._bot = bot
         self._props = props
 
