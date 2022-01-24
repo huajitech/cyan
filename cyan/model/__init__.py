@@ -26,6 +26,7 @@ class Model:
         return isinstance(obj, _type) and obj.bot == self.bot and obj.identifier == self.identifier
 
 
+from .announcement import *
 from .user import *
 from .guild import *
 from .member import *
