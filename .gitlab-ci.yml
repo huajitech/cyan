@@ -50,7 +50,7 @@ nightly-build:
       changes:
         - cyan/**/*
   script:
-    - python ./build/main.py
+    - poetry run python ./build/nightly_version_modifier.py
     - poetry build
   artifacts:
     paths:
@@ -103,7 +103,7 @@ nightly-publish:
       changes:
         - cyan/**/*
   needs:
-    - job: build
+    - job: nightly-build
       artifacts: true
   script:
     - pip install twine

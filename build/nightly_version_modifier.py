@@ -11,13 +11,13 @@ print(f"Project path was defined as: {dir}")
 path = os.path.join(dir, "pyproject.toml")
 if not os.path.exists(path):
     raise FileNotFoundError(f"Could not found project config file: {path}")
-print(f"Project config was found: {path}.")
+print(f"Project config was found: {path}")
 with open(path, "r") as fp:
     print("Loading project config...")
     config = toml.load(fp)
 print(f"Project config was loaded:\n {config}")
 date = datetime.today().strftime("%Y%m%d")
-version = config["tool"]["poetry"]["version"] + f"-nightly.{date}"
+version = config["tool"]["poetry"]["version"] + f".dev{date}"
 config["tool"]["poetry"]["version"] = version
 print(f"Version was modified as: {version}")
 with open(path, "w") as fp:
