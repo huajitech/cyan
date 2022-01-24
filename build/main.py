@@ -21,7 +21,7 @@ version = config["tool"]["poetry"]["version"] + f"-nightly.{date}"
 config["tool"]["poetry"]["version"] = version
 print(f"Version was modified as: {version}")
 with open(path, "w") as fp:
-    print(f"Serializing and writing config to file...")
+    print("Serializing and writing config to file...")
     toml.dump(config, fp)
 print("Config was successfully serialized and written to file.")
 print("Config was successfully updated.")
