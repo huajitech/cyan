@@ -5,6 +5,7 @@ from frozendict import frozendict
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Union
 
 from cyan.bot import Bot
+from cyan.exception import OperationFailedError
 from cyan.model import Model
 from cyan.model.guild import Guild
 from cyan.model.member import Member
@@ -128,6 +129,10 @@ class MessageContent(list[MessageElement]):
 
 
 class Message(Model):
+    """
+    消息。
+    """
+
     _bot: Bot
     _props: dict[str, Any]
     _content: MessageContent
@@ -278,6 +283,10 @@ def create_message_content(*elements: Sendable) -> MessageContent:
 
 
 class MessageAuditInfo(Model):
+    """
+    消息审核信息。
+    """
+
     _bot: Bot
     _props: dict[str, Any]
 
@@ -292,6 +301,25 @@ class MessageAuditInfo(Model):
     @property
     def identifier(self) -> str:
         return self._props["data"]["message_audit"]["audit_id"]
+
+    async def get_guild(self) -> "Guild":
+        """
+        异步获取当前消息审核信息所属频道。
+        """
+
+        return await self.bot.get_guild(self._props["guild_id"])
+
+    async def get_channel(self) -> "TextChannel":
+        """
+        异步获取当前消息审核信息所属子频道。
+        """
+
+        from cyan.model.channel import TextChannel
+
+        channel = await self.bot.get_channel(self._props["channel_id"])
+        if not isinstance(channel, TextChannel):
+            raise OperationFailedError("当前公告所属子频道不为文字子频道。")
+        return channel
 
 
 from cyan.model.message import elements  # type: ignore
