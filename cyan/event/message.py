@@ -66,7 +66,7 @@ class MessageAuditPassedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("MESSAGE_AUDIT_PASS", Intent.MESSAGE_AUDIT)
 
-    async def _parse_data(self, data: Any) -> Any:
+    async def _parse_data(self, data: Any) -> MessageAuditPassedEventData:
         audit_info = MessageAuditInfo(self._bot, data)
         channel = await audit_info.get_channel()
         message = await channel.get_message(data["message_id"])
@@ -84,5 +84,5 @@ class MessageAuditRejectedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("MESSAGE_AUDIT_REJECT", Intent.MESSAGE_AUDIT)
 
-    async def _parse_data(self, data: Any) -> Any:
+    async def _parse_data(self, data: Any) -> MessageAuditInfo:
         return MessageAuditInfo(self._bot, data)
