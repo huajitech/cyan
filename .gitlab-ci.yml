@@ -76,7 +76,7 @@ pages:
       - tags
   script:
     - cd docs
-    - poetry run sphinx-apidoc -o . ../cyan
+    - poetry run sphinx-apidoc -e -o . ../cyan
     - poetry run sphinx-build -b html . ./build
     - mv ./build ../public
   artifacts:
