@@ -107,7 +107,7 @@ class MessageContent(list[MessageElement]):
             以 `str` 类型表示消息内容的所有纯文本。
         """
 
-        from cyan.model.message.elements.content import PlainText
+        from cyan.model.message.content import PlainText
 
         return " ".join([element.content for element in self if isinstance(element, PlainText)])
 
@@ -267,7 +267,7 @@ def create_message_content(*elements: Sendable) -> MessageContent:
         包含指定元素的 `MessageContent`。
     """
 
-    from cyan.model.message.elements.content import PlainText
+    from cyan.model.message.content import PlainText
 
     content = MessageContent()
     for element in elements:
@@ -322,4 +322,4 @@ class MessageAuditInfo(Model):
         return channel
 
 
-from cyan.model.message import elements  # type: ignore
+from .content import *

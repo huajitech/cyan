@@ -14,7 +14,7 @@ from cyan.exception import InvalidOperationError
 
 
 if TYPE_CHECKING:
-    from cyan.event.events._connection import ReadyEventData
+    from cyan.event._connection import ReadyEventData
     from cyan.bot import Bot
 
 
@@ -430,7 +430,7 @@ class EventSource:
         await self.send(Operation.RESUME, payload)
 
     async def _identify(self) -> None:
-        from cyan.event.events._connection import ReadyEvent
+        from cyan.event._connection import ReadyEvent
 
         self.get_event(ReadyEvent).bind(self._on_ready)
         payload = {
@@ -489,3 +489,9 @@ class EventSource:
                 self._set_heartbeat(content["d"]["heartbeat_interval"])
             case Operation.HEARTBEAT:
                 await self._send_heartbeat()
+
+
+from .channel import *
+from .guild import *
+from .member import *
+from .message import *

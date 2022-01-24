@@ -6,7 +6,7 @@ import random
 from datetime import timedelta
 
 from cyan import Session, Ticket
-from cyan.event.events import ChannelMessageReceivedEvent
+from cyan.event import ChannelMessageReceivedEvent
 from cyan.exception import OpenApiError
 from cyan.model import Message
 

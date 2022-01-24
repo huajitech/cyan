@@ -48,7 +48,7 @@ pip install cyansdk
 
 ```py
 from cyan import Session, Ticket
-from cyan.event.events import ChannelMessageReceivedEvent
+from cyan.event import ChannelMessageReceivedEvent
 from cyan.model import Message
 
 session = Session(

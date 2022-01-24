@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, Any, Union
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
-from cyan.event import EventSource
 from cyan.exception import OpenApiError, InvalidTargetError
 
 if TYPE_CHECKING:
+    from cyan.event import EventSource
     from cyan.model.user import User
     from cyan.model.guild import Guild
     from cyan.model.channel import Channel, ChannelGroup
@@ -40,7 +40,7 @@ class Bot:
 
     _base_url: str
     _client: AsyncClient
-    _event_source: EventSource
+    _event_source: "EventSource"
 
     def __init__(self, api_base_url: str, ticket: Ticket) -> None:
         """
@@ -51,6 +51,8 @@ class Bot:
             - ticket: 票据
         """
 
+        from cyan.event import EventSource
+
         self._base_url = api_base_url
         authorization = f"Bot {ticket.app_id}.{ticket.token}"
         headers = {"Authorization": authorization}
@@ -58,7 +60,7 @@ class Bot:
         self._event_source = EventSource(self, authorization)
 
     @property
-    def event_source(self) -> EventSource:
+    def event_source(self) -> "EventSource":
         """
         事件源。
         """
