@@ -7,7 +7,7 @@ stages:
   - deploy
 
 default:
-  image: nikolaik/python-nodejs:latest
+  image: registry.gitlab.huajitech.net:5050/funnysyc/seamster
 
   cache:
     paths:
