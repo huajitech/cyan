@@ -58,7 +58,7 @@ class MessageAuditPassedEventData:
 class MessageAuditPassedEvent(Event):
     """
     当消息审核通过时触发。
-    
+
     触发时回调的数据类型为 `MessageAuditPassedEventData`。
     """
 
@@ -76,7 +76,7 @@ class MessageAuditPassedEvent(Event):
 class MessageAuditRejectedEvent(Event):
     """
     当消息审核不通过时触发。
-    
+
     触发时回调的数据类型为 `MessageAuditInfo`。
     """
 

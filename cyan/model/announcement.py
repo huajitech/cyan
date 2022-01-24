@@ -56,7 +56,7 @@ class Announcement(Model):
         if not isinstance(channel, TextChannel):
             raise OperationFailedError("当前公告所属子频道不为文字子频道。")
         return channel
-        
+
     async def get_message(self) -> "Message":
         """
         异步获取当前公告的消息。

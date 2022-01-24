@@ -435,7 +435,7 @@ class TextChannel(Channel):
         if code == 304023 or code == 304024:
             return MessageAuditInfo(self.bot, data)
         return Message.from_dict(self.bot, data)
-    
+
     async def announce(self, message: Message) -> Announcement:
         """
         异步在当前子频道公告指定消息。
