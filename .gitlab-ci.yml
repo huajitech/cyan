@@ -33,11 +33,24 @@ test:
 build:
   stage: build
   only:
-    refs:
-      - tags
     changes:
       - cyan/**/*
+    refs:
+      - tags
   script:
+    - poetry build
+  artifacts:
+    paths:
+      - dist
+
+nightly-build:
+  stage: build
+  rules:
+    - if: $CI_NIGHTLY_BUILD
+      changes:
+        - cyan/**/*
+  script:
+    - python ./build/main.py
     - poetry build
   artifacts:
     paths:
@@ -82,3 +95,16 @@ pages:
   artifacts:
     paths:
       - public
+
+nightly-publish:
+  stage: deploy
+  rules:
+    - if: $CI_NIGHTLY_BUILD
+      changes:
+        - cyan/**/*
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - pip install twine
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
