@@ -37,12 +37,18 @@ GitHub：https://github.com/huajitech/cyan
 
 ## 如何使用
 
-通过 `pip` 安装 Cyan：
-```bash
-pip install cyansdk
-```
+### 安装
 
-文档：https://huajitech.proj.zone/cyan
+1. 通过 `pip` 安装 Cyan (release)：
+    ```bash
+    pip install cyansdk
+    ```
+
+2. 通过 `pip` 安装 Cyan (nightly)：https://gitlab.huajitech.net/huajitech/cyan/-/packages
+
+### 文档
+
+https://huajitech.proj.zone/cyan
 
 ## 示例
 
