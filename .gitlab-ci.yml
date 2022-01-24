@@ -47,8 +47,6 @@ nightly-build:
   stage: build
   rules:
     - if: $CI_NIGHTLY_BUILD
-      changes:
-        - cyan/**/*
   script:
     - poetry run python ./build/nightly_version_modifier.py
     - poetry build
@@ -100,8 +98,6 @@ nightly-publish:
   stage: deploy
   rules:
     - if: $CI_NIGHTLY_BUILD
-      changes:
-        - cyan/**/*
   needs:
     - job: nightly-build
       artifacts: true
