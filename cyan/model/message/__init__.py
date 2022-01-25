@@ -230,7 +230,7 @@ class Message(Model):
         return await channel.reply(self, *message)
 
     @staticmethod
-    def from_dict(bot: Bot, _dict: dict[str, Any]) -> "Message":
+    def parse(bot: Bot, _dict: dict[str, Any]) -> "Message":
         """
         解析消息内容字典为 `Message` 实例。
 

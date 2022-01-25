@@ -16,7 +16,7 @@ class ChannelMessageReceivedEvent(Event):
         return EventInfo("AT_MESSAGE_CREATE", Intent.MENTION)
 
     async def _parse_data(self, data: dict[str, Any]) -> Message:
-        return Message.from_dict(self._bot, data)
+        return Message.parse(self._bot, data)
 
 
 class MessageAuditPassedEventData:
