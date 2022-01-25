@@ -1,11 +1,15 @@
 from typing import Any
 
 from cyan.event import Event, EventInfo, Intent
-from cyan.model.channel import TextChannel
 from cyan.model.message import Message, MessageAuditInfo
 
 
-class ChannelMessageReceivedEvent(Event):
+class _MessageReceivedEvent(Event):
+    async def _parse_data(self, data: dict[str, Any]) -> Message:
+        return Message.parse(self._bot, data)
+
+
+class ChannelMessageReceivedEvent(_MessageReceivedEvent):
     """
     当接收到子频道用户所发送含提及机器人消息时触发。
 
@@ -16,11 +20,8 @@ class ChannelMessageReceivedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("AT_MESSAGE_CREATE", Intent.MENTION)
 
-    async def _parse_data(self, data: dict[str, Any]) -> Message:
-        return Message.parse(self._bot, data, TextChannel)
 
-
-class MemberMessageReceivedEvent(Event):
+class MemberMessageReceivedEvent(_MessageReceivedEvent):
     """
     当接收到用户与机器人私聊时触发。
 
@@ -30,9 +31,6 @@ class MemberMessageReceivedEvent(Event):
     @staticmethod
     def get_event_info() -> EventInfo:
         return EventInfo("DIRECT_MESSAGE_CREATE", Intent.MEMBER_MESSAGE)
-
-    async def _parse_data(self, data: dict[str, Any]) -> Message:
-        return Message.parse(self._bot, data, TextChannel)
 
 
 class MessageAuditPassedEventData:

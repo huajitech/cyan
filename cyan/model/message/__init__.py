@@ -135,14 +135,12 @@ class Message(Model):
 
     _bot: Bot
     _props: dict[str, Any]
-    _source_type: type["TextChannel"] | type[Member]
     _content: MessageContent
 
     def __init__(
         self,
         bot: Bot,
         props: dict[str, Any],
-        source: type["TextChannel"] | type[Member],
         content: MessageContent
     ) -> None:
         """
@@ -151,12 +149,10 @@ class Message(Model):
         参数：
             - bot: 消息所属机器人
             - props: 属性
-            - source: 来源
             - content: 消息内容
         """
         self._bot = bot
         self._props = props
-        self._source_type = source
         self._content = content
 
     @property
@@ -190,19 +186,6 @@ class Message(Model):
         """
 
         return datetime.fromisoformat(self._props["timestamp"])
-
-    async def get_source(self) -> Union["TextChannel", Member]:
-        """
-        异步获取消息来源。
-
-        当消息来源于文字子频道时，则返回以 `TextChannel` 类型表示的源文字子频道；
-        当消息来源于成员私聊时，则返回以 'Member' 类型表示的源成员。
-        """
-
-        if self._source_type == Member:
-            return await self.get_sender_as_member()
-        else:
-            return await self.get_channel()
 
     async def get_channel(self) -> "TextChannel":
         """
@@ -247,11 +230,7 @@ class Message(Model):
         return await channel.reply(self, *message)
 
     @staticmethod
-    def parse(
-        bot: Bot,
-        _dict: dict[str, Any],
-        source: type["TextChannel"] | type[Member]
-    ) -> "Message":
+    def parse(bot: Bot, _dict: dict[str, Any]) -> "Message":
         """
         解析消息内容字典为 `Message` 实例。
 
@@ -274,7 +253,7 @@ class Message(Model):
             else:
                 elements.extend(result.elements)
         content = MessageContent(elements)
-        return Message(bot, _dict, source, content)
+        return Message(bot, _dict, content)
 
 
 Sendable = MessageElement | str | Message | Iterable[MessageElement]
