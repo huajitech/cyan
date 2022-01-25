@@ -221,7 +221,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         异步取消日程指向目标子频道。
         """
 
-        return await self._modify({"destination": DEFAULT_ID})
+        return await self._modify({"jump_channel_id": DEFAULT_ID})
 
     async def _modify(self, changes: Dict[str, Any]) -> None:
         schedule = dict(self._props)
