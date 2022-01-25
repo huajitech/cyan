@@ -139,6 +139,7 @@ class Bot:
         参数：
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
+            - content: 请求内容（将序列化为 JSON）
 
         返回：
             以 `Response` 类型表示的服务器响应。

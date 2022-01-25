@@ -8,6 +8,9 @@ from cyan.event import Event, EventHandler
 
 
 BotStartedHandler = Callable[[Bot], Awaitable[Optional[NoReturn]]]
+"""
+机器人启动事件处理器。
+"""
 
 
 class Session:

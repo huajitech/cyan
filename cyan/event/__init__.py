@@ -127,6 +127,10 @@ class EventInfo:
 
 
 class Event:
+    """
+    事件。
+    """
+
     _handlers: Set[EventHandler]
     _bot: "Bot"
 

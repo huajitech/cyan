@@ -411,7 +411,7 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
         异步在当前子频道公告指定消息。
 
         参数：
-            - message: 将要在当前频道公告的消息
+            - message: 将要在当前子频道公告的消息
 
         返回：
             以 `Announcement` 类型表示的公告。
@@ -478,6 +478,9 @@ class ScheduleChannel(AppChannel):
 
         参数：
             - channel: 所需转换的应用子频道（应用子频道类型必须为日程提醒）
+
+        返回：
+            以 `ScheduleChannel` 类型表示等效于被转换应用子频道的日程子频道。
         """
 
         if channel.app_channel_type == AppChannelType.SCHEDULE:
@@ -532,8 +535,12 @@ class ScheduleChannel(AppChannel):
             - name: 日程名称
             - start_time: 日程开始时间
             - end_time: 日程结束时间
+            - remind_type: 提醒类型
             - description: 日程描述
             - destination: 日程指向目标子频道
+
+        返回：
+            以 `Schedule` 类型表示的日程。
         """
 
         schedule = {

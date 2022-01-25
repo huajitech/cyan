@@ -39,6 +39,9 @@ class Announcement(Model):
     async def get_guild(self) -> "Guild":
         """
         异步获取当前公告所属频道。
+
+        返回：
+            以 `Guild` 类型表示的公告所属频道。
         """
 
         return await self.bot.get_guild(self._props["guild_id"])
@@ -46,6 +49,9 @@ class Announcement(Model):
     async def get_channel(self) -> "TextChannel":
         """
         异步获取当前公告所属子频道。
+
+        返回：
+            以 `TextChannel` 类型表示的公告所属子频道。
         """
 
         from cyan.model.channel import TextChannel
@@ -57,6 +63,9 @@ class Announcement(Model):
     async def get_message(self) -> "ChannelMessage":
         """
         异步获取当前公告的消息。
+
+        返回：
+            以 `ChannelMessage` 类型表示的公告消息。
         """
 
         channel = await self.get_channel()
