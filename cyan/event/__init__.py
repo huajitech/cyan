@@ -58,14 +58,14 @@ class Intent(Enum):
     成员事件。
     """
 
-    GUILD_EXPRESSION = 1 << 10
+    EXPRESSION = 1 << 10
     """
     频道表态事件。
     """
 
-    DIRECT_MESSAGE = 1 << 12
+    MEMBER_MESSAGE = 1 << 12
     """
-    直接消息事件。
+    成员消息事件。
     """
 
     MESSAGE_AUDIT = 1 << 27
