@@ -2,7 +2,10 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from frozendict import frozendict
-from typing import TYPE_CHECKING, Any, Callable, Generic, Iterable, TypeVar
+from typing import (
+    TYPE_CHECKING, Any, Callable, Dict, Generic,
+    Iterable, TypeVar, Union, List, Optional
+)
 
 from cyan.bot import Bot
 from cyan.model.guild import Guild
@@ -23,7 +26,7 @@ class MessageElement:
     """
 
     @abstractmethod
-    def apply(self, _dict: dict[str, Any]) -> None:
+    def apply(self, _dict: Dict[str, Any]) -> None:
         """
         应用消息元素至消息。
 
@@ -45,7 +48,7 @@ class MessageElementParseResult:
     元素是否置顶。
     """
 
-    elements: list[MessageElement]
+    elements: List[MessageElement]
     """
     解析结果所有元素的 `list` 类型集合。
     """
@@ -63,25 +66,25 @@ class ContentElement(MessageElement):
 
         raise NotImplementedError
 
-    def apply(self, _dict: dict[str, Any]) -> None:
+    def apply(self, _dict: Dict[str, Any]) -> None:
         content = _dict.get("content", "")
         content += self.to_content()
         _dict["content"] = content
 
 
-MessageElementParser = Callable[[Bot, dict[str, Any]], MessageElementParseResult | None]
+MessageElementParser = Callable[[Bot, Dict[str, Any]], Optional[MessageElementParseResult]]
 """
 消息元素解析器。
 
 参数：
     - `Bot`: 请求解析的机器人实例
-    - `dict[str, Any]`: API 返回字典
+    - `Dict[str, Any]`: API 返回字典
 
 返回：
     当解析成功时，返回以 `MessageElementParseResult` 类型表示的解析结果；否则，返回 `None`。
 """
 
-_message_element_parsers = list[MessageElementParser]()
+_message_element_parsers: List[MessageElementParser] = []
 
 
 def message_element_parser() -> Callable[[MessageElementParser], None]:
@@ -95,7 +98,7 @@ def message_element_parser() -> Callable[[MessageElementParser], None]:
     return _decorate
 
 
-class MessageContent(list[MessageElement]):
+class MessageContent(List[MessageElement]):
     """
     消息内容。
     """
@@ -112,7 +115,7 @@ class MessageContent(list[MessageElement]):
 
         return " ".join([element.content for element in self if isinstance(element, PlainText)])
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """
         转换为可被 API 解析的字典。
 
@@ -120,7 +123,7 @@ class MessageContent(list[MessageElement]):
             可被 API 解析的当前实例的等效字典。
         """
 
-        elements = dict[str, Any]()
+        elements: Dict[str, Any] = {}
         for element in self:
             element.apply(elements)
         return elements
@@ -135,9 +138,9 @@ class MessageAuditInfo(Model):
     """
 
     _bot: Bot
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
 
-    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, props: Dict[str, Any]) -> None:
         """
         初始化 `MessageAuditInfo` 实例。
 
@@ -182,13 +185,13 @@ class Message(Model, Generic[_T_Message]):
     """
 
     _bot: Bot
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _content: MessageContent
 
     def __init__(
         self,
         bot: Bot,
-        props: dict[str, Any],
+        props: Dict[str, Any],
         content: MessageContent
     ) -> None:
         """
@@ -266,7 +269,7 @@ class Message(Model, Generic[_T_Message]):
         return await source.reply(self, *message)
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any]) -> _T_Message:
+    def parse(bot: Bot, _dict: Dict[str, Any]) -> _T_Message:
         """
         解析消息内容字典为 `Message` 实例。
 
@@ -281,8 +284,8 @@ class Message(Model, Generic[_T_Message]):
         raise NotImplementedError
 
     @staticmethod
-    def _get_content(bot: Bot, _dict: dict[str, Any]) -> MessageContent:
-        elements = list[MessageElement]()
+    def _get_content(bot: Bot, _dict: Dict[str, Any]) -> MessageContent:
+        elements = MessageContent()
         for parser in _message_element_parsers:
             result = parser(bot, frozendict(_dict))
             if not result:
@@ -295,7 +298,7 @@ class Message(Model, Generic[_T_Message]):
         return MessageContent(elements)
 
 
-Sendable = MessageElement | str | Message[Any] | Iterable[MessageElement]
+Sendable = Union[MessageElement, str, Message[Any], Iterable[MessageElement]]
 
 
 def create_message_content(*elements: Sendable) -> MessageContent:

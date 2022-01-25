@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from httpx import AsyncClient
 
 from cyan.color import ARGB
@@ -26,10 +26,10 @@ class Guild(Model, AsyncRenovatable["Guild"]):
     频道。
     """
 
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, props: Dict[str, Any]) -> None:
         """
         初始化 `Guild` 实例。
 
@@ -85,7 +85,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         response = await client.get(self._props["icon"])  # type: ignore
         return response.content
 
-    async def get_members(self) -> list["Member"]:
+    async def get_members(self) -> List["Member"]:
         """
         异步获取当前频道的所有成员。
 
@@ -96,9 +96,9 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         from cyan.model.member import Member
 
         cur = None
-        members = list[Member]()
+        members: List[Member] = []
         while True:
-            params: dict[str, Any] = {"limit": _MEMBER_QUERY_LIMIT}
+            params: Dict[str, Any] = {"limit": _MEMBER_QUERY_LIMIT}
             if cur:
                 params["after"] = cur
             try:
@@ -133,7 +133,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         member = response.json()
         return Member(self.bot, self, member)
 
-    async def get_channels(self) -> list["Channel"]:
+    async def get_channels(self) -> List["Channel"]:
         """
         异步获取当前频道的所有子频道。
 
@@ -149,7 +149,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             if isinstance(channel, Channel)
         ]
 
-    async def get_channel_groups(self) -> list["ChannelGroup"]:
+    async def get_channel_groups(self) -> List["ChannelGroup"]:
         """
         异步获取当前频道的所有子频道组。
 
@@ -165,7 +165,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             if isinstance(channel, ChannelGroup)
         ]
 
-    async def _get_channels_core(self) -> list[Union["Channel", "ChannelGroup"]]:
+    async def _get_channels_core(self) -> List[Union["Channel", "ChannelGroup"]]:
         from cyan.model.channel import parse as channel_parse
 
         response = await self.bot.get(f"/guilds/{self.identifier}/channels")
@@ -189,7 +189,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
                 return None
             raise
 
-    async def get_roles(self) -> list["Role"]:
+    async def get_roles(self) -> List["Role"]:
         """
         异步获取当前频道的所有身份组。
 
@@ -222,9 +222,9 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
     async def create_role(
         self,
-        name: str | None = None,
-        color: ARGB | None = None,
-        shown: bool | None = None
+        name: Optional[str] = None,
+        color: Optional[ARGB] = None,
+        shown: Optional[bool] = None
     ) -> "Role":
         """
         异步在当前频道创建身份组。
@@ -286,7 +286,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         await self.mute(timedelta())
 
-    async def get_administrators(self) -> list["Member"]:
+    async def get_administrators(self) -> List["Member"]:
         """
         异步获取当前频道的所有管理员。
 

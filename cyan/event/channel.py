@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Dict
 
 from cyan.event import Event, EventInfo, Intent, NotSupported
 from cyan.model.channel import Channel, parse
 
 
 class _ChannelEvent(Event):
-    async def _parse_data(self, data: Any) -> Channel:
+    async def _parse_data(self, data: Dict[str, Any]) -> Channel:
         channel = await parse(self._bot, data)
         if not isinstance(channel, Channel):
             raise NotSupported

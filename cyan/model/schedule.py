@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from cyan.bot import Bot
 from cyan.constant import DEFAULT_ID
@@ -56,9 +56,9 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
     _bot: Bot
     _channel: "ScheduleChannel"
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
 
-    def __init__(self, bot: Bot, channel: "ScheduleChannel", props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, channel: "ScheduleChannel", props: Dict[str, Any]) -> None:
         """
         初始化 `Schedule` 实例。
 

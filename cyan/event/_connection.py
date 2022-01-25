@@ -1,12 +1,12 @@
-from typing import Any
+from typing import Any, Dict
 
 from cyan.event import Event, EventInfo, Intent
 
 
 class ReadyEventData:
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
 
-    def __init__(self, props: dict[str, Any]) -> None:
+    def __init__(self, props: Dict[str, Any]) -> None:
         self._props = props
 
     @property

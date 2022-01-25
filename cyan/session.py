@@ -1,13 +1,13 @@
 import asyncio
 import traceback
 import warnings
-from typing import Awaitable, Callable, NoReturn
+from typing import Awaitable, Callable, NoReturn, Optional, Set, Type
 
 from cyan.bot import Bot, Ticket
 from cyan.event import Event, EventHandler
 
 
-BotStartedHandler = Callable[[Bot], Awaitable[None | NoReturn]]
+BotStartedHandler = Callable[[Bot], Awaitable[Optional[NoReturn]]]
 
 
 class Session:
@@ -16,7 +16,7 @@ class Session:
     """
 
     _bot: Bot
-    _started_handlers: set[BotStartedHandler]
+    _started_handlers: Set[BotStartedHandler]
 
     def __init__(self, api_base_url: str, ticket: Ticket) -> None:
         """
@@ -28,7 +28,7 @@ class Session:
         """
 
         self._bot = Bot(api_base_url, ticket)
-        self._started_handlers = set[BotStartedHandler]()
+        self._started_handlers = set()
 
     def on_started(self, func: BotStartedHandler) -> BotStartedHandler:
         """
@@ -38,7 +38,7 @@ class Session:
         self._started_handlers.add(func)
         return func
 
-    def on(self, _type: type[Event]) -> Callable[[EventHandler], None]:
+    def on(self, _type: Type[Event]) -> Callable[[EventHandler], None]:
         """
         装饰事件处理器以监听指定事件。
 

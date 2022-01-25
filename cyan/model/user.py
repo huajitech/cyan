@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Optional
 from httpx import AsyncClient
 
 from cyan.bot import Bot
@@ -13,10 +13,10 @@ class User(Model):
     用户。
     """
 
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, props: Dict[str, Any]) -> None:
         """
         初始化 `User` 实例。
 
@@ -115,7 +115,7 @@ class ChattableUser(User, ChattableModel[UserMessage]):
     async def _send(
         self,
         message: MessageContent,
-        replying_target: UserMessage | None
+        replying_target: Optional[UserMessage]
     ) -> UserMessage:
         from cyan.model.message import MessageContent
 
@@ -123,5 +123,5 @@ class ChattableUser(User, ChattableModel[UserMessage]):
         if replying_target:
             content["msg_id"] = replying_target.identifier
         response = await self.bot.post(f"/dms/{self._dms.guild}/messages", content=content)
-        data: dict[str, Any] = response.json()
+        data: Dict[str, Any] = response.json()
         return UserMessage.parse(self.bot, data)

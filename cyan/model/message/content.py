@@ -1,7 +1,7 @@
 import re
 from re import Match, Pattern
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, List, Optional, Type, TypeVar, Dict
 
 from cyan.bot import Bot
 from cyan.model.message import (
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class ParsableContentElement(ContentElement):
     @staticmethod
     @abstractmethod
-    def get_parse_regex() -> Pattern[str]:
+    def get_parse_regex() -> "Pattern[str]":
         """
         获取解析 `Regex`。
 
@@ -31,7 +31,7 @@ class ParsableContentElement(ContentElement):
 
     @staticmethod
     @abstractmethod
-    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> ContentElement | None:
+    def parse(bot: Bot, _dict: Dict[str, Any], match: "Match[str]") -> Optional[ContentElement]:
         """
         解析匹配结果。
 
@@ -47,13 +47,13 @@ class ParsableContentElement(ContentElement):
         raise NotImplementedError
 
 
-_element_parsables = list[type[ParsableContentElement]]()
+_element_parsables: List[Type[ParsableContentElement]] = []
 
 
 _T_ContentElement = TypeVar("_T_ContentElement", bound=ParsableContentElement)
 
 
-def parsable_content_element(cls: type[_T_ContentElement]) -> type[_T_ContentElement]:
+def parsable_content_element(cls: Type[_T_ContentElement]) -> Type[_T_ContentElement]:
     """
     装饰 `ParsableContentElement` 以用于 `ContentElement` 消息元素解析。
     """
@@ -65,8 +65,8 @@ def parsable_content_element(cls: type[_T_ContentElement]) -> type[_T_ContentEle
 @message_element_parser()
 def _parse_content(  # type: ignore
     bot: Bot,
-    _dict: dict[str, Any]
-) -> MessageElementParseResult | None:
+    _dict: Dict[str, Any]
+) -> Optional[MessageElementParseResult]:
     content: str = _dict["content"]
     if not content:
         return None
@@ -80,7 +80,7 @@ def _parse_content(  # type: ignore
         return MessageElementParseResult(True, [PlainText(content)])
     begin = content[:matches[0][1].start()]
     end = content[matches[-1][1].end():]
-    result = list[MessageElement]()
+    result: List[MessageElement] = []
     if begin:
         result.append(PlainText(begin))
     last_match = None
@@ -164,11 +164,11 @@ class Mention(ParsableContentElement):
         return self._target
 
     @staticmethod
-    def get_parse_regex() -> Pattern[str]:
+    def get_parse_regex() -> "Pattern[str]":
         return re.compile(r"<@!{0,1}([\d\w]+)>")
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> Optional["Mention"]:
+    def parse(bot: Bot, _dict: Dict[str, Any], match: "Match[str]") -> Optional["Mention"]:
         from cyan.model.user import User
 
         mentions = _dict.get("mentions", None)
@@ -200,11 +200,11 @@ class MentionAll(ParsableContentElement):
         pass
 
     @staticmethod
-    def get_parse_regex() -> Pattern[str]:
+    def get_parse_regex() -> "Pattern[str]":
         return re.compile(r"@everyone")
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> "MentionAll":
+    def parse(bot: Bot, _dict: Dict[str, Any], match: "Match[str]") -> "MentionAll":
         return MentionAll()
 
     def to_content(self) -> str:

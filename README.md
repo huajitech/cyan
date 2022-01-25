@@ -5,7 +5,7 @@
 <div align="center">
 
 [![Pipeline Status](https://gitlab.huajitech.net/huajitech/cyan/badges/main/pipeline.svg)](https://gitlab.huajitech.net/huajitech/cyan/-/commits/main)
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://gitlab.huajitech.net/huajitech/cyan)
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://gitlab.huajitech.net/huajitech/cyan)
 [![PyPI - License](https://img.shields.io/pypi/l/cyansdk)](https://gitlab.huajitech.net/huajitech/cyan)
 [![PyPI - Version](https://img.shields.io/pypi/v/cyansdk)](https://pypi.org/project/cyansdk/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cyansdk)](https://pypi.org/project/cyansdk/)

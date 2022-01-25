@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 
 from cyan.bot import Bot
 from cyan.model.message import Message
@@ -41,7 +41,7 @@ class ChannelMessage(Message["ChannelMessage"]):
         return await channel.guild.get_member(self.sender.identifier)
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any]) -> "ChannelMessage":
+    def parse(bot: Bot, _dict: Dict[str, Any]) -> "ChannelMessage":
         content = Message._get_content(bot, _dict)
         return ChannelMessage(bot, _dict, content)
 
@@ -65,6 +65,6 @@ class UserMessage(Message["UserMessage"]):
         return ChattableUser(self.sender, dms)
 
     @staticmethod
-    def parse(bot: Bot, _dict: dict[str, Any]) -> "UserMessage":
+    def parse(bot: Bot, _dict: Dict[str, Any]) -> "UserMessage":
         content = Message._get_content(bot, _dict)
         return UserMessage(bot, _dict, content)

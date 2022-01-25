@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, Generic, Union, TypeVar, TYPE_CHECKING
 
 from cyan.bot import Bot
 
@@ -31,7 +31,7 @@ class ChattableModel(Generic[_T_Message]):
 
         raise NotImplementedError
 
-    async def send(self, *message: "Sendable") -> _T_Message | "MessageAuditInfo":
+    async def send(self, *message: "Sendable") -> Union[_T_Message, "MessageAuditInfo"]:
         """
         异步发送消息。
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Dict, List, Optional, Union
 
 from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
@@ -130,11 +130,11 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
     子频道组。
     """
 
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, guild: Guild, props: Dict[str, Any]) -> None:
         """
         初始化 `ChannelGroup` 实例。
 
@@ -180,7 +180,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
 
         return ChannelVisibility(self._props["private_type"])
 
-    async def get_owner(self) -> Member | None:
+    async def get_owner(self) -> Optional[Member]:
         """
         获取子频道组所有者。
 
@@ -199,7 +199,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
                 return None
             raise
 
-    async def get_children(self) -> list["Channel"]:
+    async def get_children(self) -> List["Channel"]:
         """
         获取子频道组的成员。
 
@@ -223,11 +223,11 @@ class Channel(Model, AsyncRenovatable["Channel"]):
     子频道。
     """
 
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _guild: Guild
     _bot: Bot
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, guild: Guild, props: Dict[str, Any]) -> None:
         """
         初始化 `Channel` 实例。
 
@@ -281,7 +281,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
 
         return ChannelPermission(self._props["speak_permission"])
 
-    async def get_owner(self) -> Member | None:
+    async def get_owner(self) -> Optional[Member]:
         """
         异步获取子频道所有者。
 
@@ -362,7 +362,7 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
     from cyan.model.message import MessageAuditInfo, MessageContent, Sendable
 
     @property
-    def text_channel_type(self) -> TextChannelType | int:
+    def text_channel_type(self) -> Union[TextChannelType, int]:
         """
         文字子频道类型。
 
@@ -379,7 +379,7 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
         assert isinstance(result, ChannelMessage)
         return result
 
-    async def send(self, *message: Sendable) -> MessageAuditInfo | ChannelMessage:
+    async def send(self, *message: Sendable) -> Union[MessageAuditInfo, ChannelMessage]:
         from cyan.model.message import create_message_content
 
         return await self._send(create_message_content(*message), None)
@@ -392,15 +392,15 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
     async def _send(
         self,
         message: MessageContent,
-        replying_target: ChannelMessage | None
-    ) -> MessageAuditInfo | ChannelMessage:
+        replying_target: Optional[ChannelMessage]
+    ) -> Union[MessageAuditInfo, ChannelMessage]:
         from cyan.model.message import MessageContent, MessageAuditInfo
 
         content = MessageContent(message).to_dict()
         if replying_target:
             content["msg_id"] = replying_target.identifier
         response = await self.bot.post(f"/channels/{self.identifier}/messages", content=content)
-        data: dict[str, Any] = response.json()
+        data: Dict[str, Any] = response.json()
         code = data.get("code", None)
         if code == 304023 or code == 304024:
             return MessageAuditInfo(self.bot, data)
@@ -455,7 +455,7 @@ class AppChannel(Channel):
     """
 
     @property
-    def app_channel_type(self) -> AppChannelType | int:
+    def app_channel_type(self) -> Union[AppChannelType, int]:
         """
         应用子频道类型。
 
@@ -486,7 +486,7 @@ class ScheduleChannel(AppChannel):
 
     # TODO: 实现为获取所有日程（通过传入指定 since 参数以实现，但据目前所提供的 API 下测试失败）。
     # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/schedule/get_schedules.html。
-    async def get_schedules(self) -> list[Schedule]:
+    async def get_schedules(self) -> List[Schedule]:
         """
         异步获取子频道当天日程列表。
 
@@ -523,7 +523,7 @@ class ScheduleChannel(AppChannel):
         end_time: datetime,
         remind_type: RemindType = RemindType.SILENT,
         description: str = "",
-        destination: Channel | None = None
+        destination: Optional[Channel] = None
     ) -> Schedule:
         """
         异步在当前子频道创建日程。
@@ -585,9 +585,9 @@ _CHANNEL_TYPE_MAPPING = {
 
 async def parse(
     bot: Bot,
-    _dict: dict[str, Any],
-    guild: Guild | None = None
-) -> Channel | ChannelGroup:
+    _dict: Dict[str, Any],
+    guild: Optional[Guild] = None
+) -> Union[Channel, ChannelGroup]:
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 

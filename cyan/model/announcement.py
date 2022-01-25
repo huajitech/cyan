@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 from cyan.bot import Bot
 from cyan.model import Model
 
@@ -13,10 +13,10 @@ class Announcement(Model):
     公告。
     """
 
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _bot: Bot
 
-    def __init__(self, bot: Bot, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, props: Dict[str, Any]) -> None:
         """
         初始化 `Announcement` 实例。
 

@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Dict
 
 from cyan.event import Event, EventInfo, Intent
 from cyan.model.member import Member
 
 
 class _MemberEvent(Event):
-    async def _parse_data(self, data: dict[str, Any]) -> Member:
+    async def _parse_data(self, data: Dict[str, Any]) -> Member:
         guild_identifier = data["guild_id"]
         guild = await self._bot.get_guild(guild_identifier)
         return Member(self._bot, guild, data)

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Dict, List
 
 from cyan.bot import Bot
 from cyan.model import ChattableModel
@@ -19,10 +19,10 @@ class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):
 
     _bot: Bot
     _guild: Guild
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
     _user: User
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, guild: Guild, props: Dict[str, Any]) -> None:
         """
         初始化 `Member` 实例。
 
@@ -80,7 +80,7 @@ class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):
 
         return self._guild
 
-    async def get_roles(self) -> list[Role]:
+    async def get_roles(self) -> List[Role]:
         """
         异步获取当前成员的所有所属身份组。
 

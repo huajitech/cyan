@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from cyan.event import Event, EventInfo, Intent
 from cyan.model.message import MessageAuditInfo
@@ -16,7 +16,7 @@ class ChannelMessageReceivedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("AT_MESSAGE_CREATE", Intent.MENTION)
 
-    async def _parse_data(self, data: dict[str, Any]) -> ChannelMessage:
+    async def _parse_data(self, data: Dict[str, Any]) -> ChannelMessage:
         return ChannelMessage.parse(self._bot, data)
 
 
@@ -31,7 +31,7 @@ class UserMessageReceivedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("DIRECT_MESSAGE_CREATE", Intent.DIRECT_MESSAGE)
 
-    async def _parse_data(self, data: dict[str, Any]) -> UserMessage:
+    async def _parse_data(self, data: Dict[str, Any]) -> UserMessage:
         return UserMessage.parse(self._bot, data)
 
 
@@ -82,7 +82,7 @@ class MessageAuditPassedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("MESSAGE_AUDIT_PASS", Intent.MESSAGE_AUDIT)
 
-    async def _parse_data(self, data: Any) -> MessageAuditPassedEventData:
+    async def _parse_data(self, data: Dict[str, Any]) -> MessageAuditPassedEventData:
         audit_info = MessageAuditInfo(self._bot, data)
         channel = await audit_info.get_channel()
         message = await channel.get_message(data["message_id"])
@@ -100,5 +100,5 @@ class MessageAuditRejectedEvent(Event):
     def get_event_info() -> EventInfo:
         return EventInfo("MESSAGE_AUDIT_REJECT", Intent.MESSAGE_AUDIT)
 
-    async def _parse_data(self, data: Any) -> MessageAuditInfo:
+    async def _parse_data(self, data: Dict[str, Any]) -> MessageAuditInfo:
         return MessageAuditInfo(self._bot, data)

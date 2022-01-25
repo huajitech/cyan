@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 from urllib.parse import urljoin
 from httpx import AsyncClient, Response
 
@@ -67,7 +67,7 @@ class Bot:
 
         return self._event_source
 
-    async def get(self, path: str, params: dict[str, Any] | None = None) -> Response:
+    async def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Response:
         """
         异步向服务器请求 GET 操作。
 
@@ -86,7 +86,7 @@ class Bot:
     async def post(
         self,
         path: str,
-        params: dict[str, Any] | None = None,
+        params: Optional[Dict[str, Any]] = None,
         content: Any = None
     ) -> Response:
         """
@@ -108,7 +108,7 @@ class Bot:
     async def put(
         self,
         path: str,
-        params: dict[str, Any] | None = None,
+        params: Optional[Dict[str, Any]] = None,
         content: Any = None
     ) -> Response:
         """
@@ -130,7 +130,7 @@ class Bot:
     async def delete(
         self,
         path: str,
-        params: dict[str, Any] | None = None,
+        params: Optional[Dict[str, Any]] = None,
         content: Any = None
     ) -> Response:
         """
@@ -153,7 +153,7 @@ class Bot:
     async def patch(
         self,
         path: str,
-        params: dict[str, Any] | None = None,
+        params: Optional[Dict[str, Any]] = None,
         content: Any = None
     ) -> Response:
         """
@@ -212,7 +212,7 @@ class Bot:
         response = await self.get(f"/guilds/{identifier}")
         return Guild(self, response.json())
 
-    async def get_guilds(self) -> list["Guild"]:
+    async def get_guilds(self) -> List["Guild"]:
         """
         异步获取当前机器人的所有频道。
 
@@ -223,9 +223,9 @@ class Bot:
         from cyan.model.guild import Guild
 
         cur = None
-        guilds = list[Guild]()
+        guilds: List[Guild] = []
         while True:
-            params: dict[str, Any] = {"limit": _GUILD_QUERY_LIMIT}
+            params: Dict[str, Any] = {"limit": _GUILD_QUERY_LIMIT}
             if cur:
                 params["after"] = cur
             response = await self.get("/users/@me/guilds", params)
@@ -293,7 +293,7 @@ class Bot:
 
     async def __aexit__(
         self,
-        exc_type: type[BaseException] = ...,
+        exc_type: Type[BaseException] = ...,
         exc_value: BaseException = ...,
         traceback: TracebackType = ...
     ) -> None:

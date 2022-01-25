@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from cyan.bot import Bot
 from cyan.color import ARGB
@@ -44,9 +44,9 @@ class Role(Model, AsyncRenovatable["Role"]):
 
     _bot: Bot
     _guild: Guild
-    _props: dict[str, Any]
+    _props: Dict[str, Any]
 
-    def __init__(self, bot: Bot, guild: Guild, props: dict[str, Any]) -> None:
+    def __init__(self, bot: Bot, guild: Guild, props: Dict[str, Any]) -> None:
         """
         初始化 `Role` 实例。
 
@@ -186,9 +186,9 @@ class Role(Model, AsyncRenovatable["Role"]):
 
     async def _modify(
         self,
-        name: str | None = None,
-        color: int | None = None,
-        shown: bool | None = None
+        name: Optional[str] = None,
+        color: Optional[int] = None,
+        shown: Optional[bool] = None
     ) -> None:
         _filter = {
             "name": int(name is not None),

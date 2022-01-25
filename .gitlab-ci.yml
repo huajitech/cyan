@@ -18,7 +18,6 @@ default:
   before_script:
     - python -V
     - node -v
-    - poetry install
 
 test:
   stage: test
@@ -27,6 +26,7 @@ test:
       - cyan/**/*
       - example/**/*
   script:
+    - poetry install
     - poetry run pyright
     - poetry run flake8
 
@@ -38,6 +38,7 @@ build:
     refs:
       - tags
   script:
+    - poetry install
     - poetry build
   artifacts:
     paths:
@@ -48,6 +49,7 @@ nightly-build:
   rules:
     - if: $CI_NIGHTLY_BUILD
   script:
+    - poetry install
     - poetry run python ./build/nightly_version_modifier.py
     - poetry build
   artifacts:
@@ -86,9 +88,10 @@ pages:
     refs:
       - tags
   script:
+    - pip install sphinx sphinx-rtd-theme
     - cd docs
-    - poetry run sphinx-apidoc -e -o . ../cyan
-    - poetry run sphinx-build -b html . ./build
+    - sphinx-apidoc -e -o . ../cyan
+    - sphinx-build -b html . ./build
     - mv ./build ../public
   artifacts:
     paths:

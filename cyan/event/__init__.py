@@ -6,7 +6,10 @@ import warnings
 from asyncio.tasks import Task
 from enum import Enum
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, NoReturn
+from typing import (
+    TYPE_CHECKING, Any, Awaitable, Callable,
+    Dict, NoReturn, Optional, Set, Type, Union
+)
 from websockets.client import connect
 from websockets.exceptions import ConnectionClosed
 from websockets.legacy.client import WebSocketClientProtocol
@@ -19,13 +22,10 @@ if TYPE_CHECKING:
     from cyan.bot import Bot
 
 
-EventHandler = (
-    Callable[
-        [Any], Awaitable[None] | Awaitable[NoReturn]
-    ] | Callable[
-        [Any, Any], Awaitable[None] | Awaitable[NoReturn]
-    ]
-)
+EventHandler = Union[
+    Callable[[Any], Union[Awaitable[None], Awaitable[NoReturn]]],
+    Callable[[Any, Any], Union[Awaitable[None], Awaitable[NoReturn]]]
+]
 """
 事件处理器。
 """
@@ -127,7 +127,7 @@ class EventInfo:
 
 
 class Event:
-    _handlers: set[EventHandler]
+    _handlers: Set[EventHandler]
     _bot: "Bot"
 
     def __init__(self, bot: "Bot") -> None:
@@ -138,7 +138,7 @@ class Event:
             - bot: 事件所属机器人
         """
 
-        self._handlers = set[EventHandler]()
+        self._handlers = set()
         self._bot = bot
 
     @staticmethod
@@ -259,34 +259,35 @@ class Operation(Enum):
 
 
 class _EventProvider:
-    _type_dict: dict[type, Event]
-    _event_name_dict: dict[str, set[Event]]
-    _registered_intents: set[Intent]
+    _type_dict: Dict[type, Event]
+    _event_name_dict: Dict[str, Set[Event]]
+    _registered_intents: Set[Intent]
 
     def __init__(self) -> None:
-        self._type_dict = dict[type, Event]()
-        self._event_name_dict = dict[str, set[Event]]()
-        self._registered_intents = set[Intent]((Intent.DEFAULT,))
+        self._type_dict = {}
+        self._event_name_dict = {}
+        self._registered_intents = set((Intent.DEFAULT,))
 
-    def get_intents(self) -> set[Intent]:
+    def get_intents(self) -> Set[Intent]:
         return self._registered_intents
 
-    def get_by_type(self, bot: "Bot", _type: type[Event]) -> Event:
+    def get_by_type(self, bot: "Bot", _type: Type[Event]) -> Event:
         event = self._type_dict.get(_type, None)
         if event:
             return event
         event = _type(bot)
         self._type_dict[_type] = event
         event_info = _type.get_event_info()
-        events = self._event_name_dict.get(event_info.name, None)
+        events: Optional[Set[Event]] = self._event_name_dict.get(event_info.name, None)
         if not events:
-            self._event_name_dict[event_info.name] = events = set[Event]()
+            events = set()
+            self._event_name_dict[event_info.name] = events
         events.add(event)
         self._registered_intents.add(event_info.intent)
         return event
 
-    def get_by_event_name(self, event_name: str) -> set[Event]:
-        return self._event_name_dict.get(event_name, set[Event]())
+    def get_by_event_name(self, event_name: str) -> Set[Event]:
+        return self._event_name_dict.get(event_name, set())
 
 
 class _ConnectionResumed(Exception):
@@ -301,12 +302,12 @@ class EventSource:
     _websocket: WebSocketClientProtocol
     _bot: "Bot"
     _serial_code: int
-    _session: str | None
+    _session: Optional[str]
     _authorization: str
     _connected: bool
-    _heartbeat_task: Task[NoReturn] | None
+    _heartbeat_task: Optional["Task[NoReturn]"]
     _event_provider: _EventProvider
-    _task: Task[None] | None
+    _task: Optional["Task[None]"]
 
     def __init__(self, bot: "Bot", authorization: str):
         """
@@ -391,7 +392,7 @@ class EventSource:
         data = json.dumps(content)
         await self._websocket.send(data)
 
-    def get_event(self, _type: type[Event]) -> Event:
+    def get_event(self, _type: Type[Event]) -> Event:
         """
         获取指定类型的事件。
 
@@ -409,7 +410,7 @@ class EventSource:
             raise InvalidOperationError("WebSocket 已连接时不可获取未订阅 Intent 的事件。")
         return self._event_provider.get_by_type(self._bot, _type)
 
-    def listen(self, _type: type[Event]) -> Callable[[EventHandler], None]:
+    def listen(self, _type: Type[Event]) -> Callable[[EventHandler], None]:
         """
         装饰事件处理器以监听指定事件。
 
@@ -451,10 +452,11 @@ class EventSource:
         from cyan.event._connection import ReadyEvent
 
         self.get_event(ReadyEvent).bind(self._on_ready)
+        properties: Dict[str, Any] = {}
         payload = {
             "token": self._authorization,
             "intents": self._calculate_intents(),
-            "properties": dict[str, Any]()
+            "properties": properties
         }
         await self.send(Operation.IDENTIFY, payload)
 
@@ -495,18 +497,19 @@ class EventSource:
             self._heartbeat_task.cancel()
         self._heartbeat_task = asyncio.create_task(_heartbeat())
 
-    async def _handle(self, content: dict[str, Any]) -> None:
+    async def _handle(self, content: Dict[str, Any]) -> None:
         operation = Operation(content["op"])
         self._serial_code = content.get("s", self._serial_code)
-        match operation:
-            case Operation.EVENT:
-                await self._call_events(content["t"], content["d"])
-            case Operation.RECONNECT:
-                await self._resume()
-            case Operation.CONNECTED:
-                self._set_heartbeat(content["d"]["heartbeat_interval"])
-            case Operation.HEARTBEAT:
-                await self._send_heartbeat()
+        if operation == Operation.EVENT:
+            await self._call_events(content["t"], content["d"])
+        elif operation == Operation.RECONNECT:
+            await self._resume()
+        elif operation == Operation.CONNECTED:
+            self._set_heartbeat(content["d"]["heartbeat_interval"])
+        elif operation == Operation.HEARTBEAT:
+            await self._send_heartbeat()
+        else:
+            return
 
 
 from .channel import *
