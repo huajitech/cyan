@@ -156,7 +156,82 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
         await self.bot.delete(f"/channels/{self.channel.identifier}/schedules/{self.identifier}")
 
-    # TODO: 实现日程信息修改。
+    async def set_name(self, name: str) -> None:
+        """
+        异步修改日程名称。
+
+        参数：
+            - name: 目标名称
+        """
+
+        return await self._modify({"name": name})
+
+    async def set_start_time(self, time: datetime) -> None:
+        """
+        异步修改日程开始时间。
+
+        参数：
+            - time: 目标开始时间
+        """
+
+        return await self._modify({"start_timestamp": str(int(time.timestamp() * 1000))})
+
+    async def set_end_time(self, time: datetime) -> None:
+        """
+        异步修改日程结束时间。
+
+        参数：
+            - time: 目标结束时间
+        """
+
+        return await self._modify({"end_timestamp": str(int(time.timestamp() * 1000))})
+
+    async def set_description(self, description: str) -> None:
+        """
+        异步修改日程描述。
+
+        参数：
+            - description: 目标描述
+        """
+
+        return await self._modify({"description": description})
+
+    async def set_destination(self, channel: Channel) -> None:
+        """
+        异步修改日程指向的目标子频道。
+
+        参数：
+            - channel: 目标子频道
+        """
+
+        return await self._modify({"jump_channel_id": channel.identifier})
+
+    async def set_remind_type(self, remind_type: RemindType) -> None:
+        """
+        异步修改日程提醒类型。
+
+        参数：
+            - remind_type: 目标提醒类型
+        """
+
+        return await self._modify({"remind_type": str(remind_type.value)})
+
+    async def unset_destination(self) -> None:
+        """
+        异步取消日程指向目标子频道。
+        """
+
+        return await self._modify({"destination": DEFAULT_ID})
+
+    async def _modify(self, changes: Dict[str, Any]) -> None:
+        content = dict(self._props)
+        content.pop("id")
+        content.update(changes)
+        response = await self.bot.patch(
+            f"/channels/{self.channel.identifier}/schedules/{self.identifier}",
+            content=content
+        )
+        self._props = response.json()
 
     async def renovate(self) -> "Schedule":
         from cyan.model.channel import AppChannel, ScheduleChannel
