@@ -419,7 +419,7 @@ class TextChannel(Channel):
 
         response = await self.bot.get(f"/channels/{self.identifier}/messages/{identifier}")
         message = response.json()
-        return Message.parse(self.bot, message)
+        return Message.parse(self.bot, message, TextChannel)
 
     async def _send(
         self,
@@ -436,7 +436,7 @@ class TextChannel(Channel):
         code = data.get("code", None)
         if code == 304023 or code == 304024:
             return MessageAuditInfo(self.bot, data)
-        return Message.parse(self.bot, data)
+        return Message.parse(self.bot, data, TextChannel)
 
     async def announce(self, message: Message) -> Announcement:
         """
