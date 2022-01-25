@@ -123,7 +123,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         异步修改身份组颜色。
 
         参数：
-            - name: 目标颜色
+            - color: 目标颜色
         """
 
         await self._modify(color=color.to_hex())

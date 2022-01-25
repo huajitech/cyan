@@ -241,7 +241,7 @@ class Bot:
         异步获取指定 ID 子频道。
 
         参数：
-            - identifier: 频道 ID
+            - identifier: 子频道 ID
 
         返回：
             以 `Channel` 类型表示的子频道。
@@ -259,7 +259,7 @@ class Bot:
         异步获取指定 ID 子频道。
 
         参数：
-            - identifier: 频道 ID
+            - identifier: 频道组 ID
 
         返回：
             以 `Channel` 类型表示的子频道。

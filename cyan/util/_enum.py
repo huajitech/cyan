@@ -2,11 +2,7 @@ from enum import EnumMeta
 from typing import Any
 
 
-def get_enum_key(
-    enum: EnumMeta,
-    value: Any,
-    default: Any = ...
-) -> Any:
+def get_enum_key(enum: EnumMeta, value: Any, default: Any = ...) -> Any:
     """
     获取 `Enum` 值对应的键。
 

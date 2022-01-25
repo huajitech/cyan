@@ -314,6 +314,9 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         判断当前子频道是否为指定子频道组的成员。
 
+        参数：
+            - parent: 将要用于判断是否为附属子频道的指定子频道组
+
         返回：
             如果当前子频道为指定子频道组的成员，返回 `True`；否则，返回 `False`。
         """

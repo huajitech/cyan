@@ -309,7 +309,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         异步添加管理员到当前频道。
 
         参数：
-            - member: 将要添加到当前频道的成员
+            - member: 将要作为频道管理员的成员
         """
 
         from cyan.model.role import DefaultRoleId

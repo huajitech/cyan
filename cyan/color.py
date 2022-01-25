@@ -64,7 +64,7 @@ class ARGB:
         转换 `ARGB` 为 HEX 颜色值。
 
         返回：
-            `int` 形式 的 HEX 颜色值。
+            以 `int` 形式表达的 HEX 颜色值。
         """
 
         return (self.alpha << 24) + (self.red << 16) + (self.green << 8) + self.blue
@@ -73,6 +73,9 @@ class ARGB:
     def from_hex(number: int) -> "ARGB":
         """
         转换 `ARGB` HEX 颜色值的 `int` 形式为 `ARGB`。
+
+        参数：
+            - number: 以 `int` 形式表达的 HEX 颜色值
 
         返回：
             `ARGB` 类型表示的 ARGB 颜色值。
