@@ -196,7 +196,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
 
         return await self._modify({"description": description})
 
-    async def set_destination(self, channel: Channel) -> None:
+    async def set_destination(self, channel: "Channel") -> None:
         """
         异步修改日程指向的目标子频道。
 
@@ -224,9 +224,11 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         return await self._modify({"destination": DEFAULT_ID})
 
     async def _modify(self, changes: Dict[str, Any]) -> None:
-        content = dict(self._props)
-        content.pop("id")
-        content.update(changes)
+        schedule = dict(self._props)
+        schedule.pop("id")
+        schedule.pop("creator")
+        schedule.update(changes)
+        content = {"schedule": schedule}
         response = await self.bot.patch(
             f"/channels/{self.channel.identifier}/schedules/{self.identifier}",
             content=content
