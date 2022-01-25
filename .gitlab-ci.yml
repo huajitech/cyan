@@ -32,13 +32,10 @@ test:
 
 build:
   stage: build
-  only:
-    changes:
-      - cyan/**/*
-    refs:
-      - tags
+  rules:
+    - if: $CI_COMMIT_TAG || $BUILD
   script:
-    - poetry install
+    - poetry install --no-dev
     - poetry build
   artifacts:
     paths:
@@ -49,7 +46,7 @@ nightly-build:
   rules:
     - if: $CI_NIGHTLY_BUILD
   script:
-    - poetry install
+    - poetry install --no-dev
     - poetry run python ./build/nightly_version_modifier.py
     - poetry build
   artifacts:
@@ -84,14 +81,13 @@ release:
 
 pages:
   stage: deploy
-  only:
-    refs:
-      - tags
+  rules:
+    - if: $CI_COMMIT_TAG || $BUILD_PAGES
   script:
-    - pip install sphinx sphinx-rtd-theme
+    - poetry install --no-dev -E sphinx sphinx-rtd-theme
     - cd docs
-    - sphinx-apidoc -e -o . ../cyan
-    - sphinx-build -b html . ./build
+    - poetry run sphinx-apidoc -e -o . ../cyan
+    - poetry run sphinx-build -b html . ./build
     - mv ./build ../public
   artifacts:
     paths:
@@ -100,7 +96,7 @@ pages:
 nightly-publish:
   stage: deploy
   rules:
-    - if: $CI_NIGHTLY_BUILD
+    - if: $NIGHTLY_BUILD
   needs:
     - job: nightly-build
       artifacts: true
