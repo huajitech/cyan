@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import warnings
 from typing import Awaitable, Callable, NoReturn
 
@@ -61,11 +62,6 @@ class Session:
             for handler in self._started_handlers:
                 try:
                     await handler(bot)
-                except Exception as ex:
-                    message = str(ex)
-                    warnings.warn(
-                        f"调用事件处理器 {handler} 时捕获到异常 {type(ex).__name__}" + (
-                            ":\n" + message if message else "。"
-                        )
-                    )
+                except Exception:
+                    warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
             await source.wait_until_stopped()

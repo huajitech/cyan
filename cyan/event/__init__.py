@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 import json
+import traceback
 import warnings
 from asyncio.tasks import Task
 from enum import Enum
@@ -63,9 +64,9 @@ class Intent(Enum):
     频道表态事件。
     """
 
-    MEMBER_MESSAGE = 1 << 12
+    DIRECT_MESSAGE = 1 << 12
     """
-    成员消息事件。
+    直接消息事件。
     """
 
     MESSAGE_AUDIT = 1 << 27
@@ -207,13 +208,8 @@ class Event:
                 await handler(**{
                     name: value for name, value in args.items() if name in argnames  # type: ignore
                 })
-            except Exception as ex:
-                message = str(ex)
-                warnings.warn(
-                    f"调用事件处理器 {handler} 时捕获到异常 {type(ex).__name__}" + (
-                        ":\n" + message if message else "。"
-                    )
-                )
+            except Exception:
+                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
 
 
 class Operation(Enum):

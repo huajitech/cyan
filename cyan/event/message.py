@@ -1,36 +1,38 @@
 from typing import Any
 
 from cyan.event import Event, EventInfo, Intent
-from cyan.model.message import Message, MessageAuditInfo
+from cyan.model.message import MessageAuditInfo
+from cyan.model.message.message import ChannelMessage, UserMessage
 
 
-class _MessageReceivedEvent(Event):
-    async def _parse_data(self, data: dict[str, Any]) -> Message:
-        return Message.parse(self._bot, data)
-
-
-class ChannelMessageReceivedEvent(_MessageReceivedEvent):
+class ChannelMessageReceivedEvent(Event):
     """
     当接收到子频道用户所发送含提及机器人消息时触发。
 
-    触发时回调的数据类型为 `Message`。
+    触发时回调的数据类型为 `ChannelMessage`。
     """
 
     @staticmethod
     def get_event_info() -> EventInfo:
         return EventInfo("AT_MESSAGE_CREATE", Intent.MENTION)
 
+    async def _parse_data(self, data: dict[str, Any]) -> ChannelMessage:
+        return ChannelMessage.parse(self._bot, data)
 
-class MemberMessageReceivedEvent(_MessageReceivedEvent):
+
+class UserMessageReceivedEvent(Event):
     """
     当接收到用户与机器人私聊时触发。
 
-    触发时回调的数据类型为 `Message`。
+    触发时回调的数据类型为 `UserMessage`。
     """
 
     @staticmethod
     def get_event_info() -> EventInfo:
-        return EventInfo("DIRECT_MESSAGE_CREATE", Intent.MEMBER_MESSAGE)
+        return EventInfo("DIRECT_MESSAGE_CREATE", Intent.DIRECT_MESSAGE)
+
+    async def _parse_data(self, data: dict[str, Any]) -> UserMessage:
+        return UserMessage.parse(self._bot, data)
 
 
 class MessageAuditPassedEventData:
@@ -39,9 +41,9 @@ class MessageAuditPassedEventData:
     """
 
     _audit_info: MessageAuditInfo
-    _message: Message
+    _message: ChannelMessage
 
-    def __init__(self, audit_info: MessageAuditInfo, message: Message) -> None:
+    def __init__(self, audit_info: MessageAuditInfo, message: ChannelMessage) -> None:
         """
         初始化 `MessageAuditPassedEventData` 实例。
 
@@ -61,7 +63,7 @@ class MessageAuditPassedEventData:
         return self._audit_info
 
     @property
-    def message(self) -> Message:
+    def message(self) -> ChannelMessage:
         """
         消息。
         """

@@ -1,17 +1,19 @@
 import re
 from re import Match, Pattern
 from abc import abstractmethod
-from typing import Any, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Optional, TypeVar
 
 from cyan.bot import Bot
-from cyan.model.channel import Channel
 from cyan.model.message import (
     ContentElement,
     MessageElement,
     MessageElementParseResult,
     message_element_parser
 )
-from cyan.model.user import User
+
+if TYPE_CHECKING:
+    from cyan.model.channel import Channel
+    from cyan.model.user import User
 
 
 class ParsableContentElement(ContentElement):
@@ -141,9 +143,9 @@ class Mention(ParsableContentElement):
     提及。
     """
 
-    _target: User
+    _target: "User"
 
-    def __init__(self, target: User) -> None:
+    def __init__(self, target: "User") -> None:
         """
         初始化 `Mention` 实例。
 
@@ -154,7 +156,7 @@ class Mention(ParsableContentElement):
         self._target = target
 
     @property
-    def target(self) -> User:
+    def target(self) -> "User":
         """
         提及目标。
         """
@@ -167,6 +169,8 @@ class Mention(ParsableContentElement):
 
     @staticmethod
     def parse(bot: Bot, _dict: dict[str, Any], match: Match[str]) -> Optional["Mention"]:
+        from cyan.model.user import User
+
         mentions = _dict.get("mentions", None)
         if mentions:
             for mention in mentions:
@@ -215,9 +219,9 @@ class ChannelLink(ContentElement):
     子频道链接。
     """
 
-    _target: Channel
+    _target: "Channel"
 
-    def __init__(self, target: Channel) -> None:
+    def __init__(self, target: "Channel") -> None:
         """
         初始化 `ChannelLink` 实例。
 
@@ -228,7 +232,7 @@ class ChannelLink(ContentElement):
         self._target = target
 
     @property
-    def target(self) -> Channel:
+    def target(self) -> "Channel":
         """
         目标子频道。
         """

@@ -2,13 +2,17 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from cyan.bot import Bot
+from cyan.model import ChattableModel
 from cyan.model.guild import Guild
+from cyan.model.message import Sendable
+from cyan.model.message.message import UserMessage
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.role import Role
-from cyan.model.user import User
+from cyan.model.user import ChattableUser, User
+from cyan.model._dms import DirectMessageSubject
 
 
-class Member(User, AsyncRenovatable["Member"]):
+class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):
     """
     成员。
     """
@@ -31,7 +35,7 @@ class Member(User, AsyncRenovatable["Member"]):
         self._bot = bot
         self._guild = guild
         self._props = props
-        self._user = User(self.bot, self._props["user"])
+        self._user = User(bot, props["user"])
 
     @property
     def bot(self) -> Bot:
@@ -44,6 +48,13 @@ class Member(User, AsyncRenovatable["Member"]):
     @property
     def name(self) -> str:
         return self._user.name
+
+    @property
+    def is_bot(self) -> bool:
+        return self._user.is_bot
+
+    async def get_avatar(self) -> bytes:
+        return await self._user.get_avatar()
 
     @property
     def alias(self) -> str:
@@ -68,10 +79,6 @@ class Member(User, AsyncRenovatable["Member"]):
         """
 
         return self._guild
-
-    @property
-    def is_bot(self) -> bool:
-        return self._user.is_bot
 
     async def get_roles(self) -> list[Role]:
         """
@@ -113,6 +120,25 @@ class Member(User, AsyncRenovatable["Member"]):
         """
 
         await self.mute(timedelta())
+
+    async def send(self, *message: Sendable) -> UserMessage:
+        user = await self._get_chattable_user()
+        return await user.send(*message)
+
+    async def reply(self, target: UserMessage, *message: "Sendable") -> UserMessage:
+        user = await self._get_chattable_user()
+        return await user.reply(target, *message)
+
+    async def get_message(self, identifier: str) -> UserMessage:
+        user = await self._get_chattable_user()
+        return await user.get_message(identifier)
+
+    async def _get_chattable_user(self) -> ChattableUser:
+        content = {"recipient_id": self.identifier, "source_guild_id": self.guild.identifier}
+        response = await self.bot.post("/users/@me/dms", content=content)
+        data = response.json()
+        dms = DirectMessageSubject(data["guild_id"], data["channel_id"])
+        return ChattableUser(self._user, dms)
 
     async def renovate(self) -> "Member":
         guild = await self.guild.renovate()

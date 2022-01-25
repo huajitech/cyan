@@ -1,10 +1,9 @@
 from typing import TYPE_CHECKING, Any
 from cyan.bot import Bot
-from cyan.exception import OperationFailedError
 from cyan.model import Model
 
 if TYPE_CHECKING:
-    from cyan.model.message import Message
+    from cyan.model.message.message import ChannelMessage
     from cyan.model.channel import TextChannel
     from cyan.model.guild import Guild
 
@@ -28,7 +27,6 @@ class Announcement(Model):
 
         self._props = props
         self._bot = bot
-        print(props)
 
     @property
     def bot(self) -> Bot:
@@ -53,11 +51,10 @@ class Announcement(Model):
         from cyan.model.channel import TextChannel
 
         channel = await self.bot.get_channel(self._props["channel_id"])
-        if not isinstance(channel, TextChannel):
-            raise OperationFailedError("当前公告所属子频道不为文字子频道。")
+        assert isinstance(channel, TextChannel)
         return channel
 
-    async def get_message(self) -> "Message":
+    async def get_message(self) -> "ChannelMessage":
         """
         异步获取当前公告的消息。
         """

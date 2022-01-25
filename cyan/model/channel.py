@@ -7,8 +7,9 @@ from cyan.bot import Bot
 from cyan.exception import InvalidOperationError, OpenApiError
 from cyan.model.announcement import Announcement
 from cyan.model.guild import Guild
-from cyan.model import Model
+from cyan.model import ChattableModel, Model
 from cyan.model.member import Member
+from cyan.model.message.message import ChannelMessage
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.role import DefaultRoleId
 from cyan.model.schedule import Schedule, RemindType
@@ -353,12 +354,12 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         return await self.bot.get_channel(self.identifier)
 
 
-class TextChannel(Channel):
+class TextChannel(Channel, ChattableModel[ChannelMessage]):
     """
     文字子频道。
     """
 
-    from cyan.model.message import Message, MessageAuditInfo, MessageContent, Sendable
+    from cyan.model.message import MessageAuditInfo, MessageContent, Sendable
 
     @property
     def text_channel_type(self) -> TextChannelType | int:
@@ -371,62 +372,29 @@ class TextChannel(Channel):
 
         return get_enum_key(TextChannelType, self._props["sub_type"])
 
-    async def reply(self, target: Message, *message: Sendable) -> MessageAuditInfo | Message:
-        """
-        异步回复指定消息。
-
-        参数：
-            - target: 将要被回复的消息
-            - message: 回应消息
-
-        返回：
-            当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
-            否则，返回表示以 `Message` 类型表示的所发送消息。
-        """
-
+    async def reply(self, target: ChannelMessage, *message: Sendable) -> ChannelMessage:
         from cyan.model.message import create_message_content
 
-        return await self._send(create_message_content(*message), target)
+        result = await self._send(create_message_content(*message), target)
+        assert isinstance(result, ChannelMessage)
+        return result
 
-    async def send(self, *message: Sendable) -> MessageAuditInfo | Message:
-        """
-        异步发送消息。
-
-        参数：
-            - message: 将要发送的消息
-
-        返回：
-            当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
-            否则，返回表示以 `Message` 类型表示的所发送消息。
-        """
-
+    async def send(self, *message: Sendable) -> MessageAuditInfo | ChannelMessage:
         from cyan.model.message import create_message_content
 
         return await self._send(create_message_content(*message), None)
 
-    async def get_message(self, identifier: str) -> Message:
-        """
-        异步获取指定 ID 消息。
-
-        参数：
-            - identifier: 消息 ID
-
-        返回：
-            以 `Message` 类型表示的消息。
-        """
-
-        from cyan.model.message import Message
-
+    async def get_message(self, identifier: str) -> ChannelMessage:
         response = await self.bot.get(f"/channels/{self.identifier}/messages/{identifier}")
         message = response.json()
-        return Message.parse(self.bot, message)
+        return ChannelMessage.parse(self.bot, message)
 
     async def _send(
         self,
         message: MessageContent,
-        replying_target: Message | None
-    ) -> MessageAuditInfo | Message:
-        from cyan.model.message import Message, MessageContent, MessageAuditInfo
+        replying_target: ChannelMessage | None
+    ) -> MessageAuditInfo | ChannelMessage:
+        from cyan.model.message import MessageContent, MessageAuditInfo
 
         content = MessageContent(message).to_dict()
         if replying_target:
@@ -436,9 +404,9 @@ class TextChannel(Channel):
         code = data.get("code", None)
         if code == 304023 or code == 304024:
             return MessageAuditInfo(self.bot, data)
-        return Message.parse(self.bot, data)
+        return ChannelMessage.parse(self.bot, data)
 
-    async def announce(self, message: Message) -> Announcement:
+    async def announce(self, message: ChannelMessage) -> Announcement:
         """
         异步在当前子频道公告指定消息。
 

@@ -11,7 +11,7 @@ from cyan.model.announcement import Announcement
 
 
 if TYPE_CHECKING:
-    from cyan.model.message import Message
+    from cyan.model.message.message import ChannelMessage
     from cyan.model.channel import Channel, ChannelGroup
     from cyan.model.member import Member
     from cyan.model.role import Role
@@ -354,7 +354,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
 
         await self.bot.delete(f"/guilds/{self.identifier}/roles/{role.identifier}")
 
-    async def announce(self, message: "Message") -> Announcement:
+    async def announce(self, message: "ChannelMessage") -> Announcement:
         """
         异步在当前频道公告指定消息。
 
@@ -365,7 +365,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             以 `Announcement` 类型表示的公告。
         """
 
-        channel = await message.get_channel()
+        channel = await message.get_source()
         content = {"message_id": message.identifier, "channel_id": channel.identifier}
         response = await self.bot.post(f"/guilds/{self.identifier}/announces", content=content)
         announcement = response.json()

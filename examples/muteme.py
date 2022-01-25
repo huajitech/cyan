@@ -8,7 +8,7 @@ from datetime import timedelta
 from cyan import Session, Ticket
 from cyan.event import ChannelMessageReceivedEvent
 from cyan.exception import OpenApiError
-from cyan.model import Message
+from cyan.model import ChannelMessage
 
 session = Session(
     "https://sandbox.api.sgroup.qq.com/",
@@ -17,7 +17,7 @@ session = Session(
 
 
 @session.on(ChannelMessageReceivedEvent)
-async def message_received(data: Message):
+async def message_received(data: ChannelMessage):
     plain_text = data.content.extract_plain_text()
     if plain_text.strip() == "我要自闭":
         member = await data.get_sender_as_member()
