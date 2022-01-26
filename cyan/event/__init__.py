@@ -478,6 +478,7 @@ class EventSource:
                 raise
             await self._connect()
             await self._resume()
+            raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any) -> None:
         for event in self._event_provider.get_by_event_name(event_name):
