@@ -482,7 +482,8 @@ class EventSource:
                     raise _ConnectionResumed
         except ConnectionClosed:
             await asyncio.sleep(5)
-            await self.connect()
+            await self._connect()
+            await self._identify()
             raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any) -> None:
