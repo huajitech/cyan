@@ -473,23 +473,11 @@ class EventSource:
             async for data in self._websocket:
                 content = json.loads(data)
                 await self._handle(content)
-        except ConnectionClosed:
-            try:
-                await self._connect()
-                await self._resume()
-            except Exception:
-                await self._reconnect()
-            raise _ConnectionResumed
-
-    async def _reconnect(self) -> None:
-        while True:
-            try:
-                await self._connect()
-            except Exception:
-                warnings.warn(f"尝试重新连接时出现异常，将于 5s 后再尝试连接：\n{traceback.format_exc()}")
-                await asyncio.sleep(5)
-                continue
-            await self._identify()
+        except ConnectionClosed as ex:
+            if ex.code != 4009:
+                raise
+            await self._connect()
+            await self._resume()
 
     async def _call_events(self, event_name: str, data: Any) -> None:
         for event in self._event_provider.get_by_event_name(event_name):
