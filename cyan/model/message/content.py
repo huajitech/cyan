@@ -83,12 +83,11 @@ def _parse_content(  # type: ignore
     result: List[MessageElement] = []
     if begin:
         result.append(PlainText(begin))
-    last_match = None
+    last_match = matches[0][1]
     for match in matches:
-        if last_match:
-            plain_text_content = content[last_match.end():match[1].start()]
-            if plain_text_content:
-                result.append(PlainText(plain_text_content))
+        plain_text_content = content[last_match.end():match[1].start()]
+        if plain_text_content:
+            result.append(PlainText(plain_text_content))
         element = match[0].parse(bot, _dict, match[1])
         if element:
             result.append(element)
@@ -124,7 +123,23 @@ class PlainText(ContentElement):
         return self._content
 
     def to_content(self) -> str:
-        return self.content
+        content = self.content
+        matches = [
+            match
+            for _type in _element_parsables
+            for match in _type.get_parse_regex().finditer(content)
+        ]
+        if not matches:
+            return content
+        result = content[:matches[0].start()]
+        last_match = matches[0]
+        for match in matches:
+            result += content[last_match.end():match.start()]
+            matched = match.group(0)
+            result += f"{matched[0]} {matched[1:]}"  # Workaround.
+            last_match = match
+        content += self.content[:matches[-1].end()]
+        return result
 
     def __str__(self) -> str:
         return self.content
