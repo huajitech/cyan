@@ -204,7 +204,8 @@ class Event:
         except NotSupported:
             return
         except Exception:
-            raise
+            warnings.warn(f"事件数据处理失败：\n{traceback.format_exc()}")
+            return
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
             argnames = inspect.signature(handler).parameters.keys()
@@ -213,7 +214,7 @@ class Event:
                     name: value for name, value in args.items() if name in argnames  # type: ignore
                 })
             except Exception:
-                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
+                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常：\n{traceback.format_exc()}")
 
 
 class Operation(Enum):
@@ -437,8 +438,7 @@ class EventSource:
                     continue
             return
 
-    def _calculate_intents(self) -> int:
-        intents = self._event_provider.get_intents()
+    def _calculate_intents(self, intents: Set[Intent]) -> int:
         intents_number = 0
         for intent in intents:
             intents_number |= intent.value
@@ -457,9 +457,10 @@ class EventSource:
 
         self.get_event(ReadyEvent).bind(self._on_ready)
         properties: Dict[str, Any] = {}
+        intents = self._event_provider.get_intents()
         payload = {
             "token": self._authorization,
-            "intents": self._calculate_intents(),
+            "intents": self._calculate_intents(intents),
             "properties": properties
         }
         await self.send(Operation.IDENTIFY, payload)
@@ -468,16 +469,21 @@ class EventSource:
         self._session = data.session
 
     async def _receive(self) -> None:
-        async for data in self._websocket:
-            try:
-                content = json.loads(data)
-                await self._handle(content)
-            except ConnectionClosed as ex:
-                if ex.code != 4009:
-                    raise
-                await self._connect()
-                await self._resume()
-                raise _ConnectionResumed
+        try:
+            async for data in self._websocket:
+                try:
+                    content = json.loads(data)
+                    await self._handle(content)
+                except ConnectionClosed as ex:
+                    if ex.code != 4009:
+                        raise
+                    await self._connect()
+                    await self._resume()
+                    raise _ConnectionResumed
+        except ConnectionClosed:
+            await asyncio.sleep(5)
+            await self.connect()
+            raise _ConnectionResumed
 
     async def _call_events(self, event_name: str, data: Any) -> None:
         for event in self._event_provider.get_by_event_name(event_name):
