@@ -481,7 +481,7 @@ class EventSource:
                 await self._reconnect()
             raise _ConnectionResumed
 
-    async def _reconnect(self):
+    async def _reconnect(self) -> None:
         while True:
             try:
                 await self._connect()
