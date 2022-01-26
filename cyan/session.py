@@ -7,9 +7,9 @@ from cyan.bot import Bot, Ticket
 from cyan.event import Event, EventHandler
 
 
-BotStartedHandler = Callable[[Bot], Awaitable[Optional[NoReturn]]]
+SessionHandler = Callable[[Bot], Awaitable[Optional[NoReturn]]]
 """
-机器人启动事件处理器。
+机器人事件处理器。
 """
 
 
@@ -19,7 +19,8 @@ class Session:
     """
 
     _bot: Bot
-    _started_handlers: Set[BotStartedHandler]
+    _started_handlers: Set[SessionHandler]
+    _terminated_handlers: Set[SessionHandler]
 
     def __init__(self, api_base_url: str, ticket: Ticket) -> None:
         """
@@ -32,13 +33,22 @@ class Session:
 
         self._bot = Bot(api_base_url, ticket)
         self._started_handlers = set()
+        self._terminated_handlers = set()
 
-    def on_started(self, func: BotStartedHandler) -> BotStartedHandler:
+    def on_started(self, func: SessionHandler) -> SessionHandler:
         """
-        装饰事件处理器以监听机器人启动事件。
+        装饰事件处理器以监听会话启动事件。
         """
 
         self._started_handlers.add(func)
+        return func
+
+    def on_terminated(self, func: SessionHandler) -> SessionHandler:
+        """
+        装饰事件处理器以监听会话结束事件。
+        """
+
+        self._terminated_handlers.add(func)
         return func
 
     def on(self, _type: Type[Event]) -> Callable[[EventHandler], None]:
@@ -58,13 +68,20 @@ class Session:
 
         asyncio.run(self._run())
 
+    async def _distribute(self, handlers: Set[SessionHandler]):
+        for handler in handlers:
+            try:
+                await handler(self._bot)
+            except Exception:
+                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
+
     async def _run(self) -> None:
-        async with self._bot as bot:
-            source = bot.event_source
-            await source.connect()
-            for handler in self._started_handlers:
-                try:
-                    await handler(bot)
-                except Exception:
-                    warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
-            await source.wait_until_stopped()
+        async with self._bot:
+            await self._distribute(self._started_handlers)
+            source = self._bot.event_source
+            try:
+                await source.connect()
+                await source.wait_until_stopped()
+            except Exception:
+                warnings.warn(f"会话由于异常意外结束：\n{traceback.format_exc()}")
+            await self._distribute(self._terminated_handlers)
