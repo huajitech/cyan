@@ -46,7 +46,7 @@ nightly-build:
   rules:
     - if: $NIGHTLY_BUILD
   script:
-    - poetry install --no-dev
+    - poetry install
     - poetry run python ./build/nightly_version_modifier.py
     - poetry build
   artifacts:
