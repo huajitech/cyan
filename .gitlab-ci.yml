@@ -44,7 +44,7 @@ build:
 nightly-build:
   stage: build
   rules:
-    - if: $CI_NIGHTLY_BUILD
+    - if: $NIGHTLY_BUILD
   script:
     - poetry install --no-dev
     - poetry run python ./build/nightly_version_modifier.py
