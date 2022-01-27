@@ -81,9 +81,9 @@ class Guild(Model, AsyncRenovatable["Guild"]):
             以 `bytes` 类型表示的图像文件内容。
         """
 
-        client = AsyncClient()
-        response = await client.get(self._props["icon"])  # type: ignore
-        return response.content
+        async with AsyncClient() as client:
+            response = await client.get(self._props["icon"])  # type: ignore
+            return response.content
 
     async def get_members(self) -> List["Member"]:
         """

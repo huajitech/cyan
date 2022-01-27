@@ -60,9 +60,9 @@ class User(Model):
             以 `bytes` 类型表示的图像文件内容。
         """
 
-        client = AsyncClient()
-        response = await client.get(self._props["avatar"])  # type: ignore
-        return response.content
+        async with AsyncClient() as client:
+            response = await client.get(self._props["avatar"])  # type: ignore
+            return response.content
 
 
 class ChattableUser(User, ChattableModel[UserMessage]):
