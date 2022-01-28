@@ -83,5 +83,5 @@ class Session:
                 await source.connect()
                 await source.wait_until_stopped()
             except Exception:
-                warnings.warn(f"会话由于异常意外结束：\n{traceback.format_exc()}")
+                warnings.warn(f"会话由于异常意外结束:\n{traceback.format_exc()}")
             await self._distribute(self._terminated_handlers)

@@ -204,7 +204,7 @@ class Event:
         except NotSupported:
             return
         except Exception:
-            warnings.warn(f"事件数据处理失败：\n{traceback.format_exc()}")
+            warnings.warn(f"事件数据处理失败:\n{traceback.format_exc()}")
             return
         for handler in self._handlers:
             args = {"bot": self._bot, "data": event_data}
@@ -214,7 +214,7 @@ class Event:
                     name: value for name, value in args.items() if name in argnames  # type: ignore
                 })
             except Exception:
-                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常：\n{traceback.format_exc()}")
+                warnings.warn(f"调用事件处理器 {handler} 时捕获到异常:\n{traceback.format_exc()}")
 
 
 class Operation(Enum):
