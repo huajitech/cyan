@@ -24,27 +24,27 @@ Cyan 是一个简单易用的 QQ 机器人 Python SDK，基于 Python 的类型�
 
 ## 仓库
 
-HuajiTech GitLab（主仓库）：https://gitlab.huajitech.net/huajitech/cyan
+HuajiTech GitLab（主仓库）: https://gitlab.huajitech.net/huajitech/cyan
 
-GitHub：https://github.com/huajitech/cyan
+GitHub: https://github.com/huajitech/cyan
 
 ## 特性
 
-- 异步操作：使用 `httpx`、`websockets` 异步框架及 Python 的异步特性
-- 化繁为简：简化 API 繁琐的操作，使用户容易上手
-- 类型注释：SDK 100% 使用类型注解，通过 `Pyright` 的**严格**检查，用户可使用支持类型检查的 IDE 减少 Bug 出现的可能性
-- 支持扩展：SDK 开放与 API 交互的函数，用户可通过提供的函数与 API 交互，实现 SDK 未实现的功能
+- 异步操作: 使用 `httpx`、`websockets` 异步框架及 Python 的异步特性
+- 化繁为简: 简化 API 繁琐的操作，使用户容易上手
+- 类型注释: SDK 100% 使用类型注解，通过 `Pyright` 的**严格**检查，用户可使用支持类型检查的 IDE 减少 Bug 出现的可能性
+- 支持扩展: SDK 开放与 API 交互的函数，用户可通过提供的函数与 API 交互，实现 SDK 未实现的功能
 
 ## 如何使用
 
 ### 安装
 
-1. 通过 `pip` 安装 Cyan (release)：
+1. 通过 `pip` 安装 Cyan (release):
     ```bash
     pip install cyansdk
     ```
 
-2. 通过 `pip` 安装 Cyan (nightly)：https://gitlab.huajitech.net/huajitech/cyan/-/packages
+2. 通过 `pip` 安装 Cyan (nightly): https://gitlab.huajitech.net/huajitech/cyan/-/packages
 
 ### 文档
 
@@ -65,7 +65,7 @@ session = Session(
 
 @session.on(ChannelMessageReceivedEvent)
 async def message_received(data: ChannelMessage):
-    await data.reply("收到消息：\n", data)
+    await data.reply("收到消息:\n", data)
 
 session.run()
 ```
