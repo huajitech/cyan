@@ -19,7 +19,7 @@ class ChannelMessage(Message["ChannelMessage"]):
         """
         异步获取消息来源。
 
-        返回：
+        返回:
             以 `TextChannel` 类型表示的源文字频道。
         """
 
@@ -33,7 +33,7 @@ class ChannelMessage(Message["ChannelMessage"]):
         """
         异步获取消息发送者的 `Member` 实例。
 
-        返回：
+        返回:
             以 `Member` 类型表示的消息发送者。
         """
 
@@ -55,7 +55,7 @@ class UserMessage(Message["UserMessage"]):
         """
         异步获取消息来源。
 
-        返回：
+        返回:
             以 `ChattableUser` 类型表示的源用户。
         """
 

@@ -50,7 +50,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
         初始化 `Role` 实例。
 
-        参数：
+        参数:
             - bot: 身份组所属机器人
             - guild: 身份组所属频道
             - props: 属性
@@ -112,7 +112,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
         异步修改身份组名称。
 
-        参数：
+        参数:
             - name: 目标名称
         """
 
@@ -122,7 +122,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
         异步修改身份组颜色。
 
-        参数：
+        参数:
             - color: 目标颜色
         """
 
@@ -146,7 +146,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
         异步添加成员到当前身份组。
 
-        参数：
+        参数:
             - member: 将要添加到当前身份组的成员
         """
 
@@ -167,7 +167,7 @@ class Role(Model, AsyncRenovatable["Role"]):
         """
         异步从当前身份组移除指定成员。
 
-        参数：
+        参数:
             - member: 将要从当前身份组移除的成员
         """
 

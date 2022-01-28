@@ -26,7 +26,7 @@ class Session:
         """
         初始化 `Session` 示例。
 
-        参数：
+        参数:
             - api_base_url: API 地址（包括 schema, host, port）
             - ticket: 票据
         """
@@ -55,7 +55,7 @@ class Session:
         """
         装饰事件处理器以监听指定事件。
 
-        参数：
+        参数:
             - _type: 所需监听事件的类型
         """
 

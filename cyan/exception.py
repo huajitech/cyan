@@ -35,7 +35,7 @@ class OpenApiError(CyanException):
         """
         初始化 `ApiError` 实例。
 
-        参数：
+        参数:
             - status_code: API 状态码
             - code: HTTP 返回码
             - message: 错误消息

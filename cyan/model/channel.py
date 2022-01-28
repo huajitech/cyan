@@ -138,7 +138,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         """
         初始化 `ChannelGroup` 实例。
 
-        参数：
+        参数:
             - bot: 子频道组所属机器人
             - guild: 子频道组所属频道
             - props: 属性
@@ -184,7 +184,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         """
         获取子频道组所有者。
 
-        返回：
+        返回:
             当存在子频道组所有者时，返回以 `Member` 类型表示的当前子频道所有者；
             若不存在，则返回 `None`。
         """
@@ -203,7 +203,7 @@ class ChannelGroup(Model, AsyncRenovatable["ChannelGroup"]):
         """
         获取子频道组的成员。
 
-        返回：
+        返回:
             以 `Channel` 类型表示成员子频道的 `list` 集合。
         """
 
@@ -231,7 +231,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         初始化 `Channel` 实例。
 
-        参数：
+        参数:
             - bot: 子频道所属机器人
             - guild: 子频道所属频道
             - props: 属性
@@ -285,7 +285,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         异步获取子频道所有者。
 
-        返回：
+        返回:
             当存在子频道所有者时，返回以 `Member` 类型表示的当前子频道所有者；
             若不存在，则返回 `None`。
         """
@@ -304,7 +304,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         异步获取子频道附属的子频道组。
 
-        返回：
+        返回:
             以 `Channel` 类型表示的当前子频道附属的子频道组。
         """
 
@@ -314,10 +314,10 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         判断当前子频道是否为指定子频道组的成员。
 
-        参数：
+        参数:
             - parent: 将要用于判断是否为附属子频道的指定子频道组
 
-        返回：
+        返回:
             如果当前子频道为指定子频道组的成员，返回 `True`；否则，返回 `False`。
         """
 
@@ -327,7 +327,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         异步添加管理员到当前子频道。
 
-        参数：
+        参数:
             - member: 将要添加到当前子频道的成员
         """
 
@@ -342,7 +342,7 @@ class Channel(Model, AsyncRenovatable["Channel"]):
         """
         异步从当前子频道移除指定管理员。
 
-        参数：
+        参数:
             - member: 将要从当前子频道移除的管理员
         """
 
@@ -413,10 +413,10 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
         """
         异步在当前子频道公告指定消息。
 
-        参数：
+        参数:
             - message: 将要在当前子频道公告的消息
 
-        返回：
+        返回:
             以 `Announcement` 类型表示的公告。
         """
 
@@ -479,10 +479,10 @@ class ScheduleChannel(AppChannel):
         """
         转换 `AppChannel` 实例为 `ScheduleChannel` 实例。
 
-        参数：
+        参数:
             - channel: 所需转换的应用子频道（应用子频道类型必须为日程提醒）
 
-        返回：
+        返回:
             以 `ScheduleChannel` 类型表示等效于被转换应用子频道的日程子频道。
         """
 
@@ -496,7 +496,7 @@ class ScheduleChannel(AppChannel):
         """
         异步获取子频道当天日程列表。
 
-        返回：
+        返回:
             以 `Schedule` 类型表示日程的 `list` 集合。
         """
 
@@ -511,10 +511,10 @@ class ScheduleChannel(AppChannel):
         """
         异步获取子频道的指定 ID 日程。
 
-        参数：
+        参数:
             - identifier: 日程 ID
 
-        返回：
+        返回:
             以 `Schedule` 类型表示的日程。
         """
 
@@ -534,7 +534,7 @@ class ScheduleChannel(AppChannel):
         """
         异步在当前子频道创建日程。
 
-        参数：
+        参数:
             - name: 日程名称
             - start_time: 日程开始时间
             - end_time: 日程结束时间
@@ -542,7 +542,7 @@ class ScheduleChannel(AppChannel):
             - description: 日程描述
             - destination: 日程指向目标子频道
 
-        返回：
+        返回:
             以 `Schedule` 类型表示的日程。
         """
 
@@ -601,11 +601,11 @@ async def parse(
     """
     解析子频道信息字典为 `Channel` 或 `ChannelGroup` 类型。
 
-    参数：
+    参数:
         - _dict: 将用于解析的字典
         - guild: 目标的附属频道
 
-    返回：
+    返回:
         当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组，否则返回以 `Channel` 类型表示的子频道。
     """
 

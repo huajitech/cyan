@@ -102,7 +102,7 @@ class EventInfo:
         """
         初始化 `EventInfo` 实例。
 
-        参数：
+        参数:
             - name: 事件名称
             - intent: 事件所需注册的 `Intent`
         """
@@ -138,7 +138,7 @@ class Event:
         """
         初始化 `Event` 实例。
 
-        参数：
+        参数:
             - bot: 事件所属机器人
         """
 
@@ -151,7 +151,7 @@ class Event:
         """
         获取当前事件信息。
 
-        返回：
+        返回:
             以 `EventInfo` 类型表示的事件信息。
         """
 
@@ -162,10 +162,10 @@ class Event:
         """
         解析数据。
 
-        参数：
+        参数:
             - data: 将要解析的数据
 
-        返回：
+        返回:
             解析后的数据。
         """
 
@@ -175,7 +175,7 @@ class Event:
         """
         绑定事件处理器。
 
-        参数：
+        参数:
             - handler: 将要绑定的事件处理器
         """
 
@@ -195,7 +195,7 @@ class Event:
         """
         分发事件数据。
 
-        参数：
+        参数:
             - data: 用于解析及分发的数据
         """
 
@@ -318,7 +318,7 @@ class EventSource:
         """
         初始化 `EventSource` 实例。
 
-        参数：
+        参数:
             - bot: 事件源所属机器人
             - authorization: 认证信息
         """
@@ -386,7 +386,7 @@ class EventSource:
         """
         异步发送数据至服务器。
 
-        参数：
+        参数:
             - operation: 操作
             - payload: Payload
         """
@@ -401,10 +401,10 @@ class EventSource:
         """
         获取指定类型的事件。
 
-        参数：
+        参数:
             - _type: 所需获取事件的类型
 
-        返回：
+        返回:
             指定类型事件的实例。
         """
 
@@ -419,7 +419,7 @@ class EventSource:
         """
         装饰事件处理器以监听指定事件。
 
-        参数：
+        参数:
             - _type: 所需监听事件的类型
         """
 

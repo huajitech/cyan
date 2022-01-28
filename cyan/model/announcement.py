@@ -20,7 +20,7 @@ class Announcement(Model):
         """
         初始化 `Announcement` 实例。
 
-        参数：
+        参数:
             - bot: 公告所属机器人
             - props: 属性
         """
@@ -40,7 +40,7 @@ class Announcement(Model):
         """
         异步获取当前公告所属频道。
 
-        返回：
+        返回:
             以 `Guild` 类型表示的公告所属频道。
         """
 
@@ -50,7 +50,7 @@ class Announcement(Model):
         """
         异步获取当前公告所属子频道。
 
-        返回：
+        返回:
             以 `TextChannel` 类型表示的公告所属子频道。
         """
 
@@ -64,7 +64,7 @@ class Announcement(Model):
         """
         异步获取当前公告的消息。
 
-        返回：
+        返回:
             以 `ChannelMessage` 类型表示的公告消息。
         """
 

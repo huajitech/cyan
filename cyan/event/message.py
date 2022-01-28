@@ -47,7 +47,7 @@ class MessageAuditPassedEventData:
         """
         初始化 `MessageAuditPassedEventData` 实例。
 
-        参数：
+        参数:
             - audit_info: 消息审核信息。
         """
 

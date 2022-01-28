@@ -62,7 +62,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         初始化 `Schedule` 实例。
 
-        参数：
+        参数:
             - bot: 日程所属机器人
             - channel: 日程所属频道
             - props: 属性
@@ -139,7 +139,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步获取日程指向的目标子频道。
 
-        返回：
+        返回:
             当存在目标子频道时，返回以 `Channel` 类型表示的子频道；若不存在，则返回 `None`。
         """
 
@@ -160,7 +160,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程名称。
 
-        参数：
+        参数:
             - name: 目标名称
         """
 
@@ -170,7 +170,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程开始时间。
 
-        参数：
+        参数:
             - time: 目标开始时间
         """
 
@@ -180,7 +180,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程结束时间。
 
-        参数：
+        参数:
             - time: 目标结束时间
         """
 
@@ -190,7 +190,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程描述。
 
-        参数：
+        参数:
             - description: 目标描述
         """
 
@@ -200,7 +200,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程指向的目标子频道。
 
-        参数：
+        参数:
             - channel: 目标子频道
         """
 
@@ -210,7 +210,7 @@ class Schedule(Model, AsyncRenovatable["Schedule"]):
         """
         异步修改日程提醒类型。
 
-        参数：
+        参数:
             - remind_type: 目标提醒类型
         """
 

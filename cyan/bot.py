@@ -46,7 +46,7 @@ class Bot:
         """
         初始化 `Bot` 实例。
 
-        参数：
+        参数:
             - api_base_url: API 地址（包括 schema, host, port）
             - ticket: 票据
         """
@@ -71,11 +71,11 @@ class Bot:
         """
         异步向服务器请求 GET 操作。
 
-        参数：
+        参数:
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
 
-        返回：
+        返回:
             以 `Response` 类型表示的服务器响应。
         """
 
@@ -92,12 +92,12 @@ class Bot:
         """
         异步向服务器请求 POST 操作。
 
-        参数：
+        参数:
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
             - content: 请求内容（将序列化为 JSON）
 
-        返回：
+        返回:
             以 `Response` 类型表示的服务器响应。
         """
 
@@ -114,12 +114,12 @@ class Bot:
         """
         异步向服务器请求 PUT 操作。
 
-        参数：
+        参数:
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
             - content: 请求内容（将序列化为 JSON）
 
-        返回：
+        返回:
             以 `Response` 类型表示的服务器响应。
         """
 
@@ -136,12 +136,12 @@ class Bot:
         """
         异步向服务器请求 DELETE 操作。
 
-        参数：
+        参数:
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
             - content: 请求内容（将序列化为 JSON）
 
-        返回：
+        返回:
             以 `Response` 类型表示的服务器响应。
         """
 
@@ -160,12 +160,12 @@ class Bot:
         """
         异步向服务器请求 PATCH 操作。
 
-        参数：
+        参数:
             - path: 请求路径（不包含 API 地址）
             - params: 请求参数
             - content: 请求内容（将序列化为 JSON）
 
-        返回：
+        返回:
             以 `Response` 类型表示的服务器响应。
         """
 
@@ -186,7 +186,7 @@ class Bot:
         """
         异步获取当前机器人用户。
 
-        返回：
+        返回:
             以 `User` 类型表示的当前用户。
         """
 
@@ -201,10 +201,10 @@ class Bot:
         """
         异步获取指定 ID 频道。
 
-        参数：
+        参数:
             - identifier: 频道 ID
 
-        返回：
+        返回:
             以 `Guild` 类型表示的频道。
         """
 
@@ -217,7 +217,7 @@ class Bot:
         """
         异步获取当前机器人的所有频道。
 
-        返回：
+        返回:
             以 `Guild` 类型表示频道的 `list` 集合。
         """
 
@@ -240,10 +240,10 @@ class Bot:
         """
         异步获取指定 ID 子频道。
 
-        参数：
+        参数:
             - identifier: 子频道 ID
 
-        返回：
+        返回:
             以 `Channel` 类型表示的子频道。
         """
 
@@ -258,10 +258,10 @@ class Bot:
         """
         异步获取指定 ID 子频道。
 
-        参数：
+        参数:
             - identifier: 频道组 ID
 
-        返回：
+        返回:
             以 `Channel` 类型表示的子频道。
         """
 

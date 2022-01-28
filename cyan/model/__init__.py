@@ -21,11 +21,11 @@ class ChattableModel(Generic[_T_Message]):
         """
         异步回复指定消息。
 
-        参数：
+        参数:
             - target: 将要被回复的消息
             - message: 回应消息
 
-        返回：
+        返回:
             返回表示以 `Message` 类型表示的所发送消息。
         """
 
@@ -35,10 +35,10 @@ class ChattableModel(Generic[_T_Message]):
         """
         异步发送消息。
 
-        参数：
+        参数:
             - message: 将要发送的消息
 
-        返回：
+        返回:
             当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
             否则，返回表示以 `Message` 类型表示的所发送消息。
         """
@@ -49,10 +49,10 @@ class ChattableModel(Generic[_T_Message]):
         """
         异步获取指定 ID 消息。
 
-        参数：
+        参数:
             - identifier: 消息 ID
 
-        返回：
+        返回:
             以 `Message` 类型表示的消息。
         """
 

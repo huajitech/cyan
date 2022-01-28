@@ -30,7 +30,7 @@ class MessageElement:
         """
         应用消息元素至消息。
 
-        参数：
+        参数:
             - _dict: 将用于发送至 API 的字典。
         """
 
@@ -60,7 +60,7 @@ class ContentElement(MessageElement):
         """
         转换为可被 API 解析的字符串内容。
 
-        返回：
+        返回:
             可被 API 解析的当前实例的等效字符串内容。
         """
 
@@ -76,11 +76,11 @@ MessageElementParser = Callable[[Bot, Dict[str, Any]], Optional[MessageElementPa
 """
 消息元素解析器。
 
-参数：
+参数:
     - `Bot`: 请求解析的机器人实例
     - `Dict[str, Any]`: API 返回字典
 
-返回：
+返回:
     当解析成功时，返回以 `MessageElementParseResult` 类型表示的解析结果；否则，返回 `None`。
 """
 
@@ -107,7 +107,7 @@ class MessageContent(List[MessageElement]):
         """
         提取纯文本。
 
-        返回：
+        返回:
             以 `str` 类型表示消息内容的所有纯文本。
         """
 
@@ -119,7 +119,7 @@ class MessageContent(List[MessageElement]):
         """
         转换为可被 API 解析的字典。
 
-        返回：
+        返回:
             可被 API 解析的当前实例的等效字典。
         """
 
@@ -144,7 +144,7 @@ class MessageAuditInfo(Model):
         """
         初始化 `MessageAuditInfo` 实例。
 
-        参数：
+        参数:
             - bot: 消息审核信息所属机器人
             - props: 属性
         """
@@ -197,7 +197,7 @@ class Message(Model, Generic[_T_Message]):
         """
         初始化 `Message` 实例。
 
-        参数：
+        参数:
             - bot: 消息所属机器人
             - props: 属性
             - content: 消息内容
@@ -247,7 +247,7 @@ class Message(Model, Generic[_T_Message]):
         """
         异步获取消息来源。
 
-        返回：
+        返回:
             以 `ChattableModel[T]` 为基类的 `Model` 消息源。
         """
 
@@ -257,10 +257,10 @@ class Message(Model, Generic[_T_Message]):
         """
         异步回复当前消息。
 
-        参数：
+        参数:
             - message: 回应消息
 
-        返回：
+        返回:
             当消息需被审核时返回以 `MessageAuditInfo` 类型表示的消息审核信息；
             否则，返回表示以 `Message` 类型表示的所发送消息。
         """
@@ -273,11 +273,11 @@ class Message(Model, Generic[_T_Message]):
         """
         解析消息内容字典为 `Message` 实例。
 
-        参数：
+        参数:
             - bot: 请求解析的机器人实例
             - _dict: 将用于解析的消息内容字典
 
-        返回：
+        返回:
             以 `Message` 类型表示的消息。
         """
 
@@ -310,10 +310,10 @@ def create_message_content(*elements: Sendable) -> MessageContent:
     若为 `Iterable[MessageElement]` 则取出其中元素呈现；
     若为 `ChannelMessage` 则获取其中内容并取出其中元素呈现。
 
-    参数：
+    参数:
         - elements: 元素
 
-    返回：
+    返回:
         包含指定元素的 `MessageContent`。
     """
 

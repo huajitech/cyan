@@ -23,7 +23,7 @@ class ParsableContentElement(ContentElement):
         """
         获取解析 `Regex`。
 
-        返回：
+        返回:
             以 `Pattern` 类型表示用于解析当前类型的 `Regex`。
         """
 
@@ -35,12 +35,12 @@ class ParsableContentElement(ContentElement):
         """
         解析匹配结果。
 
-        参数：
+        参数:
             - bot: 请求解析的机器人实例
             - _dict: API 返回字典
             - match: 匹配结果
 
-        返回：
+        返回:
             当解析成功时，返回以 `ContentElement` 类型表示的元素；否则，返回 `None`。
         """
 
@@ -108,7 +108,7 @@ class PlainText(ContentElement):
         """
         初始化 `PlainText` 实例。
 
-        参数：
+        参数:
             - content: 内容
         """
 
@@ -164,7 +164,7 @@ class Mention(ParsableContentElement):
         """
         初始化 `Mention` 实例。
 
-        参数：
+        参数:
             - target: 目标用户
         """
 
@@ -240,7 +240,7 @@ class ChannelLink(ContentElement):
         """
         初始化 `ChannelLink` 实例。
 
-        参数：
+        参数:
             - target: 目标子频道
         """
 

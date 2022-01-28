@@ -20,7 +20,7 @@ class User(Model):
         """
         初始化 `User` 实例。
 
-        参数：
+        参数:
             - bot: 用户所属机器人
             - props: 属性
         """
@@ -56,7 +56,7 @@ class User(Model):
         """
         异步获取用户头像。
 
-        返回：
+        返回:
             以 `bytes` 类型表示的图像文件内容。
         """
 
@@ -78,7 +78,7 @@ class ChattableUser(User, ChattableModel[UserMessage]):
         """
         初始化 `ChattableUser` 实例。
 
-        参数：
+        参数:
             - bot: 用户所属机器人
             - props: 属性
             - dms: `DirectMessageSubject` 实例
@@ -96,10 +96,10 @@ class ChattableUser(User, ChattableModel[UserMessage]):
         """
         异步发送消息。
 
-        参数：
+        参数:
             - message: 将要发送的消息
 
-        返回：
+        返回:
             返回表示以 `UserMessage` 类型表示的所发送消息。
         """
 

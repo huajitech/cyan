@@ -33,7 +33,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         初始化 `Guild` 实例。
 
-        参数：
+        参数:
             - bot: 频道所属机器人
             - props: 属性
         """
@@ -77,7 +77,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取频道头像。
 
-        返回：
+        返回:
             以 `bytes` 类型表示的图像文件内容。
         """
 
@@ -89,7 +89,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的所有成员。
 
-        返回：
+        返回:
             以 `Member` 类型表示成员的 `list` 集合。
         """
 
@@ -120,10 +120,10 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的指定 ID 成员。
 
-        参数：
+        参数:
             - identifier: 成员 ID
 
-        返回：
+        返回:
             以 `Member` 类型表示的成员。
         """
 
@@ -137,7 +137,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的所有子频道。
 
-        返回：
+        返回:
             以 `Channel` 类型表示子频道的 `list` 集合。
         """
 
@@ -153,7 +153,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的所有子频道组。
 
-        返回：
+        返回:
             以 `ChannelGroup` 类型表示子频道组的 `list` 集合。
         """
 
@@ -176,7 +176,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取频道所有者。
 
-        返回：
+        返回:
             当存在频道所有者时，返回以 `Member` 类型表示的当前频道所有者；
             若不存在，则返回 `None`。
         """
@@ -193,7 +193,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的所有身份组。
 
-        返回：
+        返回:
             以 `Role` 类型表示身份组的 `list` 集合。
         """
 
@@ -207,10 +207,10 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的指定 ID 身份组。
 
-        参数：
+        参数:
             - identifier: 身份组 ID
 
-        返回：
+        返回:
             以 `Role` 类型表示的身份组。
         """
 
@@ -229,12 +229,12 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步在当前频道创建身份组。
 
-        参数：
+        参数:
             - name: 身份组名称
             - color: 身份组颜色
             - shown: 身份组是否在成员列表中单独展示
 
-        返回：
+        返回:
             以 `Role` 类型表示的身份组。
         """
 
@@ -261,7 +261,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步禁言当前频道指定时长。
 
-        参数：
+        参数:
             - duration: 禁言时长
         """
 
@@ -272,7 +272,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步禁言当前频道至指定时间。
 
-        参数：
+        参数:
             - time: 禁言终止时间
         """
 
@@ -290,7 +290,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步获取当前频道的所有管理员。
 
-        返回：
+        返回:
             以 `Member` 类型表示管理员的 `list` 集合。
         """
 
@@ -308,7 +308,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步添加管理员到当前频道。
 
-        参数：
+        参数:
             - member: 将要作为频道管理员的成员
         """
 
@@ -323,7 +323,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步从当前频道移除指定管理员。
 
-        参数：
+        参数:
             - member: 将要从当前频道移除的管理员
         """
 
@@ -338,7 +338,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步从当前频道移除指定成员。
 
-        参数：
+        参数:
             - member: 将要从当前频道移除的成员
         """
 
@@ -348,7 +348,7 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步从当前频道移除指定身份组。
 
-        参数：
+        参数:
             - role: 将要从当前频道移除的身份组
         """
 
@@ -358,10 +358,10 @@ class Guild(Model, AsyncRenovatable["Guild"]):
         """
         异步在当前频道公告指定消息。
 
-        参数：
+        参数:
             - message: 将要在当前频道公告的消息
 
-        返回：
+        返回:
             以 `Announcement` 类型表示的公告。
         """
 

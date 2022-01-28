@@ -44,7 +44,7 @@ class ARGB:
         """
         初始化 `ARGB` 实例。
 
-        参数：
+        参数:
             - alpha: Alpha 透明度通道（值范围：0-255）
             - red: 红色通道（值范围：0-255）
             - green: 绿色通道（值范围：0-255）
@@ -63,7 +63,7 @@ class ARGB:
         """
         转换 `ARGB` 为 HEX 颜色值。
 
-        返回：
+        返回:
             以 `int` 形式表达的 HEX 颜色值。
         """
 
@@ -74,10 +74,10 @@ class ARGB:
         """
         转换 `ARGB` HEX 颜色值的 `int` 形式为 `ARGB`。
 
-        参数：
+        参数:
             - number: 以 `int` 形式表达的 HEX 颜色值
 
-        返回：
+        返回:
             `ARGB` 类型表示的 ARGB 颜色值。
         """
 

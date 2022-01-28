@@ -26,7 +26,7 @@ class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):
         """
         初始化 `Member` 实例。
 
-        参数：
+        参数:
             - bot: 成员所属机器人
             - guild: 成员所属频道
             - props: 属性
@@ -84,7 +84,7 @@ class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):
         """
         异步获取当前成员的所有所属身份组。
 
-        返回：
+        返回:
             以 `Role` 类型表示当前成员所属身份组的 `list` 集合。
         """
 
