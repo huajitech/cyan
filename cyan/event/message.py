@@ -1,6 +1,9 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from cyan.event import Event, EventInfo, Intent
+from cyan.model.channel import Channel
+from cyan.model.emoticon import Emoticon, parse as emoticon_parse
+from cyan.model.member import Member
 from cyan.model.message import MessageAuditInfo
 from cyan.model.message.message import ChannelMessage, UserMessage
 
@@ -102,3 +105,83 @@ class MessageAuditRejectedEvent(Event):
 
     async def _parse_data(self, data: Dict[str, Any]) -> MessageAuditInfo:
         return MessageAuditInfo(self._bot, data)
+
+
+class UserExpressionEventData:
+    """
+    用户表态事件数据。
+    """
+
+    _channel: Channel
+    _sender: Member
+    _emoticon: Union[Emoticon, str, None]
+
+    def __init__(
+        self,
+        channel: Channel,
+        sender: Member,
+        emoticon: Union[Emoticon, str, None]
+    ) -> None:
+        """
+        初始化 `UserExpressionEventData` 实例。
+        """
+
+        self._channel = channel
+        self._sender = sender
+        self._emoticon = emoticon
+
+    @property
+    def channel(self):
+        """
+        频道。
+        """
+
+        return self._channel
+
+    @property
+    def sender(self):
+        """
+        发送者。
+        """
+
+        return self._sender
+
+    @property
+    def emoticon(self):
+        """
+        表情。
+        """
+
+        return self._emoticon
+
+
+class _UserExpressionEvent(Event):
+    async def _parse_data(self, data: Dict[str, Any]) -> UserExpressionEventData:
+        channel = await self._bot.get_channel(data["channel_id"])
+        emoticon = emoticon_parse(data["emoji"])
+        sender = await channel.guild.get_member(data["user_id"])
+        return UserExpressionEventData(channel, sender, emoticon)
+
+
+class UserExpressionReceivedEvent(_UserExpressionEvent):
+    """
+    当接收到用户发送表情表态时触发。
+
+    触发时回调的数据类型为 `UserExpressionEventData`。
+    """
+
+    @staticmethod
+    def get_event_info() -> EventInfo:
+        return EventInfo("MESSAGE_REACTION_ADD", Intent.EXPRESSION)
+
+
+class UserExpressionRecalledEvent(_UserExpressionEvent):
+    """
+    当用户撤回表情表态时触发。
+
+    触发时回调的数据类型为 `UserExpressionEventData`。
+    """
+
+    @staticmethod
+    def get_event_info() -> EventInfo:
+        return EventInfo("MESSAGE_REACTION_REMOVE", Intent.EXPRESSION)

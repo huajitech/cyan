@@ -606,7 +606,7 @@ async def parse(
         - guild: 目标的附属频道
 
     返回:
-        当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组，否则返回以 `Channel` 类型表示的子频道。
+        当子频道类型为子频道组时返回以 `ChannelGroup` 类型表示的子频道组；否则返回以 `Channel` 类型表示的子频道。
     """
 
     channel_type = _CHANNEL_TYPE_MAPPING.get(_dict["type"], UnknownChannel)

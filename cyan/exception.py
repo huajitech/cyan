@@ -22,6 +22,14 @@ class InvalidTargetError(CyanException):
     pass
 
 
+class NotSupportedError(CyanException):
+    """
+    当操作不支持时抛出。
+    """
+
+    pass
+
+
 class OpenApiError(CyanException):
     """
     当 OpenAPI 返回错误时抛出。
