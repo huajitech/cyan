@@ -1,5 +1,4 @@
-from typing import Any, Dict, Union
-from cyan.bot import Bot
+from typing import Any, Dict, NoReturn, Union
 from cyan.exception import NotSupportedError
 from cyan.model import Model
 
@@ -11,7 +10,7 @@ class Emoticon(Model):
 
     _identifier: str
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         初始化 `Emoticon` 实例。
 
@@ -26,7 +25,7 @@ class Emoticon(Model):
         return self._identifier
 
     @property
-    def bot(self) -> Bot:
+    def bot(self) -> NoReturn:
         """
         注意:
             `Emoticon` 实例不储存 `Bot` 信息。

@@ -131,7 +131,7 @@ class UserExpressionEventData:
         self._emoticon = emoticon
 
     @property
-    def channel(self):
+    def channel(self) -> Channel:
         """
         频道。
         """
@@ -139,7 +139,7 @@ class UserExpressionEventData:
         return self._channel
 
     @property
-    def sender(self):
+    def sender(self) -> Member:
         """
         发送者。
         """
@@ -147,7 +147,7 @@ class UserExpressionEventData:
         return self._sender
 
     @property
-    def emoticon(self):
+    def emoticon(self) -> Union[Emoticon, str, None]:
         """
         表情。
         """
