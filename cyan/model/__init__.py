@@ -10,7 +10,36 @@ if TYPE_CHECKING:
 _T_Message = TypeVar("_T_Message", bound="Message")  # type: ignore
 
 
-class ChattableModel(Generic[_T_Message]):
+class Model:
+    """
+    Model。
+    """
+
+    @property
+    @abstractmethod
+    def bot(self) -> Bot:
+        """
+        `Model` 所属机器人。
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def identifier(self) -> str:
+        """
+        `Model` ID。
+        """
+        raise NotImplementedError
+
+    def __eq__(self, obj: Any) -> bool:
+        _type = type(self)
+        return isinstance(obj, _type) and obj.bot == self.bot and obj.identifier == self.identifier
+
+    def __str__(self) -> str:
+        return f"{type(self).__name__}({self.identifier})"
+
+
+class ChattableModel(Model, Generic[_T_Message]):
     """
     可聊天 `Model`。
 
@@ -57,35 +86,6 @@ class ChattableModel(Generic[_T_Message]):
         """
 
         raise NotImplementedError
-
-
-class Model:
-    """
-    Model。
-    """
-
-    @property
-    @abstractmethod
-    def bot(self) -> Bot:
-        """
-        `Model` 所属机器人。
-        """
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def identifier(self) -> str:
-        """
-        `Model` ID。
-        """
-        raise NotImplementedError
-
-    def __eq__(self, obj: Any) -> bool:
-        _type = type(self)
-        return isinstance(obj, _type) and obj.bot == self.bot and obj.identifier == self.identifier
-
-    def __str__(self) -> str:
-        return f"{type(self).__name__}({self.identifier})"
 
 
 from .announcement import *
