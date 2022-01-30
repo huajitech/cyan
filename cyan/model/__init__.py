@@ -99,3 +99,4 @@ from .message import MessageContent as MessageContent
 from .message import MessageAuditInfo as MessageAuditInfo
 from .message import MessageElement as MessageElement
 from .message.message import *
+from .emoticon import *
