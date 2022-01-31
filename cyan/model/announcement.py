@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING, Any, Dict
+
 from cyan.bot import Bot
 from cyan.model import Model
 
 if TYPE_CHECKING:
-    from cyan.model.message.message import ChannelMessage
     from cyan.model.channel import TextChannel
     from cyan.model.guild import Guild
+    from cyan.model.message.message import ChannelMessage
 
 
 class Announcement(Model):

@@ -23,6 +23,7 @@ frozendict = "^2.2.1"
 flake8 = "^4.0.1"
 pyright = "^0.0.13"
 toml = "^0.10.2"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -2,17 +2,17 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from cyan.constant import DEFAULT_ID
 from cyan.bot import Bot
+from cyan.constant import DEFAULT_ID
 from cyan.exception import InvalidOperationError, OpenApiError
+from cyan.model import ChattableModel, Model
 from cyan.model.announcement import Announcement
 from cyan.model.guild import Guild
-from cyan.model import ChattableModel, Model
 from cyan.model.member import Member
 from cyan.model.message.message import ChannelMessage
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.role import DefaultRoleId
-from cyan.model.schedule import Schedule, RemindType
+from cyan.model.schedule import RemindType, Schedule
 from cyan.util._enum import get_enum_key
 
 
@@ -397,7 +397,7 @@ class TextChannel(Channel, ChattableModel[ChannelMessage]):
         message: MessageContent,
         replying_target: Optional[ChannelMessage]
     ) -> Union[MessageAuditInfo, ChannelMessage]:
-        from cyan.model.message import MessageContent, MessageAuditInfo
+        from cyan.model.message import MessageAuditInfo, MessageContent
 
         content = MessageContent(message).to_dict()
         if replying_target:

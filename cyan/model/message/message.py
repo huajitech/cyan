@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Any, Dict
 
 from cyan.bot import Bot
-from cyan.model.message import Message
 from cyan.model._dms import DirectMessageSubject
+from cyan.model.message import Message
 
 if TYPE_CHECKING:
-    from cyan.model.member import Member
     from cyan.model.channel import TextChannel
+    from cyan.model.member import Member
     from cyan.model.user import ChattableUser
 
 

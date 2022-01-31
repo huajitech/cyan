@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 from cyan.bot import Bot
 from cyan.color import ARGB
 from cyan.exception import InvalidOperationError
-from cyan.model.guild import Guild
 from cyan.model import Model
+from cyan.model.guild import Guild
 from cyan.model.renovatable import AsyncRenovatable
 
 if TYPE_CHECKING:

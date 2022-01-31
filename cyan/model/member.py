@@ -3,13 +3,13 @@ from typing import Any, Dict, List
 
 from cyan.bot import Bot
 from cyan.model import ChattableModel
+from cyan.model._dms import DirectMessageSubject
 from cyan.model.guild import Guild
 from cyan.model.message import Sendable
 from cyan.model.message.message import UserMessage
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.role import Role
 from cyan.model.user import ChattableUser, User
-from cyan.model._dms import DirectMessageSubject
 
 
 class Member(User, AsyncRenovatable["Member"], ChattableModel[UserMessage]):

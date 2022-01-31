@@ -2,7 +2,8 @@ from typing import Any, Dict, Union
 
 from cyan.event import Event, EventInfo, Intent
 from cyan.model.channel import Channel
-from cyan.model.emoticon import Emoticon, parse as emoticon_parse
+from cyan.model.emoticon import Emoticon
+from cyan.model.emoticon import parse as emoticon_parse
 from cyan.model.member import Member
 from cyan.model.message import MessageAuditInfo
 from cyan.model.message.message import ChannelMessage, UserMessage

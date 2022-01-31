@@ -6,7 +6,6 @@ from typing import Awaitable, Callable, NoReturn, Optional, Set, Type
 from cyan.bot import Bot, Ticket
 from cyan.event import Event, EventHandler
 
-
 SessionHandler = Callable[[Bot], Awaitable[Optional[NoReturn]]]
 """
 机器人事件处理器。

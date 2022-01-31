@@ -1,20 +1,18 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from typing import (TYPE_CHECKING, Any, Callable, Dict, Generic, Iterable,
+                    List, Optional, TypeVar, Union)
+
 from frozendict import frozendict
-from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, Generic,
-    Iterable, TypeVar, Union, List, Optional
-)
 
 from cyan.bot import Bot
-from cyan.model.guild import Guild
 from cyan.model import ChattableModel, Model
-
+from cyan.model.guild import Guild
 
 if TYPE_CHECKING:
-    from cyan.model.user import User
     from cyan.model.channel import TextChannel
+    from cyan.model.user import User
 
 
 _T_Message = TypeVar("_T_Message", bound="Message")

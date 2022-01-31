@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Generic, Union, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
 
 from cyan.bot import Bot
 
@@ -89,14 +89,14 @@ class ChattableModel(Model, Generic[_T_Message]):
 
 
 from .announcement import *
-from .user import *
+from .channel import *
+from .emoticon import *
 from .guild import *
 from .member import *
-from .role import *
-from .channel import *
-from .schedule import *
-from .message import MessageContent as MessageContent
 from .message import MessageAuditInfo as MessageAuditInfo
+from .message import MessageContent as MessageContent
 from .message import MessageElement as MessageElement
 from .message.message import *
-from .emoticon import *
+from .role import *
+from .schedule import *
+from .user import *

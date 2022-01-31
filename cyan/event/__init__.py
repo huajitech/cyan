@@ -3,23 +3,21 @@ import inspect
 import json
 import traceback
 import warnings
+from abc import abstractmethod
 from asyncio.tasks import Task
 from enum import Enum
-from abc import abstractmethod
-from typing import (
-    TYPE_CHECKING, Any, Awaitable, Callable,
-    Dict, NoReturn, Optional, Set, Type, Union
-)
+from typing import (TYPE_CHECKING, Any, Awaitable, Callable, Dict, NoReturn,
+                    Optional, Set, Type, Union)
+
 from websockets.client import connect
 from websockets.exceptions import ConnectionClosed
 from websockets.legacy.client import WebSocketClientProtocol
 
 from cyan.exception import InvalidOperationError
 
-
 if TYPE_CHECKING:
-    from cyan.event._connection import ReadyEventData
     from cyan.bot import Bot
+    from cyan.event._connection import ReadyEventData
 
 
 EventHandler = Union[

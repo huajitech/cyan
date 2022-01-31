@@ -1,4 +1,5 @@
 from typing import Any, Dict, NoReturn, Union
+
 from cyan.exception import NotSupportedError
 from cyan.model import Model
 

@@ -1,15 +1,12 @@
 import re
-from re import Match, Pattern
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, List, Optional, Type, TypeVar, Dict
+from re import Match, Pattern
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar
 
 from cyan.bot import Bot
-from cyan.model.message import (
-    ContentElement,
-    MessageElement,
-    MessageElementParseResult,
-    message_element_parser
-)
+from cyan.model.message import (ContentElement, MessageElement,
+                                MessageElementParseResult,
+                                message_element_parser)
 
 if TYPE_CHECKING:
     from cyan.model.channel import Channel

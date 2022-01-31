@@ -8,9 +8,8 @@ from cyan.model import Model
 from cyan.model.renovatable import AsyncRenovatable
 from cyan.model.user import User
 
-
 if TYPE_CHECKING:
-    from cyan.model.channel import ScheduleChannel, Channel
+    from cyan.model.channel import Channel, ScheduleChannel
 
 
 class RemindType(Enum):

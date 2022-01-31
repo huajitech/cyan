@@ -2,15 +2,16 @@ from dataclasses import dataclass
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 from urllib.parse import urljoin
+
 from httpx import AsyncClient, Response
 
-from cyan.exception import OpenApiError, InvalidTargetError
+from cyan.exception import InvalidTargetError, OpenApiError
 
 if TYPE_CHECKING:
     from cyan.event import EventSource
-    from cyan.model.user import User
-    from cyan.model.guild import Guild
     from cyan.model.channel import Channel, ChannelGroup
+    from cyan.model.guild import Guild
+    from cyan.model.user import User
 
 # 参考 https://bot.q.qq.com/wiki/develop/api/openapi/user/guilds.html。
 _GUILD_QUERY_LIMIT: int = 100
